@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GTA V — 100% Completion Tracker</title>
+<style>
+:root{
+  --navy:#0b0f1a;
+  --navy2:#111729;
+  --panel:#151c2f;
+  --panel2:#1b2340;
+  --border:#2a3454;
+  --text:#e8ecf7;
+  --dim:#8b93ac;
+  --franklin:#3ddc84;
+  --michael:#3d9bdc;
+  --trevor:#dc7a3d;
+  --gold:#e0b64a;
+  --plat:#c9d6ff;
+  --danger:#e0546a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:radial-gradient(1200px 800px at 20% -10%, #16203c 0%, var(--navy) 55%);
+  color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  min-height:100vh;
+}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 80px;}
+
+.hero{
+  background:linear-gradient(135deg,var(--panel) 0%, var(--panel2) 100%);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px 22px 18px;
+  margin-bottom:16px;
+  box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
+}
+.hero h1{
+  margin:0 0 4px;
+  font-size:22px;
+  letter-spacing:.5px;
+  background:linear-gradient(90deg,var(--franklin),var(--michael),var(--trevor));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:800;
+}
+.hero .sub{color:var(--dim);font-size:13px;margin-bottom:16px;}
+
+.progress-outer{
+  background:#0a0e18;
+  border:1px solid var(--border);
+  border-radius:999px;
+  height:22px;
+  overflow:hidden;
+  position:relative;
+}
+.progress-inner{
+  height:100%;
+  background:linear-gradient(90deg,var(--franklin),var(--michael),var(--trevor));
+  transition:width .3s ease;
+  border-radius:999px;
+}
+.progress-label{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:700;letter-spacing:.5px;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+}
+.stats-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.stat{
+  flex:1;min-width:110px;
+  background:var(--navy2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:8px 10px;
+}
+.stat .n{font-size:18px;font-weight:800;}
+.stat .l{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
+
+.controls{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;
+}
+.controls input[type=text]{
+  flex:1;min-width:160px;
+  background:var(--navy2);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:9px 12px;
+  border-radius:9px;
+  font-size:13px;
+  outline:none;
+}
+.controls input[type=text]:focus{border-color:var(--michael);}
+.btn{
+  background:var(--navy2);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:9px 13px;
+  border-radius:9px;
+  font-size:12.5px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:.15s;
+}
+.btn:hover{border-color:var(--michael);background:#1c2744;}
+.btn.active{background:var(--michael);border-color:var(--michael);color:#06101f;font-weight:700;}
+.btn.danger:hover{border-color:var(--danger);}
+
+.chapter{
+  margin-bottom:14px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--panel);
+}
+.chapter-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  cursor:pointer;
+  user-select:none;
+  background:linear-gradient(90deg,var(--panel2),var(--panel));
+}
+.chapter-head:hover{background:#1c2744;}
+.chapter-title{font-size:14.5px;font-weight:800;letter-spacing:.3px;}
+.chapter-title .num{color:var(--gold);margin-right:8px;}
+.chapter-sub{font-size:11px;color:var(--dim);margin-top:2px;font-weight:400;}
+.chapter-meta{display:flex;align-items:center;gap:10px;}
+.chapter-bar{
+  width:70px;height:6px;border-radius:99px;background:#0a0e18;overflow:hidden;border:1px solid var(--border);
+}
+.chapter-bar-inner{height:100%;background:linear-gradient(90deg,var(--franklin),var(--michael));}
+.chapter-count{font-size:11px;color:var(--dim);min-width:48px;text-align:right;}
+.chevron{transition:transform .2s;color:var(--dim);}
+.chapter.open .chevron{transform:rotate(90deg);}
+
+.chapter-body{display:none;padding:4px 12px 12px;}
+.chapter.open .chapter-body{display:block;}
+
+.part-block{margin-top:10px;}
+.part-label{
+  font-size:11px;font-weight:700;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.8px;
+  padding:6px 6px 4px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:4px;
+}
+
+.task{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:9px 8px;
+  border-radius:9px;
+  transition:.12s;
+}
+.task:hover{background:#182036;}
+.task.done{opacity:.45;}
+.task.flagged{background:rgba(224,182,74,.07);}
+
+.check{
+  flex:0 0 auto;
+  width:20px;height:20px;
+  border-radius:6px;
+  border:2px solid var(--border);
+  margin-top:2px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.12s;
+  background:var(--navy2);
+}
+.check.on{
+  background:linear-gradient(135deg,var(--franklin),var(--michael));
+  border-color:transparent;
+}
+.check svg{width:12px;height:12px;display:none;stroke:#06101f;stroke-width:3;}
+.check.on svg{display:block;}
+
+.task-main{flex:1;min-width:0;}
+.task-name{
+  font-size:13.5px;font-weight:600;
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.task-name.done{text-decoration:line-through;}
+.char-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;}
+.char-F{background:var(--franklin);}
+.char-M{background:var(--michael);}
+.char-T{background:var(--trevor);}
+.char-{background:var(--dim);}
+
+.badge{
+  font-size:9px;font-weight:700;
+  padding:2px 6px;
+  border-radius:5px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  border:1px solid var(--border);
+  color:var(--dim);
+}
+.badge.opt{color:var(--gold);border-color:rgba(224,182,74,.4);background:rgba(224,182,74,.08);}
+.badge.cat{color:var(--plat);border-color:rgba(201,214,255,.3);background:rgba(201,214,255,.06);}
+
+.task-loc{font-size:11.5px;color:var(--dim);margin-top:2px;}
+.task-note{font-size:11.5px;color:#a9b1c9;margin-top:3px;line-height:1.4;}
+
+.flag-btn{
+  flex:0 0 auto;
+  width:26px;height:26px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  background:var(--navy2);
+  color:var(--dim);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  transition:.12s;
+}
+.flag-btn:hover{border-color:var(--gold);}
+.flag-btn.on{background:rgba(224,182,74,.15);border-color:var(--gold);color:var(--gold);}
+
+.empty-msg{
+  text-align:center;color:var(--dim);padding:40px 20px;font-size:13px;
+}
+
+.legend{
+  display:flex;gap:14px;flex-wrap:wrap;margin:14px 2px 0;font-size:11px;color:var(--dim);
+}
+.legend span{display:flex;align-items:center;gap:5px;}
+.legend .dot{width:8px;height:8px;border-radius:50%;}
+
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+
+@media(max-width:520px){
+  .hero h1{font-size:18px;}
+  .task-name{font-size:12.5px;}
+  .chapter-title{font-size:13px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>GTA V — 100% Total Completion Tracker</h1>
+    <div class="sub">Based on Jimbatron's GTAForums completion guide · <span id="totalCount">0</span> tasks tracked</div>
+    <div class="progress-outer">
+      <div class="progress-inner" id="progressBar" style="width:0%"></div>
+      <div class="progress-label" id="progressLabel">0 / 0 · 0%</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="n" id="statDone">0</div><div class="l">Completed</div></div>
+      <div class="stat"><div class="n" id="statFlagged">0</div><div class="l">Flagged for later</div></div>
+      <div class="stat"><div class="n" id="statRemain">0</div><div class="l">Remaining</div></div>
+    </div>
+    <div class="controls">
+      <input type="text" id="searchBox" placeholder="Search tasks by name or location…">
+      <button class="btn" id="filterAll">All</button>
+      <button class="btn" id="filterFlagged">Flagged</button>
+      <button class="btn" id="filterRemaining">Remaining</button>
+      <button class="btn danger" id="resetBtn">Reset progress</button>
+    </div>
+    <div class="legend">
+      <span><span class="dot char-F"></span>Franklin</span>
+      <span><span class="dot char-M"></span>Michael</span>
+      <span><span class="dot char-T"></span>Trevor</span>
+      <span><span class="dot" style="background:var(--gold)"></span>Optional / not required for 100%</span>
+    </div>
+  </div>
+
+  <div id="chapterList"></div>
+  <div class="empty-msg" id="emptyMsg" style="display:none;">No tasks match your filter.</div>
+
+</div>
+
+<script>
+// ---------- TASK DATA ----------
+// [chapter, chapterTitle, part, character, category, name, location, note, optional]
+const RAW = [
+[1,"Back in the Game","A","M","Mission","Prologue","North Yankton","Autostarts; gold medal awarded automatically",0],
+[1,"Back in the Game","A","F","Mission","Franklin and Lamar","Del Perro Beach","Autostarts",0],
+[1,"Back in the Game","A","F","Misc","Steal and Store a Bullet","Simeon's Dealership, Pillbox Hill","Do this before starting Repossession — useful for races/stunt jumps later",1],
+[1,"Back in the Game","A","F","Mission","Repossession","Simeon's Dealership, Pillbox Hill","Has an easy stunt jump built in",0],
+[1,"Back in the Game","A","F","Misc","Stunt Jump #1","End of Adam's Apple Boulevard","Take during Repossession",1],
+[1,"Back in the Game","A","F","Strangers & Freaks","Pulling Favours","Forum Drive, Strawberry","Tonya",0],
+[1,"Back in the Game","A","F","Random Event","Getaway Driver","Dollar Pills, Strawberry","Unlocks Patrick McReary as a Heist Member",0],
+[1,"Back in the Game","A","M","Mission","Complications","Simeon's Dealership, Pillbox Hill","Switches control to Michael — remain as him",0],
+[1,"Back in the Game","A","M","Strangers & Freaks","Grass Roots - Michael","Legion Square","Switch to Franklin after completing",1],
+[1,"Back in the Game","A","F","Mission","Chop","Forum Drive, Strawberry","",0],
+[1,"Back in the Game","A","F","Random Event","Mugging 1","Strawberry Avenue, Chamberlain Hills","",0],
+[1,"Back in the Game","A","F","Strangers & Freaks","Shift Work","Power Street, Pillbox Hill","",0],
+[1,"Back in the Game","A","F","Hobbies & Pastimes","Street Race \"South Los Santos\"","Hao's races","Intro'd via the Shift Work S&F encounter",0],
+[1,"Back in the Game","A","F","Random Event","ATM Robbery","Elgin Avenue, Pillbox Hill","",0],
+
+[1,"Back in the Game","B","F","Misc","Special Character - Graham the Zombie","Vinewood Boulevard","",1],
+[1,"Back in the Game","B","F","Strangers & Freaks","Father/Son","Eclipse Boulevard, West Vinewood","Switch to Michael after for a longer cutscene in next mission",0],
+[1,"Back in the Game","B","M","Mission","Complications (cont.)","Michael's Safe House, Rockford Hills","Switches control to Franklin — remain as him",0],
+[1,"Back in the Game","B","F","Misc","Special Character - Impotent Rage","Eclipse Boulevard","",1],
+[1,"Back in the Game","B","F","Strangers & Freaks","Paparazzo - The Sex Tape","South Mo Milton Drive","",0],
+[1,"Back in the Game","B","F","Mission","The Long Stretch","Forum Drive, Strawberry","",0],
+[1,"Back in the Game","B","F","Random Event","Security Van 1","Innocence Boulevard, Chamberlain Hills","",0],
+[1,"Back in the Game","B","F","Hobbies & Pastimes","Street Race \"City Circuit\"","Clinton Avenue, Downtown Vinewood","",0],
+[1,"Back in the Game","B","F","Random Event","Construction Accident","Calais Avenue, Little Seoul","After completion, switch to Michael",0],
+[1,"Back in the Game","B","M","Mission","Marriage Counselling","Michael's Safe House, Rockford Hills","",0],
+[1,"Back in the Game","B","M","Random Event","Escape Paparazzi","Vinewood Boulevard","",0],
+[1,"Back in the Game","B","M","Mission","Friend Request","Lester's House, El Burro Heights","Switch to Franklin when complete",0],
+
+[1,"Back in the Game","C","F","Hobbies & Pastimes","Shooting Range - Gold Medals on all Challenges","Ammunation, Pillbox Hill","",0],
+[1,"Back in the Game","C","F","Strangers & Freaks","Pulling Another Favor","Forum Drive, Strawberry","",0],
+[1,"Back in the Game","C","F","Random Event","Simeon Yaterian","Simeon's Dealership, Pillbox Hill","MISSABLE — do before the Jewel Store heist or it's gone",0],
+[1,"Back in the Game","C","F","Hobbies & Pastimes","Street Race \"Airport\"","Greenwich Parkway, LSIA","",0],
+[1,"Back in the Game","C","F","Random Event","Bike Thief City 1","Little Bighorn Drive, Rancho","Switch to Michael when complete",0],
+[1,"Back in the Game","C","M","Mission","Daddy's Little Girl","Michael's Safe House, Rockford Hills","",0],
+[1,"Back in the Game","C","M","Misc","Family Mission \"The Good Husband\"","Triggered by phone call from Amanda","Timing may shift; complete when the call comes",1],
+[1,"Back in the Game","C","M","Strangers & Freaks","Exercising Demons - Michael","Bay City Incline, Del Perro","",1],
+[1,"Back in the Game","C","M","Misc","Dr Friedlander Session \"Chaos\"","Great Ocean Highway, Del Perro","",1],
+[1,"Back in the Game","C","M","Misc","Special Character - Jesse","Red Desert Avenue, Del Perro Beach","",1],
+[1,"Back in the Game","C","M","Misc","Use a Fairground Ride","Del Perro Pier","Switch to Franklin when finished",1],
+
+[1,"Back in the Game","D","F","Strangers & Freaks","Pulling Favors Again","Call Tonya to trigger","",0],
+[1,"Back in the Game","D","F","Random Event","Security Van 4","Innocence Boulevard, Little Seoul","",0],
+[1,"Back in the Game","D","F","Hobbies & Pastimes","Street Race \"Freeway\"","Olympic Freeway, La Mesa","",0],
+[1,"Back in the Game","D","F","Strangers & Freaks","Still Pulling Favors","Call Tonya to trigger","Switch to Michael when done",0],
+[1,"Back in the Game","D","M","Random Event","Mugging 2","Meteor Street, Hawick","",0],
+[1,"Back in the Game","D","M","Mission","Casing the Jewel Store","Darnell Bros, La Mesa","",0],
+[1,"Back in the Game","D","M","Mission","BZ Gas Grenades","Los Santos Freeway","",0],
+[1,"Back in the Game","D","M","Random Event","Luring Girl into Alley","Supply Street, La Mesa","",0],
+[1,"Back in the Game","D","M","Mission","Bugstars Equipment","Elysian Island","",0],
+[1,"Back in the Game","D","M","Mission","The Jewel Store Job - Smart Approach","Darnell Bros, La Mesa","Recommended: Patrick McReary gunman, Karim Denz driver, Rickie Lukens hacker. Auto-switches to Franklin after",0],
+[1,"Back in the Game","D","F","Hobbies & Pastimes","Get a Private Dance","Vanilla Unicorn, Strawberry","",0],
+[1,"Back in the Game","D","F","Misc","Complete a Booty Call","","",1],
+
+[2,"Old Friends and New Calamities","A","M","Mission","Mr. Philips","Michael's Safe House, Rockford Hills","Save your game before starting",0],
+[2,"Old Friends and New Calamities","A","T","Misc","Stunt Jump #2","North Calafia Way","During Mr. Philips",1],
+[2,"Old Friends and New Calamities","A","T","Random Event","Drunk Driver 2","Alhambra Drive, Sandy Shores","Take couple to Altruist Camp — counts 2 of 4 toward Altruist Acolyte special event",0],
+[2,"Old Friends and New Calamities","A","T","Random Event","Crash Rescue","Great Ocean Highway, north of Mount Chiliad","Unlocks Taliana Martinez as a Heist Member",0],
+[2,"Old Friends and New Calamities","A","T","Mission","Trevor Philips Industries","Yellow Jack Inn, Grand Senora Desert","",0],
+[2,"Old Friends and New Calamities","A","T","Misc","Fully Mod Carbine Rifle + buy grenade launcher ammo","Algonquin Boulevard, Sandy Shores","Unlocks Pimp My Sidearm; helps gold medal on next mission",1],
+[2,"Old Friends and New Calamities","A","T","Mission","Nervous Ron","Trevor's Trailer, Sandy Shores","",0],
+[2,"Old Friends and New Calamities","A","T","Misc","Bridges #1-6 flown under","3 in Raton Canyon, 3 in Lago Zancudo","During Nervous Ron, also gold medal req",1],
+[2,"Old Friends and New Calamities","A","T","Misc","Purchase Property: McKenzie Field Hangar (1 of 5)","McKenzie Field, Grapeseed","Contributes to TP Industries Arms Race",1],
+[2,"Old Friends and New Calamities","A","T","Hobbies & Pastimes","Arms Traffic - Air 1","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","A","T","Hobbies & Pastimes","Arms Traffic - Ground 1","McKenzie Field, Grapeseed","",1],
+
+[2,"Old Friends and New Calamities","B","T","Strangers & Freaks","Special Bonds","Eclipse Boulevard, West Vinewood","Cutscene only; unlocks Bail Bonds + Wanted: Alive or Alive",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Bail Bonds - Quarry","Davis Quartz, Blaine County","Return target alive to unlock Wanted: Alive or Alive",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Air 2","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Ground 2","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","B","T","Random Event","Drug Shootout","Braddock Pass, Mount Chiliad","",0],
+[2,"Old Friends and New Calamities","B","T","Random Event","Countryside Robbery","Braddock Pass, Mount Chiliad","Sleep or reload some distance away if it doesn't spawn",0],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Bail Bonds - Farm","South of Route 68, Great Chaparral","",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Air 3","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Ground 3","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","B","T","Random Event","Chase Thieves Country 1","Grapeseed Mainstreet, Grapeseed","",0],
+[2,"Old Friends and New Calamities","B","T","Misc","Special Character - Clinton","Marina Drive, Sandy Shores","",1],
+[2,"Old Friends and New Calamities","B","T","Strangers & Freaks","Target Practice","Marina Drive, Sandy Shores","Unlocks Hunting + contributes to Multi-Disciplined",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Air 4","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","B","T","Hobbies & Pastimes","Arms Traffic - Ground 4","McKenzie Field, Grapeseed","",1],
+
+[2,"Old Friends and New Calamities","C","T","Random Event","Arrests 1","O'Neil Way, Grapeseed","",0],
+[2,"Old Friends and New Calamities","C","T","Misc","Receive Services from a Prostitute","Sandy Shores, Blaine County","Night only; sleep to advance time if needed",1],
+[2,"Old Friends and New Calamities","C","T","Strangers & Freaks","Rampage One - Rednecks","Marina Drive, Sandy Shores","Contributes to Red Mist",1],
+[2,"Old Friends and New Calamities","C","T","Random Event","Abandoned Vehicle 1","Sandy Shores Airfield, Grand Senora Desert","",0],
+[2,"Old Friends and New Calamities","C","T","Mission","Crystal Maze","Yellow Jack Inn, Grand Senora Desert","",0],
+[2,"Old Friends and New Calamities","C","T","Hobbies & Pastimes","Arms Traffic - Air 5","McKenzie Field, Grapeseed","",1],
+[2,"Old Friends and New Calamities","C","T","Hobbies & Pastimes","Arms Traffic - Ground 5","McKenzie Field, Grapeseed","Completes TP Industries Arms Race",1],
+[2,"Old Friends and New Calamities","C","T","Random Event","Security Van 3","Paleto Boulevard, Paleto Bay","",0],
+[2,"Old Friends and New Calamities","C","T","Strangers & Freaks","Fair Game","Procopio Promenade, Paleto Bay","Unlocks Hunting, req for Multi-Disciplined",1],
+
+[2,"Old Friends and New Calamities","D","T","Random Event","Drunk Driver (North of Paleto Bay)","North of Paleto Bay","",0],
+[2,"Old Friends and New Calamities","D","T","Random Event","Prisoner Lift 2","North of Paleto Bay","May need to reload for spawn",0],
+[2,"Old Friends and New Calamities","D","T","Misc","Special Character - Griff","Route 68, Grand Senora Desert","",1],
+[2,"Old Friends and New Calamities","D","T","Mission","Friends Reunited","Trevor's Trailer, Sandy Shores","Switch to Franklin after — he's available again",0],
+[2,"Old Friends and New Calamities","D","F","Misc","Purchase a Garage","Grove Street, Davis","Buy an Akuma from Southern SA Autos here too",1],
+[2,"Old Friends and New Calamities","D","F","Misc","Purchase a Vehicle from a Website","","",1],
+[2,"Old Friends and New Calamities","D","F","Strangers & Freaks","Pulling One Last Favor","Forum Drive, Strawberry","",0],
+[2,"Old Friends and New Calamities","D","F","Misc","Mod a vehicle (Bullet GT)","Any Los Santos Customs","Unlocks Los Santos Customs achievement",1],
+[2,"Old Friends and New Calamities","D","F","Misc","Use the car wash","Innocence Boulevard, Strawberry","Store the Bullet in your new garage after",1],
+[2,"Old Friends and New Calamities","D","F","Hobbies & Pastimes","Street Race \"Vespucci Canals\"","Collect Akuma from garage first","",0],
+[2,"Old Friends and New Calamities","D","F","Misc","Buy sticky bombs and guns for Franklin","Pillbox Hill Ammunation","",1],
+[2,"Old Friends and New Calamities","D","F","Misc","Purchase a Tattoo","Innocence Boulevard, El Burro Heights","",1],
+[2,"Old Friends and New Calamities","D","F","Misc","Purchase a Haircut","Bob Mulet, Rockford Hills","Unlocks Shop Robbery 1 trigger on next visit",1],
+[2,"Old Friends and New Calamities","D","F","Random Event","Mugging 3","Vespucci Boulevard, Little Seoul","Don't confuse with ATM Robbery nearby",0],
+
+[2,"Old Friends and New Calamities","E","M","Mission","Fame or Shame","Michael's Safe House, Rockford Hills","Switch to Michael to autotrigger; switch to Trevor after",0],
+[2,"Old Friends and New Calamities","E","T","Random Event","Bus Tour","Vinewood Boulevard","Day only",0],
+[2,"Old Friends and New Calamities","E","T","Random Event","Drunk Celebrity","South Mo Milton Drive, Vinewood Hills","Can take to Altruists but not the most convenient time",0],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Nigel and Mrs Thornhill","North Sheldon Avenue, Vinewood Hills","Cutscene only",1],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Willie","Tequi-la-la, West Vinewood","Night only",1],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Kerry","Portola Drive, Rockford Hills","Day only",1],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Mark","GWC and Golfing Society","Day only",1],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Tyler","Greenwich Way, Rockford Hills","Day only; consider stealing Tyler's Red Comet",1],
+[2,"Old Friends and New Calamities","E","T","Random Event","Security Van 2","Vespucci Boulevard, Little Seoul","",0],
+[2,"Old Friends and New Calamities","E","T","Misc","Purchase a Garage for Trevor","Adam's Apple Boulevard, Pillbox Hill","Store Tyler's stolen Comet",1],
+[2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Rampage Two - Vagos","Macdonald Street, Rancho","Contributes to Red Mist",1],
+[2,"Old Friends and New Calamities","E","T","Random Event","Drunk Driver 2 (3rd Altruist victim)","Alhambra Drive, Sandy Shores","Crosses 3rd of 4 needed for Altruist special event",0],
+[2,"Old Friends and New Calamities","E","T","Misc","Hold up a Store","Senora Freeway, north of Mount Chiliad","",1],
+[2,"Old Friends and New Calamities","E","T","Random Event","Deal Gone Wrong","East off Great Ocean Highway","",0],
+[2,"Old Friends and New Calamities","E","T","Hobbies & Pastimes","Sea Race (early morning)","East off Great Ocean Highway","Arrive ~5am to maximise time; contributes to Multi-disciplined. Switch to Franklin after",0],
+
+[2,"Old Friends and New Calamities","F","F","Random Event","Border Patrol 2","Tatavium Mountains","",0],
+[2,"Old Friends and New Calamities","F","F","Random Event","Arrests 2","Senora Way, Davis Quartz","May need reload to spawn",0],
+[2,"Old Friends and New Calamities","F","F","Strangers & Freaks","Far Out","West of YouTool Store, Sandy Shores","Cutscene only — meet Omega",0],
+[2,"Old Friends and New Calamities","F","F","Random Event","Chase Thieves Country 2","Route 68, Grand Senora Desert","",0],
+[2,"Old Friends and New Calamities","F","F","Misc","Mod Franklin's Car","Los Santos Customs, Route 68","Used later for stunt jump alignment",1],
+[2,"Old Friends and New Calamities","F","F","Hobbies & Pastimes","Stock Car Races - The Burgershot Stallion","Panorama Drive, Grand Senora Desert","Returning players only",1],
+[2,"Old Friends and New Calamities","F","F","Random Event","Border Patrol 3","Raton Pass, Raton Canyon","",0],
+[2,"Old Friends and New Calamities","F","F","Hobbies & Pastimes","Off Road Race - Canyon Cliffs","Raton Pass, Raton Canyon","Contributes to Multi-disciplined",0],
+[2,"Old Friends and New Calamities","F","F","Random Event","Duel","Route 68, Grand Senora Desert","Rewards unique Duke O'Death vehicle",0],
+[2,"Old Friends and New Calamities","F","F","Misc","Mod the Duke o' Death","Los Santos Customs, Route 68","",1],
+[2,"Old Friends and New Calamities","F","F","Hobbies & Pastimes","Stock Car Races - The Redwood Gauntlet","Panorama Drive, Grand Senora Desert","Returning players only",1],
+[2,"Old Friends and New Calamities","F","F","Random Event","Prisoner Lift 1","South off Route 68, Grand Senora Desert","",0],
+[2,"Old Friends and New Calamities","F","F","Misc","Special Character - Mani","Elgin Avenue, Alta","",1],
+[2,"Old Friends and New Calamities","F","F","Misc","Store the Duke o' Death in garage","Grove Street, Davis","Switch to Michael when done",1],
+
+[2,"Old Friends and New Calamities","G","M","Random Event","Kidnapping","Didion Drive, Vinewood Hills","",0],
+[2,"Old Friends and New Calamities","G","M","Misc","3 Spaceship Parts, 2 Letter Scraps, 1 Monkey Mosaic","Vinewood Hills","",0],
+[2,"Old Friends and New Calamities","G","M","Mission","Dead Man Walking","Galileo Observatory, Vinewood Hills","",0],
+[2,"Old Friends and New Calamities","G","M","Random Event","Gang Intimidation","El Rancho Boulevard, El Burro Heights","",0],
+[2,"Old Friends and New Calamities","G","M","Misc","Dr Friedlander Session \"Evil\"","Great Ocean Highway, Del Perro","",1],
+[2,"Old Friends and New Calamities","G","M","Misc","Purchase a Garage","Spanish Avenue, West Vinewood","Switch to Trevor when done",1],
+[2,"Old Friends and New Calamities","G","T","Strangers & Freaks","Vinewood Souvenirs - Al Di Napoli","Red Desert Avenue, Del Perro","",1],
+[2,"Old Friends and New Calamities","G","T","Misc","Stunt Jump #3","Ginger Street, Little Seoul","Given car is ideal for this jump",1],
+[2,"Old Friends and New Calamities","G","T","Random Event","Chase Thieves City 2","San Andreas Avenue, Textile City","Switch to Michael when done",0],
+[2,"Old Friends and New Calamities","G","M","Mission","Did Somebody Say Yoga?","Michael's Safe House, Rockford Hills","Store the bicycle at the end — boosts stamina",0],
+[2,"Old Friends and New Calamities","G","M","Misc","Watch TV","Michael's Safe House, Rockford Hills","Must be done with all 3 characters for the social club unlock",1],
+[2,"Old Friends and New Calamities","G","M","Misc","Special Character - Baygor","Portola Drive, Rockford Hills","Take the bicycle to help stamina",1],
+[2,"Old Friends and New Calamities","G","M","Random Event","Shop Robbery 1","Bob Mulet, Rockford Hills","Ride bicycle back, store in garage",0],
+[2,"Old Friends and New Calamities","G","M","Misc","Perform Yoga","Michael's Safe House, Rockford Hills","",1],
+[2,"Old Friends and New Calamities","G","M","Misc","Fill in the Epsilon Survey","Use your phone","Unlocks Seeking the Truth + contributes to Kifflom!. Switch to Trevor after",1],
+
+[2,"Old Friends and New Calamities","H","T","Random Event","Security Van 6","San Andreas Avenue, Little Seoul","",0],
+[2,"Old Friends and New Calamities","H","M","Misc","Play Golf with a Friend","Richman, Los Santos","",1],
+[2,"Old Friends and New Calamities","H","M","Hobbies & Pastimes","Finish golf on par or below","","Switch to Michael after",0],
+[2,"Old Friends and New Calamities","H","M","Strangers & Freaks","Seeking the Truth","Raton Canyon, Blaine County","Taxi out; after cutscene switch to Trevor",1],
+[2,"Old Friends and New Calamities","H","T","Strangers & Freaks","Vinewood Souvenirs - The Last Act","Power Street, Strawberry","Don't free Al Di Napoli early or you'll fail gold. Switch to Michael when done",1],
+[2,"Old Friends and New Calamities","H","M","Strangers & Freaks","Donate $500 to Epsilon Program (Michael)","Anywhere via phone","Unlocks Accepting the Truth. Switch back to Trevor after",1],
+[2,"Old Friends and New Calamities","H","T","Mission","Scouting the Port","Floyd's Condo, Vespucci Beach","",0],
+
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Accepting the Truth","Clinton Avenue, Downtown Vinewood","Cycle over on Michael's bike",1],
+[2,"Old Friends and New Calamities","I","M","Misc","Special Character - Pamela Drake","Vinewood Boulevard, Downtown Vinewood","",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Donate $5,000 to Epsilon Program (Michael)","Anywhere via phone","Unlocks Assuming the Truth. Switch to Franklin after",1],
+[2,"Old Friends and New Calamities","I","F","Misc","3 Spaceship Parts, 2 Letter Scraps, 4 Monkey Mosaics","South Los Santos","",0],
+[2,"Old Friends and New Calamities","I","F","Misc","Special Character - Jerome","Dutch London Street, Rancho","",1],
+[2,"Old Friends and New Calamities","I","F","Random Event","Border Patrol 1","North off Mount Haan Road, Senora Desert","",0],
+[2,"Old Friends and New Calamities","I","F","Hobbies & Pastimes","Stock Car Races - The Pisswasser Dominator","Panorama Drive, Grand Senora Desert","Returning players only",1],
+[2,"Old Friends and New Calamities","I","F","Hobbies & Pastimes","Off Road Race - Canyon Cliffs","Galileo Road, Great Chaparral","Contributes to Multi-disciplined. Switch to Michael when done",0],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth","North off Sea View Road, Grapeseed","Taxi + skip trip",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth - Benefactor Surano","South of Marlow Drive, Vinewood Hills","",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth - Pegassi Vacca","Wild Oats Drive, Vinewood Hills","Run over after dropping Surano off",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth - Dinka Double T","Boulevard Del Perro, Rockford Hills","Parked outside Life Invader office",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth - Declasse Tornado","Elgin Avenue, Hawick","Parked at garage opposite tennis court",1],
+[2,"Old Friends and New Calamities","I","M","Strangers & Freaks","Assuming the Truth - Enus Super Diamond","Off Heritage Way, Rockford Hills","Small outdoor carpark. Switch to Trevor after",1],
+
+[2,"Old Friends and New Calamities","J","T","Random Event","Security Van 9","El Rancho Boulevard, Cypress Flats","",0],
+[2,"Old Friends and New Calamities","J","T","Mission","Blitzed","LS Freight Terminal","Switch to Michael after",0],
+[2,"Old Friends and New Calamities","J","M","Strangers & Freaks","Chasing the Truth","North off Sea View Road, Grapeseed","Taxi + skip trip",1],
+[2,"Old Friends and New Calamities","J","M","Strangers & Freaks","Donate $10,000 to Epsilon Program","Anywhere via phone","Switch to Trevor after",1],
+[2,"Old Friends and New Calamities","J","T","Mission","Nervous Ron 2 / Fort Zancudo mission","Fort Zancudo","Taxi to the edge, jack a vehicle to enter. Switch to Franklin after",0],
+[2,"Old Friends and New Calamities","J","F","Misc","Watch TV","Franklin's Safe House, Strawberry","All 3 characters needed. Switch to Michael after",1],
+[2,"Old Friends and New Calamities","J","M","Hobbies & Pastimes","Off Road Race - Minward Spiral","Davis Quartz, Blaine County","Taxi + skip trip; contributes to Multi-disciplined",0],
+[2,"Old Friends and New Calamities","J","M","Strangers & Freaks","Bearing the Truth","North off Vinewood Boulevard, Downtown Vinewood","Cycle over to build stamina",1],
+[2,"Old Friends and New Calamities","J","M","Random Event","Bike Thief City 2","Bridge Street, East Vinewood","",0],
+[2,"Old Friends and New Calamities","J","M","Strangers & Freaks","Buy Epsilon Robes","Anywhere via phone","Store bicycle back at safehouse",1],
+[2,"Old Friends and New Calamities","J","M","Mission","Three's Company","Outside the FIB Building, Pillbox Hill","First time all 3 characters together",0],
+
+[2,"Old Friends and New Calamities","K","M","Misc","Buy sticky bombs and guns for Michael","Pillbox Hill Ammunation","AP Pistol + Carbine Rifle recommended. Switch to Franklin after",1],
+[2,"Old Friends and New Calamities","K","F","Hobbies & Pastimes","Off Road Race - Valley Trail","Cassidy Trail, Alamo Sea","Taxi + skip trip; contributes to Multi-disciplined. Switch to Michael after",0],
+[2,"Old Friends and New Calamities","K","M","Mission","By the Book","Triggered by phone call after switching to Michael","",0],
+[2,"Old Friends and New Calamities","K","M","Random Event","Car Theft 2","Autopia Parkway, Elysian Island","Return the car as shown to get a new suit reward",0],
+[2,"Old Friends and New Calamities","K","M","Strangers & Freaks","Wear your Epsilon Robes","Michael's Safehouse, Rockford Hills","Prep for Bearing the Truth completion",1],
+[2,"Old Friends and New Calamities","K","M","Hobbies & Pastimes","Flight School","Greenwich Parkway, LSIA","Bike down if stamina isn't maxed",0],
+[2,"Old Friends and New Calamities","K","M","Strangers & Freaks","Sleep repeatedly wearing Epsilon Robes","Michael's Safehouse, Rockford Hills","10 days straight, ~36 sleeps; completes Bearing the Truth",1],
+[2,"Old Friends and New Calamities","K","M","Mission","Merryweather Heist - Offshore","Floyd's Condo, Vespucci Beach","Offshore recommended for extra gold medal + weapons",0],
+
+[3,"Different Bosses, But Still No Pay","A","T","Strangers & Freaks","Delivering the Truth","West of Fort Zancudo, Blaine County","Taxi + skip trip. Switch to Trevor after",1],
+[3,"Different Bosses, But Still No Pay","A","T","Random Event","Security Van 5","Prosperity Street, Vespucci Canals","",0],
+[3,"Different Bosses, But Still No Pay","A","T","Misc","1 Spaceship Part, 3 Letter Scraps, 5 Monkey Mosaics","Vespucci area","",0],
+[3,"Different Bosses, But Still No Pay","A","T","Misc","Special Character - Andy Moon","Magellan Avenue, Vespucci","",1],
+[3,"Different Bosses, But Still No Pay","A","T","Strangers & Freaks","Grass Roots - Trevor","Legion Square","",1],
+[3,"Different Bosses, But Still No Pay","A","T","Strangers & Freaks","Rampage Three - Ballas","Chamberlain Hills","Contributes to Red Mist. Switch to Franklin after",1],
+[3,"Different Bosses, But Still No Pay","A","F","Mission","Hood Safari","Forum Drive, Strawberry","Switch to Trevor as you escape toward jet skis",0],
+[3,"Different Bosses, But Still No Pay","A","T","Misc","1 Spaceship Part, 3 Letter Scraps, 5 Monkey Mosaics","Ocean East of Los Santos","",0],
+[3,"Different Bosses, But Still No Pay","A","T","Hobbies & Pastimes","Sea Race - East Coast","Ocean East of Los Santos","Contributes to Multi-disciplined",0],
+[3,"Different Bosses, But Still No Pay","A","T","Random Event","Sea Plane","Ocean East of Los Santos","Switch to Michael after",0],
+[3,"Different Bosses, But Still No Pay","A","M","Misc","1 Spaceship Part, 1 Letter Scrap","Ocean East of Los Santos","",0],
+
+[3,"Different Bosses, But Still No Pay","B","M","Strangers & Freaks","Wear your Epsilon Robes","Michael's Safehouse, Rockford Hills","Prep for Exercising the Truth",1],
+[3,"Different Bosses, But Still No Pay","B","M","Random Event","Rogue Altruists","Baytree Canyon Road, Great Chaparral","",0],
+[3,"Different Bosses, But Still No Pay","B","M","Strangers & Freaks","Exercising the Truth","East of Joshua Road, Grand Senora Desert","Switch to Franklin after",1],
+[3,"Different Bosses, But Still No Pay","B","F","Random Event","Chase Thieves City 1","Hawick Avenue, Hawick","",0],
+[3,"Different Bosses, But Still No Pay","B","F","Strangers & Freaks","Grass Roots - Franklin","Sinner Street, Textile City","",0],
+[3,"Different Bosses, But Still No Pay","B","F","Misc","3 Spaceship Parts, 3 Letter Scraps, 9 Monkey Mosaics","Vinewood + surrounding districts","",0],
+[3,"Different Bosses, But Still No Pay","B","F","Strangers & Freaks","Grass Roots - The Pickup","Murrieta Heights","Switch to Michael when done",0],
+[3,"Different Bosses, But Still No Pay","B","M","Strangers & Freaks","Unknowing the Truth","Epsilon Church, West Vinewood","Save before starting — avoid accidentally driving into final marker (loses $2m). Switch to Franklin after",1],
+
+[3,"Different Bosses, But Still No Pay","C","F","Hobbies & Pastimes","Vespucci Triathlon","Greenwich Parkway, LSIA","Contributes to Multi-disciplined. Switch to Franklin after",0],
+[3,"Different Bosses, But Still No Pay","C","F","Misc","1 Letter Scrap, 4 Monkey Mosaics","La Puerta","",0],
+[3,"Different Bosses, But Still No Pay","C","F","Strangers & Freaks","Grass Roots - The Drag","La Puerta","Switch to Michael when done",0],
+[3,"Different Bosses, But Still No Pay","C","M","Misc","Special Character - Jane","Carcer Way, Burton","",1],
+[3,"Different Bosses, But Still No Pay","C","M","Strangers & Freaks","Paparazzo - The Partnership","Eclipse Boulevard, West Vinewood","",0],
+[3,"Different Bosses, But Still No Pay","C","M","Random Event","Security Van 10","Supply Street, La Mesa","",0],
+[3,"Different Bosses, But Still No Pay","C","M","Strangers & Freaks","Paparazzo - The Highness","La Puerta","Switch to Trevor when done",0],
+[3,"Different Bosses, But Still No Pay","C","T","Misc","Visit the strip club with a friend","Vanilla Unicorn, Strawberry","Call Lamar as Trevor. Switch to Franklin after",1],
+[3,"Different Bosses, But Still No Pay","C","F","Random Event","(Trigger) Visit the Sub Urban clothes store","Prosperity Street Promenade, Del Perro","Unlocks Shop Robbery 2 on next visit",0],
+[3,"Different Bosses, But Still No Pay","C","F","Mission","The Hotel Assassination","Del Perro Beach","Also your first scripted stock market play — check the guide's trade timing",0],
+[3,"Different Bosses, But Still No Pay","C","F","Strangers & Freaks","Paparazzo - The Meltdown","Downtown Vinewood","",0],
+[3,"Different Bosses, But Still No Pay","C","F","Strangers & Freaks","Grass Roots - The Smoke In","Occupation Avenue, Alta","Phone call only mission, still required for 100%. Switch to Michael after",0],
+
+[3,"Different Bosses, But Still No Pay","D","M","Misc","1 Spaceship Part, 3 Letter Scraps, 2 Monkey Mosaics","Mirror Park","",0],
+[3,"Different Bosses, But Still No Pay","D","T","Mission","Blitz Play (Heist Introduction)","El Rancho Boulevard, El Burro Heights","Cutscene only; auto-switches to Trevor",0],
+[3,"Different Bosses, But Still No Pay","D","T","Mission","Boiler Suits","Ammunation, Pillbox Hill","Switch to Franklin after",0],
+[3,"Different Bosses, But Still No Pay","D","F","Mission","Trash Truck","Mirror Park","",0],
+[3,"Different Bosses, But Still No Pay","D","F","Mission","Tow Truck","Autopia Parkway, Elysian Island","",0],
+[3,"Different Bosses, But Still No Pay","D","F","Misc","3 Spaceship Parts, 1 Letter Scrap, 2 Monkey Mosaics","El Burro Heights","Switch to Trevor after",0],
+[3,"Different Bosses, But Still No Pay","D","T","Mission","Blitz Play setup","Vitus Street, Vespucci Beach","Switch to Michael after",0],
+[3,"Different Bosses, But Still No Pay","D","M","Misc","Getaway Vehicle — steal a 4 door car","Rockford Hills","",0],
+[3,"Different Bosses, But Still No Pay","D","M","Mission","Blitz Play","El Rancho Boulevard, El Burro Heights","Switch to Michael after",0],
+[3,"Different Bosses, But Still No Pay","D","M","Misc","4 Spaceship Parts, 1 Letter Scrap","Tongva Hills","Switch to Trevor after",0],
+[3,"Different Bosses, But Still No Pay","D","T","Random Event","Sports Bike Thief","North Rockford Drive, Richman","",0],
+[3,"Different Bosses, But Still No Pay","D","M","Misc","4 Clues for Michael's Murder Mystery","Los Santos and the Vinewood Hills","Taxi + skip trip to Sonar Dock after",1],
+[3,"Different Bosses, But Still No Pay","D","M","Misc","Purchase Property: Sonar Collections Dock (2 of 5)","Chiliad Mountain State Wilderness","Unlocks Death at Sea + Nuclear Waste collectibles",0],
+[3,"Different Bosses, But Still No Pay","D","M","Strangers & Freaks","Death at Sea","Sonar Collections Dock","Unlocks Submarine Piece collectibles. Switch to Franklin after",1],
+
+[3,"Different Bosses, But Still No Pay","E","F","Misc","Buy a RPG for Franklin","Ammunation","Taxi + skip trip to Sonar Dock Collections after",1],
+[3,"Different Bosses, But Still No Pay","E","F","Strangers & Freaks","Paparazzo - Reality Check","Eclipse Boulevard, West Vinewood","",0],
+[3,"Different Bosses, But Still No Pay","E","F","Random Event","(Trigger) Shop Robbery 2","Prosperity Street Promenade, Del Perro","",0],
+[3,"Different Bosses, But Still No Pay","E","F","Mission","I Fought the Law...","","",0],
+[3,"Different Bosses, But Still No Pay","E","F","Misc","2 Spaceship Parts, 3 Letter Scraps, 2 Monkey Mosaics","South Port of LS","",0],
+[3,"Different Bosses, But Still No Pay","E","F","Misc","Stunt Jumps #4 to #14","South Port of LS","",1],
+[3,"Different Bosses, But Still No Pay","E","F","Hobbies & Pastimes","Sea Race \"Los Santos\"","LS River, Cypress Flats","Contributes to Multi-disciplined. Switch to Trevor after",0],
+[3,"Different Bosses, But Still No Pay","E","T","Mission","Eye in the Sky","Mission Row Police Station","Switch back to Trevor at end, keep the helicopter",0],
+[3,"Different Bosses, But Still No Pay","E","T","Misc","6 Spaceship Parts, 2 Letter Scraps, 1 Monkey Mosaic","LS Rooftops and Vinewood Hills","",0],
+[3,"Different Bosses, But Still No Pay","E","M","Mission","Mr Richards","Richards Majestic, Rockford Hills","Keep the helicopter at the end",0],
+[3,"Different Bosses, But Still No Pay","E","M","Misc","Optional Dr Friedlander phone session","Anywhere via phone","Missable",1],
+[3,"Different Bosses, But Still No Pay","E","M","Misc","Buy Vangelico Stock for all 3 characters","Anywhere via phone","Will increase after Minor Turbulence",1],
+[3,"Different Bosses, But Still No Pay","E","M","Mission","Caida Libre","Madrazo's Ranch, Vinewood Hills","Auto-switches to Franklin after",0],
+[3,"Different Bosses, But Still No Pay","E","F","Misc","Walk and Play Fetch with Chop","Where you spawn after Caida Libre","Select ball from inventory, throw",0],
+[3,"Different Bosses, But Still No Pay","E","F","Mission","Deep Inside","Richards Majestic, Rockford Hills","",0],
+[3,"Different Bosses, But Still No Pay","E","F","Misc","Stunt Jumps #15 to #24","South Los Santos","",1],
+
+[4,"Return from Exile to Exhume the Truth","A","M","Mission","Minor Turbulence","Michael's Safehouse, Rockford Hills","Auto-switches to Trevor for the whole mission",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","Sell Vangelico Stock for all 3 characters","Anywhere via phone","",1],
+[4,"Return from Exile to Exhume the Truth","A","T","Random Event","Hitch Lift 3","East Joshua Road, Blaine County","Last of 4 Altruist victims for the special missable event",0],
+[4,"Return from Exile to Exhume the Truth","A","T","Misc","Altruist Camp Shootout","","Special missable event unlocked by delivering all 4 victims",1],
+[4,"Return from Exile to Exhume the Truth","A","T","Misc","2 Spaceship Parts, 6 Letter Scraps, 2 Monkey Mosaics","Paleto Bay","",0],
+[4,"Return from Exile to Exhume the Truth","A","T","Hobbies & Pastimes","Alamo Sea Triathlon","Sea View Road, Sandy Shores","Contributes to Multi-disciplined. Switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","Buy sticky bombs for Michael","Ammunation, Sandy Shores","",1],
+[4,"Return from Exile to Exhume the Truth","A","M","Random Event","Country Side Gang Fight","Marina Drive, Sandy Shores","",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","1 Spaceship Part, 2 Letter Scraps, 3 Monkey Mosaics","Grand Senora Desert","",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Hobbies & Pastimes","Sea Race - Raton Canyon","Zancudo River, Blaine County","Contributes to Multi-disciplined",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","Ride the Cable Car","Mount Chiliad","",1],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","1 Letter Scrap","Mount Chiliad","",0],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","Epsilon Tract #1","","",1],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","7 Submarine Pieces, 12 Nuclear Waste, 1 Murder Mystery Clue","Sonar Collections Dock + Pacific Ocean W/S","Stay in sub, move to next start position",1],
+[4,"Return from Exile to Exhume the Truth","A","M","Misc","7 Submarine Pieces, 5 Nuclear Waste, Epsilon Tract #2","Pacific Ocean East and South","Switch to Franklin after",1],
+[4,"Return from Exile to Exhume the Truth","A","F","Misc","11 Submarine Pieces","Sea Race \"Los Santos\" start, LS River, Cypress Flats","Switch to Trevor after",1],
+
+[4,"Return from Exile to Exhume the Truth","B","T","Strangers & Freaks","Civil Border Patrol","Grand Senora Desert","",1],
+[4,"Return from Exile to Exhume the Truth","B","T","Random Event","Hitch Lift 2","North Calafia Way, Mount Chiliad","",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Hobbies & Pastimes","Sea Race - North East Coast","By El Gordo Light House","Contributes to Multi-disciplined; keep the seashark after",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Misc","3 Spaceship Parts, 3 Letter Scraps, 2 Monkey Mosaics","Grapeseed","",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Strangers & Freaks","An American Welcome","Mount Chiliad","Switch to Michael after",1],
+[4,"Return from Exile to Exhume the Truth","B","M","Random Event","Security Van 7","Chianski Passage, near Humane Labs","",0],
+[4,"Return from Exile to Exhume the Truth","B","M","Misc","4 Spaceship Parts, 1 Letter Scrap, 4 Monkey Mosaics","Humane Labs to Sandy Shores","",0],
+[4,"Return from Exile to Exhume the Truth","B","M","Mission","The Paleto Score Setup","Trevor's Meth Lab, Sandy Shores","",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Mission","Military Hardware","Route 68, Senora Desert","Switch to Trevor after",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Misc","5 Spaceship Parts, 2 Letter Scraps, 1 Monkey Mosaic, 3 Bridges flown under","Trevor's airfield to Raton Canyon","Stay in helicopter after",0],
+[4,"Return from Exile to Exhume the Truth","B","T","Hobbies & Pastimes","Bail Bonds - Mountain","Summit of Mount Chiliad","Switch to Michael after",1],
+
+[4,"Return from Exile to Exhume the Truth","C","T","Mission","Trevor's Trailer mission","Trevor's Trailer, Sandy Shores","Switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Random Event","Hitch Lift 4","Route 68, Zancudo River","",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Strangers & Freaks","Risk Assessment","Vinewood Hills","",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Strangers & Freaks","Exercising Demons - Franklin","Paleto Forest","Day only; stunt jump possible mid-mission",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Misc","Stunt Jump #25","Paleto Forest","During Exercising Demons",1],
+[4,"Return from Exile to Exhume the Truth","C","F","Misc","Stunt Jump #26","Paleto Bay, Blaine County","Steal a bike off the freeway",1],
+[4,"Return from Exile to Exhume the Truth","C","F","Misc","Special Character - Bill Binder","Duluoz Avenue, Paleto Bay","",1],
+[4,"Return from Exile to Exhume the Truth","C","F","Hobbies & Pastimes","Parachute Jump 1/13","Paleto Bay, Blaine County","Heli jump type",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Random Event","Car Theft 1","Western Highway, North Chumash","",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Misc","Steal a bike","Western Highway, North Chumash","Needed for next stunt jump",1],
+[4,"Return from Exile to Exhume the Truth","C","F","Misc","Stunt Jump #27","Raton Canyon, Blaine County","",1],
+[4,"Return from Exile to Exhume the Truth","C","F","Hobbies & Pastimes","Parachute Jumps 2, 3, 4 & 5/13","Raton Canyon, Blaine County","2 heli + 2 base jump types",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Random Event","Stag Do Running Man","Zancudo River, Blaine County","Keep the white Enus Diamond after, store in garage",0],
+[4,"Return from Exile to Exhume the Truth","C","F","Hobbies & Pastimes","Stock Car Races - The Sprunk Buffalo","Panorama Drive, Grand Senora Desert","Returning players only. Switch to Michael after",1],
+
+[4,"Return from Exile to Exhume the Truth","D","T","Mission","The Paleto Score","Trevor's Meth Lab, Sandy Shores","Switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","D","F","Hobbies & Pastimes","Parachute Jump 6/13","Grapeseed, Blaine County","Heli jump type",0],
+[4,"Return from Exile to Exhume the Truth","D","F","Hobbies & Pastimes","Off Road Race - Lakeside Splash","Marina Drive, Sandy Shores","Contributes to Multi-disciplined. Switch to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","D","M","Misc","Optional Dr Friedlander phone session (F@*ked Up)","Anywhere via phone","Missable",1],
+[4,"Return from Exile to Exhume the Truth","D","M","Misc","5 Submarine Pieces, 12 Nuclear Waste, Epsilon Tract #3","Pacific Ocean North and East","Unlocks Waste Management achievement. Switch to Trevor after",1],
+[4,"Return from Exile to Exhume the Truth","D","T","Misc","4 Bridges flown under","Trevor's airfield to Paleto Bay","Stay in helicopter after",0],
+[4,"Return from Exile to Exhume the Truth","D","T","Strangers & Freaks","Minute Man Blues","Paleto Bay, Blaine County","",1],
+[4,"Return from Exile to Exhume the Truth","D","T","Hobbies & Pastimes","Bail Bonds - Mountain (Hobo Camp)","Hobo Camp, foot of Mount Chiliad","",1],
+[4,"Return from Exile to Exhume the Truth","D","T","Strangers & Freaks","Rampage Four - Military","Fort Zancudo Approach Road","Contributes to Red Mist",1],
+[4,"Return from Exile to Exhume the Truth","D","T","Random Event","Security Van 8","Great Ocean Highway, Zancudo River","",0],
+[4,"Return from Exile to Exhume the Truth","D","T","Misc","1 Spaceship Part, 4 Letter Scraps, 1 Monkey Mosaic","Great Ocean Highway, Zancudo River","Switch to Franklin after",0],
+
+[4,"Return from Exile to Exhume the Truth","E","F","Random Event","Abandoned Vehicle 2","Ron Alternates Windfarm","Taxi out",0],
+[4,"Return from Exile to Exhume the Truth","E","F","Hobbies & Pastimes","Off Road Race - Eco Friendly","Ron Alternates Windfarm","Contributes to Multi-disciplined",0],
+[4,"Return from Exile to Exhume the Truth","E","F","Hobbies & Pastimes","Parachute Jump 7/13","Ron Alternates Windfarm","Heli jump type",0],
+[4,"Return from Exile to Exhume the Truth","E","F","Misc","3 Spaceship Parts, 2 Letter Scraps","Great Chaparral, Blaine County","Switch to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","E","M","Misc","Epsilon Tract #4","Chiliad Mountain Tunnel","",1],
+[4,"Return from Exile to Exhume the Truth","E","T","Mission","(Trevor's Trailer mission)","Trevor's Trailer, Sandy Shores","Auto-switches to Trevor; switch back to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","E","T","Mission","Monkey Business","Cape Catalina, Blaine County","Auto-switches to Trevor; switch back to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","E","M","Misc","Remove Jimmy's tacky mods from car","Burton LS Customs","Optional cosmetic fix",1],
+[4,"Return from Exile to Exhume the Truth","E","M","Misc","Epsilon Tract #5","Little Seoul","",1],
+[4,"Return from Exile to Exhume the Truth","E","M","Strangers & Freaks","What Lies Beneath","Sonar Collections Dock","Cutscene only, needs 5th Tract first",1],
+[4,"Return from Exile to Exhume the Truth","E","M","Misc","Epsilon Tract #6","Sonar Collections Dock","Switch to Franklin after",1],
+
+[4,"Return from Exile to Exhume the Truth","F","F","Misc","1 Letter Scrap","Mile High Club Construction Site","",0],
+[4,"Return from Exile to Exhume the Truth","F","F","Hobbies & Pastimes","Parachute Jump 8/13","Top of the Crane","Base jump — get the Letter Scrap before jumping!",0],
+[4,"Return from Exile to Exhume the Truth","F","F","Hobbies & Pastimes","Parachute Jump 9/13","Maze Bank Tower, Pillbox Hill","Base jump type",0],
+[4,"Return from Exile to Exhume the Truth","F","F","Misc","Stunt Jump #28 to #38","Franklin's Garage to North Los Santos","",1],
+[4,"Return from Exile to Exhume the Truth","F","F","Misc","Stunt Jump #39 and #40","Greenwich Parkway, LSIA","",1],
+[4,"Return from Exile to Exhume the Truth","F","F","Strangers & Freaks","Liquidity Risk","Greenwich Parkway, LSIA","Switch to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","F","M","Misc","Epsilon Tract #7","South of Ace Jones Drive, Richman","",1],
+[4,"Return from Exile to Exhume the Truth","F","T","Misc","Stunt Jump #41","Vinewood Hills, Los Santos","Switch to Trevor after",1],
+[4,"Return from Exile to Exhume the Truth","F","T","Hobbies & Pastimes","Parachute Jump 10/13","Tackle Street, La Puerta","Heli jump type",0],
+[4,"Return from Exile to Exhume the Truth","F","T","Mission","Hang Ten","Floyd's Condo, Vespucci Beach","Auto-switches to Michael; switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","F","F","Strangers & Freaks","Source a Helicopter","Medical Centre or Vespucci Heli Pad","Required to access next mission",1],
+[4,"Return from Exile to Exhume the Truth","F","F","Strangers & Freaks","Targeted Risk","Top of Maze Bank Tower","Switch to Trevor after",0],
+
+[4,"Return from Exile to Exhume the Truth","G","T","Mission","Surveying the Score","Vanilla Unicorn, Strawberry","Auto-switches to Michael",0],
+[4,"Return from Exile to Exhume the Truth","G","M","Misc","1 Bridge flown under","","During Surveying the Score",0],
+[4,"Return from Exile to Exhume the Truth","G","M","Misc","Buy Gruppe 6 Stock for all 3 characters","Anywhere via phone","Rebounds after Fresh Meat — buy before Bury the Hatchet",1],
+[4,"Return from Exile to Exhume the Truth","G","M","Misc","Steal a fast car, park in Michael's drive","Between Vinewood and Rockford Hills","Prep for gold medal on next mission",1],
+[4,"Return from Exile to Exhume the Truth","G","M","Mission","Bury the Hatchet","Michael's Safe House, Rockford Hills","Auto-switches to Trevor; switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","G","F","Mission","Pac Man","Franklin's Old Safe House, Strawberry","Taxi + skip trip after",0],
+[4,"Return from Exile to Exhume the Truth","G","F","Mission","Fresh Meat","Franklin's Old Safe House, Strawberry","Auto-switches to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","G","M","Misc","Sell Gruppe 6 Stock for all 3 characters","Anywhere via phone","Target ~12.5% return; sleep 12-18hrs. Switch to Trevor after",1],
+
+[5,"Erasing Past Sins and Realising Dreams","A","T","Strangers & Freaks","Rampage Five - Hipsters","Mirror Park, Los Santos","Unlocks Red Mist. Switch to Franklin after",1],
+[5,"Erasing Past Sins and Realising Dreams","A","F","Misc","Buy a parachute for Franklin","Ammunation, Pillbox Hill","Helps gold medal on Architect's Plans. Switch to Michael after",1],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Mission","Cleaning Out the Bureau","Darnell Bros, La Mesa","",0],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Hobbies & Pastimes","Parachute Jump 11/13","Mirror Park Boulevard, East Vinewood","Heli jump type",0],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Hobbies & Pastimes","Parachute Jump 12/13","Vinewood Race Track, East Vinewood","Heli jump type. Switch to Franklin after",0],
+[5,"Erasing Past Sins and Realising Dreams","A","F","Mission","Architect's Plans","Starts on switch to Franklin","Planning screen: pick Roof Entry, Taliana, Daryl, Rickie. Switch to Trevor after",0],
+[5,"Erasing Past Sins and Realising Dreams","A","T","Strangers & Freaks","Extra Commission","West Eclipse Boulevard, Richman","Switch to Michael after",1],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Mission","The Bureau Raid - Roof Entry","Darnell Bros, La Mesa","Switch to Trevor after",0],
+[5,"Erasing Past Sins and Realising Dreams","A","T","Strangers & Freaks","Closing the Deal","Rancho, Los Santos","Switch to Michael after",1],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Hobbies & Pastimes","Parachute Jump 13/13","Eclipse Towers, Rockford Hills","Base jump; unlocks final Dom mission for Franklin",0],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Misc","Stunt Jump #42","GWC and Golfing Society, Richman","Use a golf buggy from the club house",1],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Misc","2 Spaceship Parts, 4 Letter Scraps, 7 Monkey Mosaics","Golf Club to Kortz Centre","This completes ALL Spaceship Parts, Letter Scraps and Monkey Mosaics",0],
+[5,"Erasing Past Sins and Realising Dreams","A","M","Mission","The Wrap Up","The Kortz Centre, Vinewood Hills","Switch to Franklin after",0],
+
+[5,"Erasing Past Sins and Realising Dreams","B","F","Strangers & Freaks","Uncalculated Risk","Land Act Reservoir","",0],
+[5,"Erasing Past Sins and Realising Dreams","B","F","Random Event","Monkey Mosaic","Los Santos Customs, Burton","",0],
+[5,"Erasing Past Sins and Realising Dreams","B","F","Misc","Collect your Akuma","Franklin's Garage, Grove Street","Used for stunt jumps after next S&F mission",1],
+[5,"Erasing Past Sins and Realising Dreams","B","F","Strangers & Freaks","A Starlet in Vinewood","Vinewood Hills","",0],
+[5,"Erasing Past Sins and Realising Dreams","B","F","Misc","Stunt Jumps #43 to #48","East of Blaine County","Call a taxi after to get to next location",1],
+[5,"Erasing Past Sins and Realising Dreams","B","F","Strangers & Freaks","The Final Frontier","Ron Alternates Windfarm","Unique Space Docker vehicle reward. Switch to Trevor after",0],
+[5,"Erasing Past Sins and Realising Dreams","B","T","Strangers & Freaks","Surreal Estate","Rancho, Los Santos","Switch to Michael after",1],
+[5,"Erasing Past Sins and Realising Dreams","B","M","Mission","Reuniting the Family","Michael's Safe House, Rockford Hills","Auto-switches to Trevor, switch back to Michael",0],
+[5,"Erasing Past Sins and Realising Dreams","B","M","Mission","The Ballad of Rocco","Richards Majestic","Switch to Trevor after",0],
+
+[5,"Erasing Past Sins and Realising Dreams","C","T","Strangers & Freaks","Exercising Demons - Trevor","Vinewood Hills","",0],
+[5,"Erasing Past Sins and Realising Dreams","C","T","Misc","Steal a jet from Zancudo, store in hangar","Start at Trevor's airfield","Makes knife flights much easier",1],
+[5,"Erasing Past Sins and Realising Dreams","C","T","Misc","10 Bridges flown under","Trevor's airfield to Los Santos","Stay in helicopter after",0],
+[5,"Erasing Past Sins and Realising Dreams","C","T","Misc","13 Bridges flown under","LS River, Mirror Park to Cypress Flats","Stay in helicopter after",0],
+[5,"Erasing Past Sins and Realising Dreams","C","T","Misc","9 Bridges flown under","LS River, Banning to La Puerta","Stay in helicopter after",0],
+[5,"Erasing Past Sins and Realising Dreams","C","T","Strangers & Freaks","Breach of Contract","West Eclipse Boulevard, Richman","Switch to Michael after",1],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Misc","Family Mission \"Doting Dad\"","Triggered by phone call from Tracey","Timing may shift with the call",1],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Mission","Legal Trouble","Richards Majestic","Stay in the escape jet, fly north to Mount Chiliad after",0],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Misc","Stunt Jump #49","Greenwich Parkway, LSIA","",1],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Misc","Epsilon Tract #8","Summit of Mount Chiliad","",1],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Misc","Buy Fly US Stock for all 3 characters","Anywhere via phone","Rebounds after Meltdown; wait for ~50% drop first",1],
+[5,"Erasing Past Sins and Realising Dreams","C","F","Mission","Lamar Down","Franklin's Safe House, Vinewood Hills","Switch to Michael after",0],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Mission","Meltdown","Ponsonby's, Rockford Hills","",0],
+[5,"Erasing Past Sins and Realising Dreams","C","M","Misc","Sell Fly US Stock for all 3 characters","Anywhere via phone","Target 80-100% return, sleep 2-3x. Switch to Trevor after",1],
+
+[5,"Erasing Past Sins and Realising Dreams","D","M","Mission","Planning the Score","Vanilla Unicorn, Strawberry","Pick Obvious, Taliana driver 1, Karim, Welsh, Daryl. Auto-switches to Michael",0],
+[5,"Erasing Past Sins and Realising Dreams","D","M","Misc","Family Mission \"Parenting 101\"","Triggered by phone call from Jimmy","Timing may shift with the call",1],
+
+[6,"Epilogue: An Active and Lucrative Retirement","A","F","Misc","Buy Augury Insurance Stock for all 3 characters","Anywhere via phone","Check it hasn't jumped yet on the graph before buying",1],
+[6,"Epilogue: An Active and Lucrative Retirement","A","T","Strangers & Freaks","Mrs Phillips and Damaged Goods","Trevor's Trailer, Sandy Shores","Auto-switches to Franklin after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","A","F","Misc","Sell Augury Insurance Stock for all 3 characters","Anywhere via phone","Target 80-100% return, sleep as needed. Switch to Michael after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","A","M","Misc","Dr Friedlander Session \"Abandonment\"","Great Ocean Highway, Del Perro","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","A","M","Random Event","Hitch Lift 1","Ineseno Road, Chumash","Invest all 3 characters in Tinkle first; drive back to Michael's house to hit ~33% target. Switch to Franklin after",0],
+[6,"Epilogue: An Active and Lucrative Retirement","A","F","Mission","The Multi Target Assassination","Little Seoul","Scripted stock-market trade mission — check guide for exact timing. Switch to Michael after",0],
+[6,"Epilogue: An Active and Lucrative Retirement","A","M","Hobbies & Pastimes","Win at Tennis","Call Amanda, go to any Tennis Court","Switch to Franklin after",0],
+[6,"Epilogue: An Active and Lucrative Retirement","A","M","Misc","Play a friend at Tennis","","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","A","F","Mission","The Vice Assassination","Legion Square","Scripted stock trade mission. Switch to Michael after",0],
+
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Purchase Property: Los Santos Golf Club","GWC and Golfing Society, Richman","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Purchases for Michael (helipad + heli)","La Puerta and LSIA","Spend down cash before next trade caps at the $2bn limit",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Epsilon Tracts #9 and #10","Start at new helipad, La Puerta","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Friend Activity - Visit the Cinema","Call Jimmy, go to any highlighted venue","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Michael's Murder Mystery Solved","Richards Majestic","Visit Solomon's office between 21:00–6:00",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","M","Misc","Invest cash over $1.09bn in stocks","Anywhere via phone","Switch to Franklin after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Mission","The Bus Assassination","Hawick","Scripted stock trade mission",0],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Misc","Purchases for Franklin and Trevor (helipad + Buzzard)","La Puerta and LSIA","Spend down cash before next trade caps",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Misc","Purchase Properties: Towing Impound + Los Santos Customs","Rancho and Grand Senora Desert","Completes the 5-property requirement for 100%",0],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Misc","Invest cash over $1.4bn in stocks","Anywhere via phone","Switch to Trevor after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Misc","Buy a 4-door Felon and upgrade it","Anywhere via phone","Needed for final stunt jump + Three Man Army. Switch to Franklin after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","B","F","Hobbies & Pastimes","Stock Car Races - The Cheval Marshall","Panorama Drive, Grand Senora Desert","Returning players only",1],
+
+[6,"Epilogue: An Active and Lucrative Retirement","C","F","Mission","The Construction Assassination","Get Buzzard at La Puerta Helipad","Final scripted stock trade mission. Switch to Trevor after",0],
+[6,"Epilogue: An Active and Lucrative Retirement","C","F","Misc","Stunt Jump #50","Collect your upgraded Felon","Nets two achievements/trophies at once",1],
+[6,"Epilogue: An Active and Lucrative Retirement","C","","Misc","\"Three Man Army\" Achievement/Trophy","","Survive 3 min at 3-star wanted with all 3 together off-mission. Stay together with Michael + Franklin",1],
+[6,"Epilogue: An Active and Lucrative Retirement","C","T","Misc","3 Bridges flown under","West of Blaine County","Stay in helicopter with M+F after",0],
+[6,"Epilogue: An Active and Lucrative Retirement","C","T","Misc","Friend Activity - Visit a Bar","Any highlighted venue","Stay in helicopter after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","C","T","Hobbies & Pastimes","Win at Darts","Call Lamar, go to the Yellow Jack Inn","",0],
+[6,"Epilogue: An Active and Lucrative Retirement","C","T","Misc","Friend Activity - Play Darts","","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","C","T","Misc","Watch TV","Trevor's Trailer, Sandy Shores","Switch to Michael after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","C","M","Hobbies & Pastimes","Coyote Cross Triathlon","Sandy Shores, Blaine County","Huge tour of the map. Switch to Franklin after",0],
+
+[6,"Epilogue: An Active and Lucrative Retirement","D","F","Strangers & Freaks","The Last One","Chiliad Mountain State Wilderness","Switch to Franklin after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","F","Hobbies & Pastimes","Stunt Plane Time Trials","Trevor's Airfield","Switch to Franklin after",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Hobbies & Pastimes","Wildlife Photography","All across the map","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Peyote Plants","All across the map","Required for Cryptozoologist achievement",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","\"San Andreas Sightseer\" Achievement/Trophy","Uncover all of the map","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","\"Out of Your Depth\" Achievement/Trophy","Fly to the edge of the map","Get eaten by a shark",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","\"All's Fare in Love and War\" Achievement/Trophy","Downtown Cab Co.","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Director Mode Character Achievements/Trophies","Director Mode","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","\"Location Scout\" Achievement/Trophy","Director Mode","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Purchase all remaining properties","All across the map","",1],
+[6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Golden Peyote Plants and Hunt the Beast","All across the map","Unlocks The Beast in Director Mode",1],
+];
+
+const TASKS = RAW.map((r,i)=>({
+  id:'t'+i,
+  chapter:r[0],
+  chapterTitle:r[1],
+  part:r[2],
+  ch:r[3],
+  cat:r[4],
+  name:r[5],
+  loc:r[6],
+  note:r[7],
+  opt: r[8]===1
+}));
+
+// ---------- STATE / STORAGE ----------
+let state = {}; // id -> {done:bool, flagged:bool}
+let filterMode = 'all';
+let searchTerm = '';
+
+async function loadState(){
+  try{
+    const raw = localStorage.getItem('gta5-tracker-state');
+    if(raw) state = JSON.parse(raw);
+  }catch(e){ state = {}; }
+
+  // One-time bulk mark-as-done: everything through Chapter 2 Part E, plus
+  // the first task of Chapter 2 Part F ("Border Patrol 2").
+  let bulkFlag = null;
+  try{ bulkFlag = localStorage.getItem('gta5-tracker-bulk-ch2f-v1'); }catch(e){}
+
+  if(!bulkFlag){
+    TASKS.forEach(t=>{
+      let shouldMark = false;
+      if(t.chapter===1) shouldMark = true;
+      else if(t.chapter===2 && ['A','B','C','D','E'].includes(t.part)) shouldMark = true;
+      else if(t.chapter===2 && t.part==='F' && t.name==='Border Patrol 2') shouldMark = true;
+
+      if(shouldMark){
+        if(!state[t.id]) state[t.id]={done:false,flagged:false};
+        state[t.id].done = true;
+      }
+    });
+    try{ localStorage.setItem('gta5-tracker-bulk-ch2f-v1','applied'); }catch(e){}
+    saveState();
+  }
+
+  render();
+}
+function saveState(){
+  try{ localStorage.setItem('gta5-tracker-state', JSON.stringify(state)); }
+  catch(e){ console.error('save failed', e); }
+}
+
+function toggleDone(id){
+  if(!state[id]) state[id]={done:false,flagged:false};
+  state[id].done = !state[id].done;
+  saveState(); render();
+}
+function toggleFlag(id){
+  if(!state[id]) state[id]={done:false,flagged:false};
+  state[id].flagged = !state[id].flagged;
+  saveState(); render();
+}
+async function resetAll(){
+  if(!confirm('Reset ALL progress? This clears every checkmark and flag.')) return;
+  state = {};
+  await saveState();
+  render();
+}
+
+// ---------- RENDER ----------
+function render(){
+  const list = document.getElementById('chapterList');
+  const emptyMsg = document.getElementById('emptyMsg');
+  list.innerHTML = '';
+
+  let totalDone=0, totalFlagged=0;
+  const term = searchTerm.trim().toLowerCase();
+
+  // group by chapter
+  const chapters = [];
+  const chapterMap = {};
+  TASKS.forEach(t=>{
+    if(!chapterMap[t.chapter]){
+      chapterMap[t.chapter] = {num:t.chapter, title:t.chapterTitle, parts:{}, order:[]};
+      chapters.push(chapterMap[t.chapter]);
+    }
+    const c = chapterMap[t.chapter];
+    if(!c.parts[t.part]){ c.parts[t.part]=[]; c.order.push(t.part); }
+    c.parts[t.part].push(t);
+  });
+  chapters.sort((a,b)=>a.num-b.num);
+
+  let anyVisible=false;
+
+  chapters.forEach(c=>{
+    let chapterDone=0, chapterTotal=0;
+    const partsHtml=[];
+
+    c.order.forEach(partKey=>{
+      const tasksInPart = c.parts[partKey];
+      const rows=[];
+      tasksInPart.forEach(t=>{
+        const s = state[t.id]||{done:false,flagged:false};
+        chapterTotal++;
+        if(s.done) chapterDone++;
+        if(s.done) totalDone++;
+        if(s.flagged) totalFlagged++;
+
+        // filter
+        if(filterMode==='flagged' && !s.flagged) return;
+        if(filterMode==='remaining' && s.done) return;
+        if(term){
+          const hay = (t.name+' '+t.loc+' '+t.note).toLowerCase();
+          if(!hay.includes(term)) return;
+        }
+        anyVisible = true;
+
+        rows.push(`
+          <div class="task ${s.done?'done':''} ${s.flagged?'flagged':''}" data-id="${t.id}">
+            <div class="check ${s.done?'on':''}" data-action="check" data-id="${t.id}">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="task-main">
+              <div class="task-name ${s.done?'done':''}">
+                <span class="char-dot char-${t.ch}"></span>
+                ${esc(t.name)}
+                <span class="badge cat">${esc(t.cat)}</span>
+                ${t.opt?'<span class="badge opt">Optional</span>':''}
+              </div>
+              <div class="task-loc">${esc(t.loc)}</div>
+              ${t.note?`<div class="task-note">${esc(t.note)}</div>`:''}
+            </div>
+            <div class="flag-btn ${s.flagged?'on':''}" data-action="flag" data-id="${t.id}" title="Flag for later">&#9873;</div>
+          </div>
+        `);
+      });
+      if(rows.length){
+        partsHtml.push(`<div class="part-block"><div class="part-label">Part ${partKey}</div>${rows.join('')}</div>`);
+      }
+    });
+
+    if(partsHtml.length===0) return; // nothing visible in this chapter under current filter
+
+    const pct = chapterTotal? Math.round(100*chapterDone/chapterTotal):0;
+    const chapterEl = document.createElement('div');
+    chapterEl.className='chapter';
+    chapterEl.innerHTML = `
+      <div class="chapter-head" data-toggle="${c.num}">
+        <div>
+          <div class="chapter-title"><span class="num">${c.num<=5?'CH '+c.num:'EPILOGUE'}</span>${esc(c.title)}</div>
+          <div class="chapter-sub">${chapterDone} / ${chapterTotal} complete</div>
+        </div>
+        <div class="chapter-meta">
+          <div class="chapter-bar"><div class="chapter-bar-inner" style="width:${pct}%"></div></div>
+          <div class="chapter-count">${pct}%</div>
+          <div class="chevron">&#9656;</div>
+        </div>
+      </div>
+      <div class="chapter-body">${partsHtml.join('')}</div>
+    `;
+    if(openChapters.has(c.num)) chapterEl.classList.add('open');
+    list.appendChild(chapterEl);
+  });
+
+  emptyMsg.style.display = anyVisible ? 'none':'block';
+
+  const total = TASKS.length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('progressBar').style.width = (total? (100*totalDone/total):0)+'%';
+  document.getElementById('progressLabel').textContent = `${totalDone} / ${total} \u00b7 ${total?Math.round(100*totalDone/total):0}%`;
+  document.getElementById('statDone').textContent = totalDone;
+  document.getElementById('statFlagged').textContent = totalFlagged;
+  document.getElementById('statRemain').textContent = total-totalDone;
+}
+
+function esc(s){
+  return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- EVENTS ----------
+const openChapters = new Set();
+
+document.addEventListener('click', (e)=>{
+  const chkEl = e.target.closest('[data-action="check"]');
+  if(chkEl){ toggleDone(chkEl.dataset.id); return; }
+  const flagEl = e.target.closest('[data-action="flag"]');
+  if(flagEl){ toggleFlag(flagEl.dataset.id); return; }
+  const head = e.target.closest('[data-toggle]');
+  if(head){
+    const num = parseInt(head.dataset.toggle);
+    const chapterEl = head.closest('.chapter');
+    if(openChapters.has(num)){ openChapters.delete(num); chapterEl.classList.remove('open'); }
+    else{ openChapters.add(num); chapterEl.classList.add('open'); }
+    return;
+  }
+});
+
+document.getElementById('searchBox').addEventListener('input', (e)=>{
+  searchTerm = e.target.value;
+  if(searchTerm.trim()){ TASKS.forEach(t=>openChapters.add(t.chapter)); }
+  render();
+});
+
+function setFilter(mode){
+  filterMode = mode;
+  document.querySelectorAll('#filterAll,#filterFlagged,#filterRemaining').forEach(b=>b.classList.remove('active'));
+  document.getElementById('filter'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');
+  if(mode!=='all'){ TASKS.forEach(t=>openChapters.add(t.chapter)); }
+  render();
+}
+document.getElementById('filterAll').addEventListener('click',()=>setFilter('all'));
+document.getElementById('filterFlagged').addEventListener('click',()=>setFilter('flagged'));
+document.getElementById('filterRemaining').addEventListener('click',()=>setFilter('remaining'));
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+setFilter('all');
+openChapters.add(1); // start with chapter 1 open
+loadState();
+</script>
+</body>
+</html>
