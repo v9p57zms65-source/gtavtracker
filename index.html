@@ -31,12 +31,19 @@
   --danger:#e0546a;
 }
 *{box-sizing:border-box;}
+html{
+  background:var(--navy);
+  height:100%;
+}
 body{
   margin:0;
   background:radial-gradient(1200px 800px at 20% -10%, #16203c 0%, var(--navy) 55%);
+  background-color:var(--navy);
   color:var(--text);
   font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   min-height:100vh;
+  min-height:100dvh;
+  padding-top:env(safe-area-inset-top);
 }
 .wrap{max-width:980px;margin:0 auto;padding:20px 16px 80px;}
 
