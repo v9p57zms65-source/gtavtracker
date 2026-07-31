@@ -183,10 +183,14 @@ body{
   padding:9px 8px;
   border-radius:9px;
   transition:.12s;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
 .task:hover{background:#182036;}
+.task:active{background:#1f2a48;}
 .task.done{opacity:.45;}
 .task.flagged{background:rgba(224,182,74,.07);}
+.flag-btn{cursor:pointer;}
 
 .check{
   flex:0 0 auto;
@@ -1017,10 +1021,10 @@ function esc(s){
 const openChapters = new Set();
 
 document.addEventListener('click', (e)=>{
-  const chkEl = e.target.closest('[data-action="check"]');
-  if(chkEl){ toggleDone(chkEl.dataset.id); return; }
   const flagEl = e.target.closest('[data-action="flag"]');
   if(flagEl){ toggleFlag(flagEl.dataset.id); return; }
+  const taskEl = e.target.closest('.task');
+  if(taskEl){ toggleDone(taskEl.dataset.id); return; }
   const head = e.target.closest('[data-toggle]');
   if(head){
     const num = parseInt(head.dataset.toggle);
