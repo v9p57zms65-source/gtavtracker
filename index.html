@@ -167,14 +167,23 @@ body{
 .chapter-body{display:none;padding:4px 12px 12px;}
 .chapter.open .chapter-body{display:block;}
 
-.part-block{margin-top:10px;}
+.part-block{margin-top:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden;background:rgba(255,255,255,0.015);}
 .part-label{
+  display:flex;align-items:center;justify-content:space-between;
   font-size:11px;font-weight:700;color:var(--dim);
   text-transform:uppercase;letter-spacing:.8px;
-  padding:6px 6px 4px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:4px;
+  padding:9px 10px;
+  cursor:pointer;
+  user-select:none;
+  transition:.12s;
 }
+.part-label:hover{background:#182036;}
+.part-meta{display:flex;align-items:center;gap:8px;}
+.part-count{font-size:10.5px;color:var(--dim);font-weight:600;}
+.part-chevron{transition:transform .2s;color:var(--dim);font-size:11px;}
+.part-block.open .part-chevron{transform:rotate(90deg);}
+.part-rows{display:none;padding:2px 6px 8px;}
+.part-block.open .part-rows{display:block;}
 
 .task{
   display:flex;
@@ -939,10 +948,12 @@ function render(){
     c.order.forEach(partKey=>{
       const tasksInPart = c.parts[partKey];
       const rows=[];
+      let partDone=0, partTotal=0;
       tasksInPart.forEach(t=>{
         const s = state[t.id]||{done:false,flagged:false};
         chapterTotal++;
-        if(s.done) chapterDone++;
+        partTotal++;
+        if(s.done){ chapterDone++; partDone++; }
         if(s.done) totalDone++;
         if(s.flagged) totalFlagged++;
 
@@ -975,7 +986,20 @@ function render(){
         `);
       });
       if(rows.length){
-        partsHtml.push(`<div class="part-block"><div class="part-label">Part ${partKey}</div>${rows.join('')}</div>`);
+        const partKeyFull = c.num+':'+partKey;
+        const isOpen = openParts.has(partKeyFull);
+        partsHtml.push(`
+          <div class="part-block ${isOpen?'open':''}">
+            <div class="part-label" data-part-toggle="${partKeyFull}">
+              <span>Part ${partKey}</span>
+              <span class="part-meta">
+                <span class="part-count">${partDone}/${partTotal}</span>
+                <span class="part-chevron">&#9656;</span>
+              </span>
+            </div>
+            <div class="part-rows">${rows.join('')}</div>
+          </div>
+        `);
       }
     });
 
@@ -1019,12 +1043,21 @@ function esc(s){
 
 // ---------- EVENTS ----------
 const openChapters = new Set();
+const openParts = new Set(); // keys like "2:F"
 
 document.addEventListener('click', (e)=>{
   const flagEl = e.target.closest('[data-action="flag"]');
   if(flagEl){ toggleFlag(flagEl.dataset.id); return; }
   const taskEl = e.target.closest('.task');
   if(taskEl){ toggleDone(taskEl.dataset.id); return; }
+  const partHead = e.target.closest('[data-part-toggle]');
+  if(partHead){
+    const key = partHead.dataset.partToggle;
+    const partEl = partHead.closest('.part-block');
+    if(openParts.has(key)){ openParts.delete(key); partEl.classList.remove('open'); }
+    else{ openParts.add(key); partEl.classList.add('open'); }
+    return;
+  }
   const head = e.target.closest('[data-toggle]');
   if(head){
     const num = parseInt(head.dataset.toggle);
@@ -1037,7 +1070,7 @@ document.addEventListener('click', (e)=>{
 
 document.getElementById('searchBox').addEventListener('input', (e)=>{
   searchTerm = e.target.value;
-  if(searchTerm.trim()){ TASKS.forEach(t=>openChapters.add(t.chapter)); }
+  if(searchTerm.trim()){ TASKS.forEach(t=>{ openChapters.add(t.chapter); openParts.add(t.chapter+':'+t.part); }); }
   render();
 });
 
@@ -1045,7 +1078,7 @@ function setFilter(mode){
   filterMode = mode;
   document.querySelectorAll('#filterAll,#filterFlagged,#filterRemaining').forEach(b=>b.classList.remove('active'));
   document.getElementById('filter'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');
-  if(mode!=='all'){ TASKS.forEach(t=>openChapters.add(t.chapter)); }
+  if(mode!=='all'){ TASKS.forEach(t=>{ openChapters.add(t.chapter); openParts.add(t.chapter+':'+t.part); }); }
   render();
 }
 document.getElementById('filterAll').addEventListener('click',()=>setFilter('all'));
@@ -1059,9 +1092,30 @@ document.addEventListener('visibilitychange', ()=>{
 });
 window.addEventListener('focus', syncNow);
 
+function openCurrentPosition(){
+  // Find the first task (in guide order) that isn't done yet, and open just its chapter + part.
+  const firstIncomplete = TASKS.find(t=>{
+    const s = state[t.id];
+    return !(s && s.done);
+  });
+  openChapters.clear();
+  openParts.clear();
+  if(firstIncomplete){
+    openChapters.add(firstIncomplete.chapter);
+    openParts.add(firstIncomplete.chapter+':'+firstIncomplete.part);
+  } else if(TASKS.length){
+    // everything done — open the last chapter/part so there's something to see
+    const last = TASKS[TASKS.length-1];
+    openChapters.add(last.chapter);
+    openParts.add(last.chapter+':'+last.part);
+  }
+}
+
 setFilter('all');
-openChapters.add(1); // start with chapter 1 open
-loadState();
+loadState().then(()=>{
+  openCurrentPosition();
+  render();
+});
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
