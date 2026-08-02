@@ -243,9 +243,9 @@ body{
 .badge.opt{color:var(--gold);border-color:rgba(224,182,74,.4);background:rgba(224,182,74,.08);}
 .badge.icon{
   color:#0a0e18;background:var(--gold);border-color:var(--gold);
-  font-weight:800;width:16px;height:16px;padding:0;
+  font-weight:800;min-width:16px;height:16px;padding:0 3px;
   display:inline-flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:9.5px;
+  border-radius:8px;font-size:9.5px;line-height:1;
 }
 .badge.cat{color:var(--plat);border-color:rgba(201,214,255,.3);background:rgba(201,214,255,.06);}
 
@@ -346,8 +346,8 @@ const RAW = [
 [1,"Back in the Game","A","F","Random Event","ATM Robbery","Elgin Avenue, Pillbox Hill","",0],
 
 [1,"Back in the Game","B","F","Misc","Special Character - Graham the Zombie","Vinewood Boulevard","",1],
-[1,"Back in the Game","B","F","Strangers & Freaks","Father/Son","Eclipse Boulevard, West Vinewood","Switch to Michael after for a longer cutscene in next mission",0],
-[1,"Back in the Game","B","M","Mission","Complications (cont.)","Michael's Safe House, Rockford Hills","Switches control to Franklin — remain as him",0],
+[1,"Back in the Game","B","F","Strangers & Freaks","Paparazzo","Eclipse Boulevard, West Vinewood","Switch to Michael after for a longer cutscene in next mission",0],
+[1,"Back in the Game","B","M","Mission","Father/Son","Michael's Safe House, Rockford Hills","Switches control to Franklin — remain as him",0],
 [1,"Back in the Game","B","F","Misc","Special Character - Impotent Rage","Eclipse Boulevard","",1],
 [1,"Back in the Game","B","F","Strangers & Freaks","Paparazzo - The Sex Tape","South Mo Milton Drive","",0],
 [1,"Back in the Game","B","F","Mission","The Long Stretch","Forum Drive, Strawberry","",0],
@@ -420,7 +420,7 @@ const RAW = [
 [2,"Old Friends and New Calamities","C","T","Random Event","Security Van 3","Paleto Boulevard, Paleto Bay","",0],
 [2,"Old Friends and New Calamities","C","T","Strangers & Freaks","Fair Game","Procopio Promenade, Paleto Bay","Unlocks Hunting, req for Multi-Disciplined",1],
 
-[2,"Old Friends and New Calamities","D","T","Random Event","Drunk Driver (North of Paleto Bay)","North of Paleto Bay","",0],
+[2,"Old Friends and New Calamities","D","T","Random Event","Burial","North of Paleto Bay","",0],
 [2,"Old Friends and New Calamities","D","T","Random Event","Prisoner Lift 2","North of Paleto Bay","May need to reload for spawn",0],
 [2,"Old Friends and New Calamities","D","T","Misc","Special Character - Griff","Route 68, Grand Senora Desert","",1],
 [2,"Old Friends and New Calamities","D","T","Mission","Friends Reunited","Trevor's Trailer, Sandy Shores","Switch to Franklin after — he's available again",0],
@@ -437,7 +437,7 @@ const RAW = [
 
 [2,"Old Friends and New Calamities","E","M","Mission","Fame or Shame","Michael's Safe House, Rockford Hills","Switch to Michael to autotrigger; switch to Trevor after",0],
 [2,"Old Friends and New Calamities","E","T","Random Event","Bus Tour","Vinewood Boulevard","Day only",0],
-[2,"Old Friends and New Calamities","E","T","Random Event","Drunk Celebrity","South Mo Milton Drive, Vinewood Hills","Can take to Altruists but not the most convenient time",0],
+[2,"Old Friends and New Calamities","E","T","Random Event","Snatched","South Mo Milton Drive, Vinewood Hills","Can take to Altruists but not the most convenient time",0],
 [2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Nigel and Mrs Thornhill","North Sheldon Avenue, Vinewood Hills","Cutscene only",1],
 [2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Willie","Tequi-la-la, West Vinewood","Night only",1],
 [2,"Old Friends and New Calamities","E","T","Strangers & Freaks","Vinewood Souvenirs - Kerry","Portola Drive, Rockford Hills","Day only",1],
@@ -566,7 +566,7 @@ const RAW = [
 [3,"Different Bosses, But Still No Pay","D","F","Mission","Trash Truck","Mirror Park","",0],
 [3,"Different Bosses, But Still No Pay","D","F","Mission","Tow Truck","Autopia Parkway, Elysian Island","",0],
 [3,"Different Bosses, But Still No Pay","D","F","Misc","3 Spaceship Parts, 1 Letter Scrap, 2 Monkey Mosaics","El Burro Heights","Switch to Trevor after",0],
-[3,"Different Bosses, But Still No Pay","D","T","Mission","Blitz Play setup","Vitus Street, Vespucci Beach","Switch to Michael after",0],
+[3,"Different Bosses, But Still No Pay","D","T","Mission","Masks","Vitus Street, Vespucci Beach","Switch to Michael after",0],
 [3,"Different Bosses, But Still No Pay","D","M","Misc","Getaway Vehicle — steal a 4 door car","Rockford Hills","",0],
 [3,"Different Bosses, But Still No Pay","D","M","Mission","Blitz Play","El Rancho Boulevard, El Burro Heights","Switch to Michael after",0],
 [3,"Different Bosses, But Still No Pay","D","M","Misc","4 Spaceship Parts, 1 Letter Scrap","Tongva Hills","Switch to Trevor after",0],
@@ -585,7 +585,7 @@ const RAW = [
 [3,"Different Bosses, But Still No Pay","E","T","Mission","Eye in the Sky","Mission Row Police Station","Switch back to Trevor at end, keep the helicopter",0],
 [3,"Different Bosses, But Still No Pay","E","T","Misc","6 Spaceship Parts, 2 Letter Scraps, 1 Monkey Mosaic","LS Rooftops and Vinewood Hills","",0],
 [3,"Different Bosses, But Still No Pay","E","M","Mission","Mr Richards","Richards Majestic, Rockford Hills","Keep the helicopter at the end",0],
-[3,"Different Bosses, But Still No Pay","E","M","Misc","Optional Dr Friedlander phone session","Anywhere via phone","Missable",1],
+[3,"Different Bosses, But Still No Pay","E","M","Misc","Negativity","Anywhere via phone","Missable",1],
 [3,"Different Bosses, But Still No Pay","E","M","Misc","Buy Vangelico Stock for all 3 characters","Anywhere via phone","Will increase after Minor Turbulence",1],
 [3,"Different Bosses, But Still No Pay","E","M","Mission","Caida Libre","Madrazo's Ranch, Vinewood Hills","Auto-switches to Franklin after",0],
 [3,"Different Bosses, But Still No Pay","E","F","Misc","Walk and Play Fetch with Chop","Where you spawn after Caida Libre","Select ball from inventory, throw",0],
@@ -621,7 +621,7 @@ const RAW = [
 [4,"Return from Exile to Exhume the Truth","B","T","Misc","5 Spaceship Parts, 2 Letter Scraps, 1 Monkey Mosaic, 3 Bridges flown under","Trevor's airfield to Raton Canyon","Stay in helicopter after",0],
 [4,"Return from Exile to Exhume the Truth","B","T","Hobbies & Pastimes","Bail Bonds - Mountain","Summit of Mount Chiliad","Switch to Michael after",1],
 
-[4,"Return from Exile to Exhume the Truth","C","T","Mission","Trevor's Trailer mission","Trevor's Trailer, Sandy Shores","Switch to Franklin after",0],
+[4,"Return from Exile to Exhume the Truth","C","T","Mission","Predator","Trevor's Trailer, Sandy Shores","Switch to Franklin after",0],
 [4,"Return from Exile to Exhume the Truth","C","F","Random Event","Hitch Lift 4","Route 68, Zancudo River","",0],
 [4,"Return from Exile to Exhume the Truth","C","F","Strangers & Freaks","Risk Assessment","Vinewood Hills","",0],
 [4,"Return from Exile to Exhume the Truth","C","F","Strangers & Freaks","Exercising Demons - Franklin","Paleto Forest","Day only; stunt jump possible mid-mission",0],
@@ -639,7 +639,7 @@ const RAW = [
 [4,"Return from Exile to Exhume the Truth","D","T","Mission","The Paleto Score","Trevor's Meth Lab, Sandy Shores","Switch to Franklin after",0],
 [4,"Return from Exile to Exhume the Truth","D","F","Hobbies & Pastimes","Parachute Jump 6/13","Grapeseed, Blaine County","Heli jump type",0],
 [4,"Return from Exile to Exhume the Truth","D","F","Hobbies & Pastimes","Off Road Race - Lakeside Splash","Marina Drive, Sandy Shores","Contributes to Multi-disciplined. Switch to Michael after",0],
-[4,"Return from Exile to Exhume the Truth","D","M","Misc","Optional Dr Friedlander phone session (F@*ked Up)","Anywhere via phone","Missable",1],
+[4,"Return from Exile to Exhume the Truth","D","M","Misc","F@*ked Up","Anywhere via phone","Missable",1],
 [4,"Return from Exile to Exhume the Truth","D","M","Misc","5 Submarine Pieces, 12 Nuclear Waste, Epsilon Tract #3","Pacific Ocean North and East","Unlocks Waste Management achievement. Switch to Trevor after",1],
 [4,"Return from Exile to Exhume the Truth","D","T","Misc","4 Bridges flown under","Trevor's airfield to Paleto Bay","Stay in helicopter after",0],
 [4,"Return from Exile to Exhume the Truth","D","T","Strangers & Freaks","Minute Man Blues","Paleto Bay, Blaine County","",1],
@@ -653,7 +653,7 @@ const RAW = [
 [4,"Return from Exile to Exhume the Truth","E","F","Hobbies & Pastimes","Parachute Jump 7/13","Ron Alternates Windfarm","Heli jump type",0],
 [4,"Return from Exile to Exhume the Truth","E","F","Misc","3 Spaceship Parts, 2 Letter Scraps","Great Chaparral, Blaine County","Switch to Michael after",0],
 [4,"Return from Exile to Exhume the Truth","E","M","Misc","Epsilon Tract #4","Chiliad Mountain Tunnel","",1],
-[4,"Return from Exile to Exhume the Truth","E","T","Mission","(Trevor's Trailer mission)","Trevor's Trailer, Sandy Shores","Auto-switches to Trevor; switch back to Michael after",0],
+[4,"Return from Exile to Exhume the Truth","E","T","Mission","Derailed","Trevor's Trailer, Sandy Shores","Auto-switches to Trevor; switch back to Michael after",0],
 [4,"Return from Exile to Exhume the Truth","E","T","Mission","Monkey Business","Cape Catalina, Blaine County","Auto-switches to Trevor; switch back to Michael after",0],
 [4,"Return from Exile to Exhume the Truth","E","M","Misc","Remove Jimmy's tacky mods from car","Burton LS Customs","Optional cosmetic fix",1],
 [4,"Return from Exile to Exhume the Truth","E","M","Misc","Epsilon Tract #5","Little Seoul","",1],
@@ -723,6 +723,14 @@ const RAW = [
 
 [5,"Erasing Past Sins and Realising Dreams","D","M","Mission","Planning the Score","Vanilla Unicorn, Strawberry","Pick Obvious, Taliana driver 1, Karim, Welsh, Daryl. Auto-switches to Michael",0],
 [5,"Erasing Past Sins and Realising Dreams","D","M","Misc","Family Mission \"Parenting 101\"","Triggered by phone call from Jimmy","Timing may shift with the call",1],
+[5,"Erasing Past Sins and Realising Dreams","D","T","Mission","Sidetracked","Davis Quartz","Auto-switches to Trevor",0],
+[5,"Erasing Past Sins and Realising Dreams","D","T","Misc","15 Knife Flights","Trevor's airfield to Los Santos","Use the jet you sourced earlier",1],
+[5,"Erasing Past Sins and Realising Dreams","D","","Misc","Buy weapons and armour for all three characters","Nearest Ammunation","Melee weapon for Michael, silenced sniper rifle for Franklin — needed for upcoming gold medal requirements. Switch to Franklin after",1],
+[5,"Erasing Past Sins and Realising Dreams","D","M","Mission","Driller","La Mesa","Switch to Michael after",0],
+[5,"Erasing Past Sins and Realising Dreams","D","T","Mission","Getaway Vehicle","Rockford Hills","Switch to Trevor after",0],
+[5,"Erasing Past Sins and Realising Dreams","D","F","Mission","The Big Score - Obvious","Vanilla Unicorn, Strawberry","This is it — the Union Depository. Auto-switches to Franklin",0],
+[5,"Erasing Past Sins and Realising Dreams","D","","Misc","Buy Augury Insurance Stock for all three characters","Anywhere via phone","Rebounds after The Third Way — put money in now in case you miss the window before it jumps",1],
+[5,"Erasing Past Sins and Realising Dreams","D","F","Mission","The Third Way","Franklin's Safe House, Vinewood Hills","Start early morning to maximise the Augury Insurance investment window. Pick option C — Deathwish — to keep all content available; other endings are replayable from the gold medal menu. Auto-switches to Trevor after",0],
 
 [6,"Epilogue: An Active and Lucrative Retirement","A","F","Misc","Buy Augury Insurance Stock for all 3 characters","Anywhere via phone","Check it hasn't jumped yet on the graph before buying",1],
 [6,"Epilogue: An Active and Lucrative Retirement","A","T","Strangers & Freaks","Mrs Phillips and Damaged Goods","Trevor's Trailer, Sandy Shores","Auto-switches to Franklin after",1],
@@ -770,15 +778,14 @@ const RAW = [
 [6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Golden Peyote Plants and Hunt the Beast","All across the map","Unlocks The Beast in Director Mode",1],
 ];
 
-// Map icon shown in-game for a handful of missions (per the source guide's "Map Icon"
-// column). Only Lester's Assassination missions have one — "L" for his dollar-sign
-// marker — every other task leaves this blank in the source guide.
+// Map icon shown in-game for missions/content (per the source guide's "Map Icon"
+// column), extracted directly from the live page's table cells. Character-coded
+// (F/M/T = Franklin/Michael/Trevor), plus recurring contacts (L=Lester, E=Epsilon,
+// HS=Heist Setup, H=Heist finale, etc). A trailing "?" is the guide author's own
+// mark of uncertainty on that particular icon — shown as-is. Blank = not specified
+// in the source for that task.
 const ICON_MAP = {
-  'The Hotel Assassination': 'L',
-  'The Multi Target Assassination': 'L',
-  'The Vice Assassination': 'L',
-  'The Bus Assassination': 'L',
-  'The Construction Assassination': 'L',
+"Repossession":"F","Pulling Favours":"?","Complications":"F","Grass Roots - Michael":"?","Chop":"F","Shift Work":"?","Paparazzo":"?","Father/Son":"M","Paparazzo - The Sex Tape":"P?","The Long Stretch":"F","Marriage Counselling":"M","Friend Request":"L","Pulling Another Favor":"T?","Daddy's Little Girl":"M","Exercising Demons - Michael":"?","Casing the Jewel Store":"L","BZ Gas Grenades":"HS","Bugstars Equipment":"HS","The Jewel Store Job - Smart Approach":"H","Mr. Philips":"M","Trevor Philips Industries":"C","Nervous Ron":"T","Special Bonds":"?","Target Practice":"?","Rampage One - Rednecks":"?","Crystal Maze":"C","Fair Game":"C?","Friends Reunited":"T","Pulling One Last Favor":"?","Nigel and Mrs Thornhill":"?","Far Out":"?","Dead Man Walking":"B","Vinewood Souvenirs - Al Di Napoli":"N?","Did Somebody Say Yoga?":"M","Seeking the Truth":"?","Vinewood Souvenirs - The Last Act":"N?","Scouting the Port":"T","Accepting the Truth":"E","Assuming the Truth":"E","Minisub":"HS","Chasing the Truth":"E","Cargobob":"HS","Bearing the Truth":"E","Three's Company":"B","Merryweather Heist - Offshore":"H","Delivering the Truth":"E","Grass Roots - Trevor":"B?","Hood Safari":"F","Exercising the Truth":"E","Grass Roots - Franklin":"B?","Unknowing the Truth":"E","Paparazzo - The Partnership":"P?","The Hotel Assassination":"L","Grass Roots - The Smoke In":"B?","Blitz Play (Heist Introduction)":"B","Boiler Suits":"HS","Trash Truck":"HS","Tow Truck":"HS","Masks":"HS","Blitz Play":"H","Death at Sea":"?","Paparazzo - Reality Check":"B?","I Fought the Law…":"D","Eye in the Sky":"D","Mr Richards":"S","Caida Libre":"Mz","Deep Inside":"D","Minor Turbulence":"M","Civil Border Patrol":"?","An American Welcome":"M?","The Paleto Score Setup":"B","Military Hardware":"HS","Predator":"T","Risk Assessment":"?","Exercising Demons - Franklin":"F?","The Paleto Score":"H","Minute Man Blues":"M?","Derailed":"T","Monkey Business":"B","What Lies Beneath":"A?","Liquidity Risk":"D?","Hang Ten":"T","Targeted Risk":"D?","Surveying the Score":"T","Bury the Hatchet":"M","Pac Man":"D","Fresh Meat":"F","Cleaning Out the Bureau":"L","The Bureau Raid - Roof Entry":"H","Closing the Deal":"J?","The Wrap Up":"B","Uncalculated Risk":"D?","A Starlet in Vinewood":"?","The Final Frontier":"O?","Surreal Estate":"J?","Reuniting the Family":"M","The Ballard of Rocco":"S","Exercising Demons - Trevor":"F?","Breach of Contract":"J?","Legal Trouble":"S","Lamar Down":"F","Meltdown":"M","Planning the Score":"H","Sidetracked":"HS","Driller":"HS","The Big Score - Obvious":"H","The Third Way":"F","Mrs Philips and Damaged Goods":"?","The Multi Target Assassination":"L","The Vice Assassination":"L","The Bus Assassination":"L","The Construction Assassination":"L","The Last One":"F"
 };
 
 const TASKS = RAW.map((r,i)=>({
