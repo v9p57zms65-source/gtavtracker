@@ -241,6 +241,12 @@ body{
   color:var(--dim);
 }
 .badge.opt{color:var(--gold);border-color:rgba(224,182,74,.4);background:rgba(224,182,74,.08);}
+.badge.icon{
+  color:#0a0e18;background:var(--gold);border-color:var(--gold);
+  font-weight:800;width:16px;height:16px;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:9.5px;
+}
 .badge.cat{color:var(--plat);border-color:rgba(201,214,255,.3);background:rgba(201,214,255,.06);}
 
 .task-loc{font-size:11.5px;color:var(--dim);margin-top:2px;}
@@ -764,6 +770,17 @@ const RAW = [
 [6,"Epilogue: An Active and Lucrative Retirement","D","","Misc","Golden Peyote Plants and Hunt the Beast","All across the map","Unlocks The Beast in Director Mode",1],
 ];
 
+// Map icon shown in-game for a handful of missions (per the source guide's "Map Icon"
+// column). Only Lester's Assassination missions have one — "L" for his dollar-sign
+// marker — every other task leaves this blank in the source guide.
+const ICON_MAP = {
+  'The Hotel Assassination': 'L',
+  'The Multi Target Assassination': 'L',
+  'The Vice Assassination': 'L',
+  'The Bus Assassination': 'L',
+  'The Construction Assassination': 'L',
+};
+
 const TASKS = RAW.map((r,i)=>({
   id:'t'+i,
   chapter:r[0],
@@ -774,7 +791,8 @@ const TASKS = RAW.map((r,i)=>({
   name:r[5],
   loc:r[6],
   note:r[7],
-  opt: r[8]===1
+  opt: r[8]===1,
+  icon: ICON_MAP[r[5]] || null
 }));
 
 // ---------- STATE / STORAGE ----------
@@ -975,6 +993,7 @@ function render(){
               <div class="task-name ${s.done?'done':''}">
                 <span class="char-dot char-${t.ch}"></span>
                 ${esc(t.name)}
+                ${t.icon?`<span class="badge icon" title="Map icon">${esc(t.icon)}</span>`:''}
                 <span class="badge cat">${esc(t.cat)}</span>
                 ${t.opt?'<span class="badge opt">Optional</span>':''}
               </div>
