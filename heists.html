@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA Online — Heists & Jobs Tracker</title>
+<style>
+:root{
+  --navy:#0b0f18;
+  --panel:#111726;
+  --panel2:#161d30;
+  --border:rgba(255,255,255,.08);
+  --text:#e8ecf4;
+  --dim:#8a93a8;
+  --gold:#e0b64a;
+  --green:#3ddc84;
+}
+*{box-sizing:border-box;}
+html{background:var(--navy);height:100%;}
+body{
+  margin:0;
+  background:radial-gradient(1200px 800px at 20% -10%, #16203c 0%, var(--navy) 55%);
+  background-color:var(--navy);
+  color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  min-height:100vh; min-height:100dvh;
+  padding-top:env(safe-area-inset-top);
+}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 80px;}
+
+header{
+  padding:24px 20px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#1a2440,#0d1220);
+  border:1px solid var(--border);
+  margin-bottom:16px;
+}
+h1{margin:0 0 6px;font-size:24px;font-weight:800;}
+h1 span{color:var(--gold);}
+.subtitle{color:var(--dim);font-size:13px;line-height:1.5;}
+
+.progress-wrap{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+}
+.progress-bar{flex:1;height:8px;border-radius:99px;background:#0a0e18;overflow:hidden;border:1px solid var(--border);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:.3s;}
+.progress-text{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;}
+
+.eraband{
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--dim);margin:22px 0 10px;padding-left:2px;
+}
+
+.hcard{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+.hcard.done{opacity:.55;}
+.hhead{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+.check{
+  width:22px;height:22px;flex:none;border-radius:6px;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+  transition:.15s;
+}
+.check.on{background:var(--green);border-color:var(--green);}
+.check svg{width:13px;height:13px;stroke:#06101f;stroke-width:3;fill:none;opacity:0;transition:.15s;}
+.check.on svg{opacity:1;}
+.hinfo{flex:1;}
+.hname{font-weight:700;font-size:15px;}
+.hname.done{text-decoration:line-through;color:var(--dim);}
+.hmeta{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.5;}
+.hyear{font-size:11px;color:var(--gold);font-weight:700;white-space:nowrap;padding-top:2px;}
+
+.subitems{padding:0 16px 14px 50px;display:none;}
+.hcard.open .subitems{display:block;}
+.subrow{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 0;
+  font-size:13px;
+}
+.subcheck{
+  width:17px;height:17px;flex:none;border-radius:5px;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.subcheck.on{background:var(--green);border-color:var(--green);}
+.subcheck svg{width:10px;height:10px;stroke:#06101f;stroke-width:3.5;fill:none;opacity:0;}
+.subcheck.on svg{opacity:1;}
+.sublabel.done{text-decoration:line-through;color:var(--dim);}
+.expand-hint{font-size:11px;color:var(--dim);padding:0 16px 12px 50px;font-style:italic;}
+
+footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;padding-top:14px;border-top:1px solid var(--border);line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>GTA Online — <span>Heists &amp; Jobs Tracker</span></h1>
+    <p class="subtitle">Every major Heist, in the order they unlock as your account progresses, plus notable standalone Jobs worth doing at least once. Tap to check off, tap a heist name to expand sub-stages (Acts/Approaches).</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+    <div class="progress-text" id="progtext">0 / 0</div>
+  </div>
+
+  <div class="eraband">Early Game — Rank 12, High-End Apartment (2015 "Heists" update)</div>
+  <div id="list-early"></div>
+
+  <div class="eraband">Mid Game — Requires specific properties</div>
+  <div id="list-mid"></div>
+
+  <div class="eraband">Late Game — Newest content</div>
+  <div id="list-late"></div>
+
+  <div class="eraband">Other Notable One-Time Jobs (not full Heists, but worth doing)</div>
+  <div id="list-other"></div>
+
+  <footer>
+    Progress saves automatically on this device (localStorage). Payouts/requirements reflect Title Update 1.73 (Kortz Center Heist, July 2026) — Rockstar periodically adjusts these, so treat figures as a snapshot rather than permanent.
+  </footer>
+</div>
+
+<script>
+const DATA = {
+  early: [
+    {id:'fleeca', name:'The Fleeca Job', year:'2015', crew:'2 players', req:'Rank 12 + High-End Apartment', note:'The tutorial heist — bank vault job in Los Santos. Short and easy.'},
+    {id:'prison', name:'The Prison Break', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Extract Prof. Rashkovsky from Bolingbroke Penitentiary. Widely considered the most tedious of the originals.'},
+    {id:'humane', name:'The Humane Labs Raid', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Steal an experimental nerve agent from a secure lab.'},
+    {id:'seriesa', name:'Series A Funding', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Trevor Philips Industries debut — protect Trevor while sourcing product for a deal.'},
+    {id:'pacific', name:'The Pacific Standard Job', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'The finale of the original 5 — rob the Pacific Standard Bank in Downtown Vinewood.'},
+  ],
+  mid: [
+    {id:'doomsday', name:'The Doomsday Heist', year:'2017', crew:'2-4 players', req:'Facility (from $1,250,000)', note:'Three acts, run in order the first time. Total payout up to $5.25M on Hard across all three.',
+      subs:[
+        {id:'dd1', label:'Act 1: The Data Breaches'},
+        {id:'dd2', label:'Act 2: The Bogdan Problem'},
+        {id:'dd3', label:'Act 3: The Doomsday Scenario (highest-paying act)'},
+      ]},
+    {id:'casino', name:'The Diamond Casino Heist', year:'2019', crew:'2-4 players', req:'Arcade', note:'Up to ~$4.7M on a first weekly run (Diamond target). Payout is the same across approaches — vault contents decide the money, approach decides your risk profile.',
+      subs:[
+        {id:'cas1', label:'Approach: Silent & Sneaky (full stealth)'},
+        {id:'cas2', label:'Approach: Big Con (disguise-based)'},
+        {id:'cas3', label:'Approach: Aggressive (loud, guns blazing)'},
+      ]},
+    {id:'cayo', name:'The Cayo Perico Heist', year:'2020', crew:'Solo–4 players', req:'Kosatka', note:'The only heist fully soloable from setup to finale. ~$700K-$1M per solo run post-2026 payout adjustment.'},
+    {id:'contract', name:'The Contract / The Data Leaks', year:'2021', crew:'2-4 players', req:'Agency', note:'Dr. Dre and Franklin Clinton mission strand, culminating in The Data Leaks finale.'},
+  ],
+  late: [
+    {id:'cluckin', name:"Cluckin' Bell Farm Raid", year:'2024', crew:'Solo-friendly', req:'No property required — genuinely free to access', note:'$400K solo, $600K on first completion of the week. Good beginner-friendly heist since it needs no property investment at all.'},
+    {id:'kortz', name:'The Kortz Center Heist', year:'2026', crew:'2-4 players', req:'Mansion + Art Studio add-on', note:"Rockstar's newest heist and widely considered the last major one before GTA Online's focus shifts to GTA 6. Art-theft heist in Pacific Bluffs."},
+  ],
+  other: [
+    {id:'knoway', name:'KnoWay Out', year:'2026', crew:'Contact Mission', note:'Included in the current weekly completion bonus rotation alongside the full Heists.'},
+    {id:'oscar', name:'Oscar Guzman Flies Again', year:'2026', crew:'Contact Mission', note:'Also part of the current weekly bonus rotation — a notable standalone job even though it is not a full multi-setup Heist.'},
+  ]
+};
+
+const STORAGE_KEY = 'gta_online_heist_tracker_v1'; // local cache fallback
+const SUPABASE_URL = 'https://einodrrumonmokcpeswi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpbm9kcnJ1bW9ubW9rY3Blc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0Mjk0NDgsImV4cCI6MjEwMTAwNTQ0OH0.mb-pM_UmDVJYsAo6U73fKOqeJbCbNpKL5zNgVDSt0qo';
+const REST_URL = SUPABASE_URL + '/rest/v1/tracker_state';
+const ROW_ID = 'gta-online-heists';
+const SB_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'resolution=merge-duplicates'
+};
+
+let state = {};
+let openCards = new Set();
+let saveTimeout = null;
+
+function loadLocalCache(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveLocalCache(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+async function fetchRemoteState(){
+  try {
+    const res = await fetch(`${REST_URL}?id=eq.${ROW_ID}&select=data`, { headers: SB_HEADERS });
+    if(!res.ok) throw new Error('fetch failed');
+    const rows = await res.json();
+    if(rows && rows.length && rows[0].data) return rows[0].data;
+    return null;
+  } catch(e){
+    console.warn('Remote fetch failed, using local cache', e);
+    return null;
+  }
+}
+
+async function pushRemoteState(){
+  try {
+    await fetch(REST_URL, {
+      method: 'POST',
+      headers: SB_HEADERS,
+      body: JSON.stringify([{ id: ROW_ID, data: state, updated_at: new Date().toISOString() }])
+    });
+  } catch(e){
+    console.warn('Remote push failed', e);
+  }
+}
+
+function queueSave(){
+  saveLocalCache();
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(pushRemoteState, 600);
+}
+
+async function initState(){
+  state = loadLocalCache(); // show something instantly
+  renderAll();
+  const remote = await fetchRemoteState();
+  if(remote){
+    state = remote;
+    saveLocalCache();
+    renderAll();
+  }
+}
+
+function countAll(){
+  let total=0, done=0;
+  ['early','mid','late','other'].forEach(sec=>{
+    DATA[sec].forEach(h=>{
+      total++; if(state[h.id]) done++;
+      if(h.subs) h.subs.forEach(s=>{ total++; if(state[s.id]) done++; });
+    });
+  });
+  return {total,done};
+}
+
+function renderSection(sectionKey, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = DATA[sectionKey].map(h=>{
+    const isDone = !!state[h.id];
+    const isOpen = openCards.has(h.id);
+    const subsHtml = h.subs ? h.subs.map(s=>{
+      const sDone = !!state[s.id];
+      return `<div class="subrow">
+        <div class="subcheck ${sDone?'on':''}" data-subid="${s.id}">
+          <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+        </div>
+        <span class="sublabel ${sDone?'done':''}">${s.label}</span>
+      </div>`;
+    }).join('') : '';
+    return `
+      <div class="hcard ${isDone?'done':''} ${isOpen?'open':''}" data-cardid="${h.id}">
+        <div class="hhead">
+          <div class="check ${isDone?'on':''}" data-checkid="${h.id}">
+            <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+          </div>
+          <div class="hinfo" data-expand="${h.id}">
+            <div class="hname ${isDone?'done':''}">${h.name}</div>
+            <div class="hmeta">${h.crew} · ${h.req}<br>${h.note}</div>
+          </div>
+          <div class="hyear">${h.year}</div>
+        </div>
+        ${h.subs ? `<div class="subitems">${subsHtml}</div><div class="expand-hint">${isOpen? 'Tap name to collapse' : 'Tap name to see Acts/Approaches'}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAll(){
+  renderSection('early','list-early');
+  renderSection('mid','list-mid');
+  renderSection('late','list-late');
+  renderSection('other','list-other');
+  const {total,done} = countAll();
+  document.getElementById('progtext').textContent = done + ' / ' + total;
+  document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
+}
+
+document.addEventListener('click', (e)=>{
+  const chk = e.target.closest('[data-checkid]');
+  if(chk){
+    const id = chk.dataset.checkid;
+    state[id] = !state[id];
+    queueSave(); renderAll();
+    return;
+  }
+  const subchk = e.target.closest('[data-subid]');
+  if(subchk){
+    const id = subchk.dataset.subid;
+    state[id] = !state[id];
+    queueSave(); renderAll();
+    return;
+  }
+  const expand = e.target.closest('[data-expand]');
+  if(expand){
+    const id = expand.dataset.expand;
+    if(openCards.has(id)) openCards.delete(id); else openCards.add(id);
+    renderAll();
+    return;
+  }
+});
+
+initState();
+</script>
+</body>
+</html>
