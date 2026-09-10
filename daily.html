@@ -187,6 +187,11 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
       <div class="progress-text" id="progtext">0 / 0</div>
     </div>
     <div id="todayList"></div>
+
+    <div class="section" style="margin-top:24px;">
+      <div class="section-head"><span class="dot" style="background:#555"></span>Occasional — not daily, just here so you don't forget they exist</div>
+      <div id="occasionalList"></div>
+    </div>
   </div>
 
   <!-- HISTORY -->
@@ -212,38 +217,54 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 <script>
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
-  { id: 'collect', label: 'Collect & Boost (do first, takes 2 minutes)', color: '#f0c14b', tasks: [
+  { id: 'collect', label: 'Collect & Boost (do first, ~2 minutes)', color: '#f0c14b', tasks: [
     { id: 'gs_cache', name: "Find G's Cache", note: "Purple crate w/ question mark, 15 possible spots. ~$15-22K + ammo + snacks. Resets daily." },
-    { id: 'agency_safe', name: 'Collect Agency Safe', note: 'Caps at $250,000 stored — don\'t let it sit full.' },
-    { id: 'nightclub_safe', name: 'Collect Nightclub Safe', note: 'Passive income from assigned technicians.' },
-    { id: 'mansion_boost', name: "Set Mansion's Business Production Boost", note: 'Pick one business for x3 speed, 24h. Only if Mansion is owned.', optional: true },
+    { id: 'agency_safe', name: 'Collect Agency Safe', note: 'Up to $20,000/day once maxed (201 contracts). Caps at $250,000 stored.' },
+    { id: 'nightclub_safe', name: 'Collect Nightclub Safe', note: 'Best passive earner — up to $50,000/day at 95-100% popularity.' },
+    { id: 'salvage_safe', name: 'Collect Salvage Yard Office Safe', note: '~$24,000/day passive — mechanics dismantle cars even while you\'re offline.' },
+    { id: 'arcade_safe', name: 'Collect Arcade cabinet income', note: 'Low but free — ~$5,000/day when cabinets are maxed.' },
+    { id: 'moneyfronts_safe', name: 'Collect Money Fronts safes (Car Wash / Smoke on the Water / Higgins)', note: 'Combined ~$4,500/day. Keep an eye on each one\'s Heat level.' },
+    { id: 'garment_safe', name: 'Collect Garment Factory safe', note: 'Smallest passive earner (~$2,000/day) but free money is free money.' },
+    { id: 'mansion_boost', name: "Set Mansion's Business Production Boost", note: 'Pick one business for x3 speed, 24h. Only once Mansion is owned.', optional: true },
     { id: 'acid_boost', name: 'Trigger Acid Lab chemistry-table boost', note: 'Walk up to the table inside the lab. Once/day, resets 6am GMT.' },
   ]},
   { id: 'mc', label: 'MC Businesses — Source & Sell', color: '#7bc142', tasks: [
     { id: 'bunker', name: 'Bunker: buy supplies / check stock', note: 'Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.' },
     { id: 'coke', name: 'Cocaine Lockup: source & sell', note: 'Sell at 5 stacks or fewer for guaranteed 1 vehicle.' },
     { id: 'meth', name: 'Meth Lab: source & sell', note: 'Sell at 10 bins or fewer to stay capped at 2 vehicles.' },
-    { id: 'weed', name: 'Weed Farm: source & sell', note: 'Lowest priority MC business — do if time allows.' },
-    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: '10 stacks or fewer for guaranteed 1 vehicle.' },
+    { id: 'weed', name: 'Weed Farm: source & sell', note: 'Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.' },
+    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: 'Boosted +35%/~$65K-hr if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
     { id: 'docforge', name: 'Document Forgery: source & sell', note: 'Weakest earner of the 5 — optional, low priority.', optional: true },
   ]},
   { id: 'nightclub', label: 'Nightclub', color: '#7bc142', tasks: [
     { id: 'nc_tech', name: 'Check technician assignments (5 slots)', note: 'Prioritize Cocaine/Meth/Bunker/Counterfeit. Skip Weed & Document Forgery.' },
-    { id: 'nc_popularity', name: 'Run a Promote Club mission (optional)', note: 'English Dave / Tony / Lazlow popularity jobs.', optional: true },
+    { id: 'nc_popularity', name: 'Run a Promote Club mission (optional)', note: 'English Dave / Tony / Lazlow popularity jobs. Keep popularity above 90% for full safe payout.', optional: true },
   ]},
   { id: 'ceo', label: 'CEO Cargo Businesses', color: '#ff8a3d', tasks: [
     { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.' },
     { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.' },
-    { id: 'hangar_cargo', name: 'Air Freight Cargo: source matching crates', note: 'Stick to ONE top-tier type (Narcotics/Chemicals/Medical). Sell at 25 or 50.', optional: true },
+    { id: 'hangar_cargo', name: 'Air Freight Cargo: source matching crates', note: 'Stick to ONE top-tier type (Narcotics/Chemicals/Medical). +10% if Higgins Helitours owned. Sell at 25 or 50.', optional: true },
   ]},
   { id: 'agency', label: 'Agency', color: '#ff3d7f', tasks: [
     { id: 'sec_contract', name: 'Run a Security Contract (Severe tier)', note: '~$320K/hr. Pick from computer for guaranteed tier choice.' },
     { id: 'payphone', name: 'Check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', optional: true },
   ]},
-  { id: 'other', label: 'Other Ongoing Content', color: '#8b8b95', tasks: [
-    { id: 'titan_job', name: 'Replay The Titan Job (Oscar Guzman)', note: 'Repeatable finale. Run on Hard for best payout.', optional: true },
+  { id: 'vehicle_biz', label: 'Auto Shop & Salvage Yard', color: '#8b8b95', tasks: [
+    { id: 'autoshop_contract', name: 'Auto Shop: check for a Client Job', note: '$170K-300K, ~30-45 min, ~$400K/hr efficient.' },
+    { id: 'salvage_tow', name: 'Salvage Yard: run a tow / check dismantling queue', note: 'Runs passively even offline — just keep feeding it.' },
+    { id: 'bail_bounty', name: 'Bail Office: check Standard/Most Wanted Bounty', note: 'Consistent payout, no long missions.', optional: true },
+  ]},
+  { id: 'other', label: 'Weekly Check', color: '#8b8b95', tasks: [
     { id: 'weekly_bonus', name: "Check this week's 2X/bonus rotation", note: 'Prioritize whatever business is boosted this week.' },
   ]},
+];
+
+// Things that are real and worth doing, but NOT daily — shown separately, not counted in the daily %.
+const OCCASIONAL = [
+  { id: 'titan_job', name: 'Replay The Titan Job (Oscar Guzman)', note: 'Repeatable finale — whenever you feel like it, not a daily obligation. Run on Hard for best payout.' },
+  { id: 'fib_files', name: 'Run a FIB Files mission (Garment Factory)', note: 'Pavel / Jodi Marshall\'s shadow-ops mission chain.' },
+  { id: 'salvage_robbery', name: 'Salvage Yard weekly Robbery', note: 'Up to $400K per robbery — weekly cadence, not daily.' },
+  { id: 'diamond_casino', name: 'Diamond Casino Heist (via Arcade)', note: 'Still on your to-do list — team-based, different approaches each time.' },
 ];
 
 const MANSION_STEPS = [
@@ -279,9 +300,10 @@ function prettyDate(str){
 
 let data = {
   currentDate: todayStr(),
-  today: {},       // taskId -> bool
+  today: {},       // taskId -> bool (resets daily)
   history: {},      // date -> { checks: {}, done: n, total: n }
-  mansion: {}       // taskId -> bool, never resets
+  mansion: {},      // taskId -> bool, never resets
+  occasional: {}    // taskId -> last-done date string, never auto-resets, not counted in daily %
 };
 let saveTimeout = null;
 
@@ -375,6 +397,26 @@ function renderToday(){
   document.getElementById('progtext').textContent = done + ' / ' + total;
   document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
   document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
+
+  // Occasional / not-daily section
+  const occContainer = document.getElementById('occasionalList');
+  if (occContainer) {
+    occContainer.innerHTML = OCCASIONAL.map(t => {
+      const lastDone = data.occasional[t.id];
+      return `
+        <div class="task" data-occid="${t.id}" style="cursor:default;">
+          <div class="check ${lastDone ? 'on' : ''}" data-occbtn="${t.id}" style="cursor:pointer;">
+            <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+          </div>
+          <div class="tinfo">
+            <div class="tname">${esc(t.name)}</div>
+            <div class="tnote">${esc(t.note)}</div>
+            <span class="tbadge opt">${lastDone ? 'Last done: ' + esc(lastDone) : 'Not tracked as done yet'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function renderHistory(){
@@ -449,6 +491,14 @@ document.addEventListener('click', (e) => {
     data.mansion[id] = !data.mansion[id];
     queueSave();
     renderMansion();
+    return;
+  }
+  const occBtn = e.target.closest('[data-occbtn]');
+  if (occBtn) {
+    const id = occBtn.dataset.occbtn;
+    data.occasional[id] = data.occasional[id] ? null : todayStr();
+    queueSave();
+    renderToday();
     return;
   }
 });
