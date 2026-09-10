@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Operations — GTA Online</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700;800&display=swap');
+
+:root{
+  --bg:#0a0a0c;
+  --panel:#141417;
+  --panel2:#1b1b20;
+  --border:rgba(255,255,255,.07);
+  --text:#eef0f4;
+  --dim:#8b8b95;
+  --green:#7bc142;
+  --green-dark:#4f7a2a;
+  --pink:#ff3d7f;
+  --orange:#ff8a3d;
+  --gold:#f0c14b;
+  --red:#e0473f;
+}
+*{box-sizing:border-box;}
+html{background:var(--bg);height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  min-height:100vh; min-height:100dvh;
+  padding-top:env(safe-area-inset-top);
+}
+.wrap{max-width:820px;margin:0 auto;padding:18px 14px 90px;}
+
+/* ---- Header ---- */
+header{
+  position:relative;
+  padding:26px 20px 22px;
+  border-radius:14px;
+  overflow:hidden;
+  background:#000;
+  margin-bottom:16px;
+  border:1px solid var(--border);
+}
+header::before{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(115deg, var(--pink) 0%, var(--orange) 45%, transparent 75%);
+  opacity:.85;
+}
+header::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 0%, #000 92%);
+}
+.htitle{
+  position:relative; z-index:2;
+  font-family:'Archivo Black',sans-serif;
+  font-size:28px;
+  letter-spacing:.5px;
+  line-height:1.05;
+  text-transform:uppercase;
+  color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+.hsub{position:relative; z-index:2; color:#f3f3f3; font-size:12.5px; margin-top:6px; opacity:.9;}
+.hdate{position:relative; z-index:2; color:#fff; font-size:13px; margin-top:12px; font-weight:700; letter-spacing:.3px;}
+
+/* ---- Tabs ---- */
+.tabs{display:flex; gap:8px; margin-bottom:16px;}
+.tab{
+  flex:1;
+  text-align:center;
+  padding:10px 8px;
+  border-radius:10px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  font-weight:700;
+  font-size:12.5px;
+  letter-spacing:.3px;
+  color:var(--dim);
+  cursor:pointer;
+  transition:.15s;
+}
+.tab.active{background:var(--green-dark); color:#fff; border-color:var(--green);}
+.tab:hover:not(.active){background:var(--panel2);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* ---- Progress bar ---- */
+.progress-wrap{
+  display:flex; align-items:center; gap:12px;
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  padding:12px 14px; margin-bottom:16px;
+}
+.progress-bar{flex:1; height:9px; border-radius:99px; background:#000; overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:.3s;}
+.progress-text{font-size:12.5px; font-weight:800; color:var(--gold); white-space:nowrap;}
+
+/* ---- Section groups ---- */
+.section{margin-bottom:18px;}
+.section-head{
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
+  color:var(--dim); margin-bottom:8px; padding-left:2px;
+}
+.section-head .dot{width:8px; height:8px; border-radius:50%; flex:none;}
+
+.task{
+  display:flex; align-items:flex-start; gap:12px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:11px 13px;
+  margin-bottom:6px;
+  cursor:pointer;
+  transition:.12s;
+}
+.task:hover{background:var(--panel2);}
+.task.done{opacity:.5;}
+.check{
+  width:22px; height:22px; flex:none; border-radius:6px;
+  border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  margin-top:1px;
+  transition:.15s;
+}
+.check.on{background:var(--green); border-color:var(--green);}
+.check svg{width:13px; height:13px; stroke:#06101f; stroke-width:3; fill:none; opacity:0;}
+.check.on svg{opacity:1;}
+.tinfo{flex:1;}
+.tname{font-weight:700; font-size:14px;}
+.tname.done{text-decoration:line-through;}
+.tnote{font-size:12px; color:var(--dim); margin-top:2px; line-height:1.5;}
+.tbadge{
+  font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
+  white-space:nowrap; margin-top:2px; display:inline-block;
+}
+.tbadge.opt{color:var(--dim); background:rgba(255,255,255,.06);}
+
+/* ---- History ---- */
+.hist-row{
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; margin-bottom:8px;
+}
+.hist-date{font-weight:700; font-size:13.5px;}
+.hist-stats{font-size:12px; color:var(--dim);}
+.hist-pct{font-weight:800; font-size:14px;}
+.hist-empty{color:var(--dim); font-size:13px; text-align:center; padding:30px 10px;}
+
+/* ---- Mansion goal ---- */
+.goal-card{
+  background:linear-gradient(135deg,#1a1420,#0f0d12);
+  border:1px solid rgba(240,193,75,.3);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+}
+.goal-title{font-family:'Archivo Black',sans-serif; font-size:18px; color:var(--gold); text-transform:uppercase; letter-spacing:.4px;}
+.goal-sub{font-size:12.5px; color:var(--dim); margin-top:4px; margin-bottom:14px;}
+
+footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="htitle">Daily Operations</div>
+    <div class="hsub">Every business, every day. Run the empire, don't let it run you.</div>
+    <div class="hdate" id="dateDisplay"></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-view="today">Today</div>
+    <div class="tab" data-view="history">History</div>
+    <div class="tab" data-view="mansion">Mansion Goal</div>
+  </div>
+
+  <!-- TODAY -->
+  <div class="view active" id="view-today">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+      <div class="progress-text" id="progtext">0 / 0</div>
+    </div>
+    <div id="todayList"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="view" id="view-history">
+    <div id="historyList"></div>
+  </div>
+
+  <!-- MANSION -->
+  <div class="view" id="view-mansion">
+    <div class="goal-card">
+      <div class="goal-title">Get the Mansion</div>
+      <div class="goal-sub">One-time goal, not daily. Doesn't reset — check items off as you actually do them.</div>
+      <div id="mansionList"></div>
+    </div>
+  </div>
+
+  <footer>
+    Progress syncs automatically across your devices.<br>
+    "Today" resets once per real-world day — whatever's checked when the date rolls over gets logged to History.
+  </footer>
+</div>
+
+<script>
+// ---------- TASK DEFINITIONS ----------
+const SECTIONS = [
+  { id: 'collect', label: 'Collect & Boost (do first, takes 2 minutes)', color: '#f0c14b', tasks: [
+    { id: 'gs_cache', name: "Find G's Cache", note: "Purple crate w/ question mark, 15 possible spots. ~$15-22K + ammo + snacks. Resets daily." },
+    { id: 'agency_safe', name: 'Collect Agency Safe', note: 'Caps at $250,000 stored — don\'t let it sit full.' },
+    { id: 'nightclub_safe', name: 'Collect Nightclub Safe', note: 'Passive income from assigned technicians.' },
+    { id: 'mansion_boost', name: "Set Mansion's Business Production Boost", note: 'Pick one business for x3 speed, 24h. Only if Mansion is owned.', optional: true },
+    { id: 'acid_boost', name: 'Trigger Acid Lab chemistry-table boost', note: 'Walk up to the table inside the lab. Once/day, resets 6am GMT.' },
+  ]},
+  { id: 'mc', label: 'MC Businesses — Source & Sell', color: '#7bc142', tasks: [
+    { id: 'bunker', name: 'Bunker: buy supplies / check stock', note: 'Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.' },
+    { id: 'coke', name: 'Cocaine Lockup: source & sell', note: 'Sell at 5 stacks or fewer for guaranteed 1 vehicle.' },
+    { id: 'meth', name: 'Meth Lab: source & sell', note: 'Sell at 10 bins or fewer to stay capped at 2 vehicles.' },
+    { id: 'weed', name: 'Weed Farm: source & sell', note: 'Lowest priority MC business — do if time allows.' },
+    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: '10 stacks or fewer for guaranteed 1 vehicle.' },
+    { id: 'docforge', name: 'Document Forgery: source & sell', note: 'Weakest earner of the 5 — optional, low priority.', optional: true },
+  ]},
+  { id: 'nightclub', label: 'Nightclub', color: '#7bc142', tasks: [
+    { id: 'nc_tech', name: 'Check technician assignments (5 slots)', note: 'Prioritize Cocaine/Meth/Bunker/Counterfeit. Skip Weed & Document Forgery.' },
+    { id: 'nc_popularity', name: 'Run a Promote Club mission (optional)', note: 'English Dave / Tony / Lazlow popularity jobs.', optional: true },
+  ]},
+  { id: 'ceo', label: 'CEO Cargo Businesses', color: '#ff8a3d', tasks: [
+    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.' },
+    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.' },
+    { id: 'hangar_cargo', name: 'Air Freight Cargo: source matching crates', note: 'Stick to ONE top-tier type (Narcotics/Chemicals/Medical). Sell at 25 or 50.', optional: true },
+  ]},
+  { id: 'agency', label: 'Agency', color: '#ff3d7f', tasks: [
+    { id: 'sec_contract', name: 'Run a Security Contract (Severe tier)', note: '~$320K/hr. Pick from computer for guaranteed tier choice.' },
+    { id: 'payphone', name: 'Check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', optional: true },
+  ]},
+  { id: 'other', label: 'Other Ongoing Content', color: '#8b8b95', tasks: [
+    { id: 'titan_job', name: 'Replay The Titan Job (Oscar Guzman)', note: 'Repeatable finale. Run on Hard for best payout.', optional: true },
+    { id: 'weekly_bonus', name: "Check this week's 2X/bonus rotation", note: 'Prioritize whatever business is boosted this week.' },
+  ]},
+];
+
+const MANSION_STEPS = [
+  { id: 'm_pick', label: 'Decide which Mansion (Tongva Estate / Vinewood Residence / Richman Villa)', note: 'All three have identical interiors — pure location preference.' },
+  { id: 'm_save', label: 'Save enough cash ($11.5M–$12.8M base)' },
+  { id: 'm_buy', label: 'Buy the Mansion' },
+  { id: 'm_armory', label: 'Buy Armory upgrade ($720,000)' },
+  { id: 'm_workshop', label: 'Buy Vehicle Workshop upgrade ($880,000)' },
+  { id: 'm_skip', label: 'Skip the Arcade add-on (needs a separate Arcade you don\'t have) and Security unless griefed often' },
+];
+
+// ---------- SUPABASE ----------
+const SUPABASE_URL = 'https://einodrrumonmokcpeswi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpbm9kcnJ1bW9ubW9rY3Blc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0Mjk0NDgsImV4cCI6MjEwMTAwNTQ0OH0.mb-pM_UmDVJYsAo6U73fKOqeJbCbNpKL5zNgVDSt0qo';
+const REST_URL = SUPABASE_URL + '/rest/v1/tracker_state';
+const ROW_ID = 'gta-online-daily-ops';
+const SB_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'resolution=merge-duplicates'
+};
+const LOCAL_KEY = 'gta_daily_ops_v1';
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function prettyDate(str){
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+let data = {
+  currentDate: todayStr(),
+  today: {},       // taskId -> bool
+  history: {},      // date -> { checks: {}, done: n, total: n }
+  mansion: {}       // taskId -> bool, never resets
+};
+let saveTimeout = null;
+
+function totalDailyTasks(){
+  return SECTIONS.reduce((sum, s) => sum + s.tasks.length, 0);
+}
+
+function rolloverIfNewDay(){
+  const t = todayStr();
+  if (data.currentDate !== t) {
+    // archive whatever was checked on the old date
+    const total = totalDailyTasks();
+    const doneCount = Object.values(data.today).filter(Boolean).length;
+    data.history[data.currentDate] = { checks: data.today, done: doneCount, total: total };
+    data.today = {};
+    data.currentDate = t;
+  }
+}
+
+function loadLocal(){
+  try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); } catch(e) { return null; }
+}
+function saveLocal(){ localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); }
+
+async function fetchRemote(){
+  try {
+    const res = await fetch(`${REST_URL}?id=eq.${ROW_ID}&select=data`, { headers: SB_HEADERS });
+    if(!res.ok) throw new Error('fetch failed');
+    const rows = await res.json();
+    if(rows && rows.length && rows[0].data) return rows[0].data;
+    return null;
+  } catch(e){ console.warn('remote fetch failed', e); return null; }
+}
+async function pushRemote(){
+  try {
+    await fetch(REST_URL, {
+      method: 'POST', headers: SB_HEADERS,
+      body: JSON.stringify([{ id: ROW_ID, data: data, updated_at: new Date().toISOString() }])
+    });
+  } catch(e){ console.warn('remote push failed', e); }
+}
+function queueSave(){
+  saveLocal();
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(pushRemote, 600);
+}
+
+async function initState(){
+  const local = loadLocal();
+  if (local) data = local;
+  rolloverIfNewDay();
+  renderAll();
+
+  const remote = await fetchRemote();
+  if (remote) {
+    data = remote;
+    rolloverIfNewDay();
+    saveLocal();
+    renderAll();
+  }
+}
+
+// ---------- RENDER ----------
+function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderToday(){
+  const container = document.getElementById('todayList');
+  container.innerHTML = SECTIONS.map(sec => `
+    <div class="section">
+      <div class="section-head"><span class="dot" style="background:${sec.color}"></span>${esc(sec.label)}</div>
+      ${sec.tasks.map(t => {
+        const isDone = !!data.today[t.id];
+        return `
+          <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
+            <div class="check ${isDone?'on':''}">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+            </div>
+            <div class="tinfo">
+              <div class="tname ${isDone?'done':''}">${esc(t.name)}</div>
+              <div class="tnote">${esc(t.note||'')}</div>
+              ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `).join('');
+
+  const total = totalDailyTasks();
+  const done = Object.values(data.today).filter(Boolean).length;
+  document.getElementById('progtext').textContent = done + ' / ' + total;
+  document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
+  document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
+}
+
+function renderHistory(){
+  const container = document.getElementById('historyList');
+  const dates = Object.keys(data.history).sort().reverse();
+  if (!dates.length){
+    container.innerHTML = '<div class="hist-empty">No history yet — complete some tasks today, and once a new day rolls over it\'ll show up here.</div>';
+    return;
+  }
+  container.innerHTML = dates.map(d => {
+    const h = data.history[d];
+    const pct = h.total ? Math.round((h.done/h.total)*100) : 0;
+    const color = pct >= 80 ? '#7bc142' : pct >= 40 ? '#f0c14b' : '#e0473f';
+    return `
+      <div class="hist-row">
+        <div>
+          <div class="hist-date">${esc(prettyDate(d))}</div>
+          <div class="hist-stats">${h.done} / ${h.total} tasks completed</div>
+        </div>
+        <div class="hist-pct" style="color:${color}">${pct}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderMansion(){
+  const container = document.getElementById('mansionList');
+  container.innerHTML = MANSION_STEPS.map(t => {
+    const isDone = !!data.mansion[t.id];
+    return `
+      <div class="task ${isDone?'done':''}" data-mansionid="${t.id}" style="background:rgba(255,255,255,.03);">
+        <div class="check ${isDone?'on':''}">
+          <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+        </div>
+        <div class="tinfo">
+          <div class="tname ${isDone?'done':''}">${esc(t.label)}</div>
+          ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAll(){
+  renderToday();
+  renderHistory();
+  renderMansion();
+}
+
+// ---------- EVENTS ----------
+document.addEventListener('click', (e) => {
+  const tabEl = e.target.closest('.tab');
+  if (tabEl) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tabEl.classList.add('active');
+    document.getElementById('view-' + tabEl.dataset.view).classList.add('active');
+    return;
+  }
+  const taskEl = e.target.closest('[data-taskid]');
+  if (taskEl) {
+    const id = taskEl.dataset.taskid;
+    rolloverIfNewDay();
+    data.today[id] = !data.today[id];
+    queueSave();
+    renderToday();
+    return;
+  }
+  const mansionEl = e.target.closest('[data-mansionid]');
+  if (mansionEl) {
+    const id = mansionEl.dataset.mansionid;
+    data.mansion[id] = !data.mansion[id];
+    queueSave();
+    renderMansion();
+    return;
+  }
+});
+
+// check for day rollover periodically in case the tab is left open overnight
+setInterval(() => {
+  const before = data.currentDate;
+  rolloverIfNewDay();
+  if (before !== data.currentDate) { queueSave(); renderAll(); }
+}, 60000);
+
+initState();
+</script>
+</body>
+</html>
