@@ -104,9 +104,35 @@ header::after{
 .section-head{
   display:flex; align-items:center; gap:8px;
   font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
-  color:var(--dim); margin-bottom:8px; padding-left:2px;
+  color:var(--dim); margin-bottom:8px; padding:6px 8px 6px 2px;
+  border-radius:8px;
+  cursor:pointer;
+  user-select:none;
 }
+.section-head:hover{background:rgba(255,255,255,.03);}
 .section-head .dot{width:8px; height:8px; border-radius:50%; flex:none;}
+.section-head .label-text{flex:1;}
+.section-head .chevron{
+  transition:transform .2s; color:var(--dim); font-size:11px; flex:none;
+}
+.section.collapsed .chevron{transform:rotate(-90deg);}
+.section.collapsed .section-body{display:none;}
+.section-drag{
+  flex:none; color:var(--dim); font-size:15px; padding:2px 4px;
+  cursor:grab; touch-action:none;
+}
+.section-drag:active{cursor:grabbing;}
+.section.sortable-ghost{opacity:.35;}
+.section.sortable-chosen .section-head{background:rgba(255,255,255,.05);}
+
+.task-drag{
+  flex:none; color:var(--dim); font-size:13px; padding:4px 2px 4px 0;
+  cursor:grab; touch-action:none; opacity:.5;
+  margin-top:1px;
+}
+.task-drag:active{cursor:grabbing;}
+.task.sortable-ghost{opacity:.3;}
+.task.sortable-chosen{background:var(--panel2);}
 
 .task{
   display:flex; align-items:flex-start; gap:12px;
@@ -164,6 +190,7 @@ header::after{
 
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -292,8 +319,23 @@ let data = {
   currentDate: todayStr(),
   today: {},       // taskId -> bool (resets daily)
   history: {},      // date -> { checks: {}, done: n, total: n }
-  mansion: {}       // taskId -> bool, never resets
+  mansion: {},      // taskId -> bool, never resets
+  sectionOrder: null,       // array of section ids, in display order. null = use default SECTIONS order
+  taskOrder: {},            // sectionId -> array of task ids, in display order. missing = use default order
+  collapsed: {}             // sectionId -> bool
 };
+
+function ensureOrder(){
+  if (!data.sectionOrder) data.sectionOrder = SECTIONS.map(s => s.id);
+  // include any sections that exist in SECTIONS but not yet in sectionOrder (e.g. after an update)
+  SECTIONS.forEach(s => { if (!data.sectionOrder.includes(s.id)) data.sectionOrder.push(s.id); });
+  SECTIONS.forEach(sec => {
+    if (!data.taskOrder[sec.id]) data.taskOrder[sec.id] = sec.tasks.map(t => t.id);
+    const known = sec.tasks.map(t => t.id);
+    data.taskOrder[sec.id].forEach(id => { if (!known.includes(id)) { const i = data.taskOrder[sec.id].indexOf(id); data.taskOrder[sec.id].splice(i,1); } });
+    known.forEach(id => { if (!data.taskOrder[sec.id].includes(id)) data.taskOrder[sec.id].push(id); });
+  });
+}
 let saveTimeout = null;
 
 function totalDailyTasks(){
@@ -359,33 +401,90 @@ async function initState(){
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function renderToday(){
+  ensureOrder();
   const container = document.getElementById('todayList');
-  container.innerHTML = SECTIONS.map(sec => `
-    <div class="section">
-      <div class="section-head"><span class="dot" style="background:${sec.color}"></span>${esc(sec.label)}</div>
-      ${sec.tasks.map(t => {
-        const isDone = !!data.today[t.id];
-        return `
-          <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
-            <div class="check ${isDone?'on':''}">
-              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+  const orderedSections = data.sectionOrder.map(id => SECTIONS.find(s => s.id === id)).filter(Boolean);
+
+  container.innerHTML = orderedSections.map(sec => {
+    const isCollapsed = !!data.collapsed[sec.id];
+    const orderedTaskIds = data.taskOrder[sec.id] || sec.tasks.map(t => t.id);
+    const tasksById = Object.fromEntries(sec.tasks.map(t => [t.id, t]));
+    const doneInSection = orderedTaskIds.filter(id => data.today[id]).length;
+    return `
+    <div class="section ${isCollapsed ? 'collapsed' : ''}" data-sectionid="${sec.id}">
+      <div class="section-head" data-sectiontoggle="${sec.id}">
+        <span class="section-drag" data-sectiondrag>&#9776;</span>
+        <span class="dot" style="background:${sec.color}"></span>
+        <span class="label-text">${esc(sec.label)} <span style="color:${sec.color};font-weight:800;">(${doneInSection}/${orderedTaskIds.length})</span></span>
+        <span class="chevron">&#9656;</span>
+      </div>
+      <div class="section-body" data-tasklist="${sec.id}">
+        ${orderedTaskIds.map(tid => {
+          const t = tasksById[tid];
+          if (!t) return '';
+          const isDone = !!data.today[t.id];
+          return `
+            <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
+              <span class="task-drag" data-taskdrag>&#9776;</span>
+              <div class="check ${isDone?'on':''}" data-checkbtn>
+                <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+              </div>
+              <div class="tinfo" data-checkbtn>
+                <div class="tname ${isDone?'done':''}">${esc(t.name)}</div>
+                <div class="tnote">${esc(t.note||'')}</div>
+                ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
+              </div>
             </div>
-            <div class="tinfo">
-              <div class="tname ${isDone?'done':''}">${esc(t.name)}</div>
-              <div class="tnote">${esc(t.note||'')}</div>
-              ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
-            </div>
-          </div>
-        `;
-      }).join('')}
+          `;
+        }).join('')}
+      </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   const total = totalDailyTasks();
   const done = Object.values(data.today).filter(Boolean).length;
   document.getElementById('progtext').textContent = done + ' / ' + total;
   document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
   document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
+
+  initSortables();
+}
+
+let sectionSortable = null;
+let taskSortables = [];
+
+function initSortables(){
+  const container = document.getElementById('todayList');
+  if (sectionSortable) { sectionSortable.destroy(); sectionSortable = null; }
+  taskSortables.forEach(s => s.destroy());
+  taskSortables = [];
+
+  if (!window.Sortable) return; // graceful skip if CDN failed to load
+
+  sectionSortable = Sortable.create(container, {
+    handle: '[data-sectiondrag]',
+    animation: 150,
+    onEnd: () => {
+      const newOrder = Array.from(container.children).map(el => el.dataset.sectionid);
+      data.sectionOrder = newOrder;
+      queueSave();
+    }
+  });
+
+  document.querySelectorAll('[data-tasklist]').forEach(listEl => {
+    const sectionId = listEl.dataset.tasklist;
+    const s = Sortable.create(listEl, {
+      handle: '[data-taskdrag]',
+      animation: 150,
+      onEnd: () => {
+        const newOrder = Array.from(listEl.children).map(el => el.dataset.taskid);
+        data.taskOrder[sectionId] = newOrder;
+        queueSave();
+      }
+    });
+    taskSortables.push(s);
+  });
 }
 
 function renderHistory(){
@@ -445,8 +544,19 @@ document.addEventListener('click', (e) => {
     document.getElementById('view-' + tabEl.dataset.view).classList.add('active');
     return;
   }
+  // don't toggle collapse/task when clicking a drag handle itself
+  if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]')) return;
+
+  const sectionHead = e.target.closest('[data-sectiontoggle]');
+  if (sectionHead) {
+    const id = sectionHead.dataset.sectiontoggle;
+    data.collapsed[id] = !data.collapsed[id];
+    queueSave();
+    renderToday();
+    return;
+  }
   const taskEl = e.target.closest('[data-taskid]');
-  if (taskEl) {
+  if (taskEl && e.target.closest('[data-checkbtn]')) {
     const id = taskEl.dataset.taskid;
     rolloverIfNewDay();
     data.today[id] = !data.today[id];
