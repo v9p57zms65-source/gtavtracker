@@ -575,6 +575,17 @@ document.addEventListener('click', (e) => {
     const id = taskEl.dataset.taskid;
     rolloverIfNewDay();
     data.today[id] = !data.today[id];
+
+    // If this task just completed its whole section, auto-collapse that section.
+    if (data.today[id]) {
+      const owningSection = SECTIONS.find(sec => sec.tasks.some(t => t.id === id));
+      if (owningSection) {
+        const orderedIds = data.taskOrder[owningSection.id] || owningSection.tasks.map(t => t.id);
+        const allDone = orderedIds.every(tid => data.today[tid]);
+        if (allDone) data.collapsed[owningSection.id] = true;
+      }
+    }
+
     queueSave();
     renderToday();
     return;
