@@ -239,48 +239,61 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 <script>
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
-  { id: 'purple', label: "Daily Purple-Icon Events", color: '#b06bff', tasks: [
+  { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
     { id: 'gs_cache', name: "Find G's Cache", note: "Purple crate w/ question mark, 15 possible spots. ~$15-22K + ammo + snacks. Resets daily." },
     { id: 'stash_house', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
-    { id: 'madrazo_hit', name: "Do today's Madrazo Hit", note: 'Bail Office contact. $20,000 + $10,000 bonus for using his specified weapon = $30,000/day.' },
+    { id: 'madrazo_hit', name: "Do today's Madrazo Hit", note: 'Purple dollar icon. $20,000 + $10,000 bonus for using his specified weapon = $30,000/day.' },
   ]},
-  { id: 'safes', label: 'Collect the Safes', color: '#f0c14b', tasks: [
-    { id: 'agency_safe', name: 'Agency Safe', note: 'Up to $20,000/day once maxed (201 contracts). Caps at $250,000 stored.' },
-    { id: 'nightclub_safe', name: 'Nightclub Safe', note: 'Best passive earner — up to $50,000/day at 95-100% popularity.' },
-    { id: 'salvage_safe', name: 'Salvage Yard Office Safe', note: '~$24,000/day passive — mechanics dismantle cars even while you\'re offline.' },
-    { id: 'arcade_safe', name: 'Arcade cabinet income', note: 'Low but free — ~$5,000/day when cabinets are maxed.' },
-    { id: 'moneyfronts_safe', name: 'Money Fronts safes (Car Wash / Smoke on the Water / Higgins)', note: 'Each caps ~$100K. If a Heat meter is near full, run one legal job there first or income pauses.' },
-    { id: 'garment_safe', name: 'Garment Factory safe', note: 'Smallest passive earner (~$2,000/day) but free money is free money.' },
-    { id: 'bail_agents', name: 'Send both Bail Enforcement Agents, then collect safe', note: 'Each run pays $5K-$10K randomly, takes 48 min. Safe caps at $100K ($200K for GTA+). Must be present to dispatch.' },
-  ]},
-  { id: 'boost', label: 'Boosts (do these before grinding)', color: '#ff8a3d', tasks: [
-    { id: 'mansion_boost', name: "Set Mansion's Business Production Boost", note: 'Pick one business for x3 speed, 24h. Only once Mansion is owned.', optional: true },
-    { id: 'acid_boost', name: 'Trigger Acid Lab chemistry-table boost', note: 'Walk up to the table inside the lab. Once/day, resets 6am GMT.' },
-  ]},
-  { id: 'mc', label: 'MC Businesses — Source & Sell', color: '#7bc142', tasks: [
+  { id: 'mansion', label: '1. Mansion — start here', color: '#f0c14b', tasks: [
+    { id: 'mansion_boost', name: "Set today's Business Production Boost", note: 'Pick one business for x3 speed, 24h, from the wall terminal.', optional: true },
     { id: 'bunker', name: 'Bunker: buy supplies / check stock', note: 'Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.' },
     { id: 'coke', name: 'Cocaine Lockup: source & sell', note: 'Sell at 5 stacks or fewer for guaranteed 1 vehicle.' },
     { id: 'meth', name: 'Meth Lab: source & sell', note: 'Sell at 10 bins or fewer to stay capped at 2 vehicles.' },
     { id: 'weed', name: 'Weed Farm: source & sell', note: 'Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.' },
-    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: 'Boosted +35%/~$65K-hr if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
+    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: 'Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
     { id: 'docforge', name: 'Document Forgery: source & sell', note: 'Weakest earner of the 5 — optional, low priority.', optional: true },
   ]},
-  { id: 'nightclub', label: 'Nightclub', color: '#7bc142', tasks: [
+  { id: 'acid', label: '2. Acid Lab', color: '#c4e538', tasks: [
+    { id: 'acid_boost', name: 'Trigger the chemistry-table boost', note: 'Walk up to the table inside. Once/day, resets 6am GMT.' },
+    { id: 'acid_supply', name: 'Buy/check supplies', note: 'Keep production running.' },
+    { id: 'acid_sell', name: 'Sell if stocked', note: 'Always a single delivery vehicle regardless of stock — no cap to worry about here.' },
+  ]},
+  { id: 'nightclub', label: '3. Nightclub', color: '#ff3dd8', tasks: [
+    { id: 'nightclub_safe', name: 'Collect the safe', note: 'Best passive earner — up to $50,000/day at 95-100% popularity.' },
     { id: 'nc_tech', name: 'Check technician assignments (5 slots)', note: 'Prioritize Cocaine/Meth/Bunker/Counterfeit. Skip Weed & Document Forgery.' },
-    { id: 'nc_popularity', name: 'Run a Promote Club mission (optional)', note: 'English Dave / Tony / Lazlow popularity jobs. Keep popularity above 90% for full safe payout.', optional: true },
+    { id: 'nc_popularity', name: 'Check popularity — run a Promote mission if it\'s slipping', note: 'Keep it above 90% for full safe payout. English Dave / Tony / Lazlow jobs.', optional: true },
+    { id: 'nc_warehouse_sell', name: 'Check warehouse stock — sell if worth it', note: 'Always a single vehicle, no risk. Sell whenever there\'s a meaningful amount.' },
   ]},
-  { id: 'ceo', label: 'CEO Cargo Businesses', color: '#ff8a3d', tasks: [
-    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.' },
-    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.' },
-    { id: 'hangar_cargo', name: 'Air Freight Cargo: source matching crates', note: 'Stick to ONE top-tier type (Narcotics/Chemicals/Medical). +10% if Higgins Helitours owned. Sell at 25 or 50.', optional: true },
-  ]},
-  { id: 'agency', label: 'Agency', color: '#ff3d7f', tasks: [
+  { id: 'agency', label: '4. Agency', color: '#ff3d7f', tasks: [
+    { id: 'agency_safe', name: 'Collect Agency Safe', note: 'Up to $20,000/day once maxed. Caps at $250,000 stored.' },
     { id: 'sec_contract', name: 'Run a Security Contract (Severe tier)', note: '~$320K/hr. Pick from computer for guaranteed tier choice.' },
     { id: 'payphone', name: 'Check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', optional: true },
   ]},
-  { id: 'vehicle_biz', label: 'Auto Shop & Salvage Yard', color: '#8b8b95', tasks: [
-    { id: 'autoshop_contract', name: 'Auto Shop: check for a Client Job', note: '$170K-300K, ~30-45 min, ~$400K/hr efficient.' },
-    { id: 'salvage_tow', name: 'Salvage Yard: run a tow / check dismantling queue', note: 'Runs passively even offline — just keep feeding it.' },
+  { id: 'ceo_cargo', label: '5. CEO Warehouses', color: '#ff8a3d', tasks: [
+    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.' },
+    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.' },
+    { id: 'hangar_cargo', name: 'Air Freight Cargo: source matching crates', note: 'Stick to ONE top-tier type. +10% if Higgins Helitours owned. Sell at 25 or 50.', optional: true },
+  ]},
+  { id: 'autoshop', label: '6. Auto Shop', color: '#3d9bdc', tasks: [
+    { id: 'autoshop_contract', name: 'Check for a Client Job', note: '$170K-300K, ~30-45 min, ~$400K/hr efficient.' },
+  ]},
+  { id: 'salvage', label: '7. Salvage Yard', color: '#8b8b95', tasks: [
+    { id: 'salvage_safe', name: 'Collect Office Safe', note: '~$24,000/day passive — mechanics dismantle cars even while offline.' },
+    { id: 'salvage_tow', name: 'Run a tow / check dismantling queue', note: 'Runs passively even offline — just keep feeding it.' },
+  ]},
+  { id: 'bail', label: '8. Bail Office', color: '#8b8b95', tasks: [
+    { id: 'bail_agents', name: 'Send both Bail Enforcement Agents, then collect safe', note: 'Each run pays $5K-$10K randomly, takes 48 min. Safe caps at $100K ($200K for GTA+).' },
+  ]},
+  { id: 'garment', label: '9. Garment Factory', color: '#8b8b95', tasks: [
+    { id: 'garment_safe', name: 'Collect safe', note: 'Smallest passive earner (~$2,000/day) but free money is free money.' },
+  ]},
+  { id: 'arcade', label: '10. Arcade', color: '#8b8b95', tasks: [
+    { id: 'arcade_safe', name: 'Collect cabinet income', note: 'Low but free — ~$5,000/day when cabinets are maxed.' },
+  ]},
+  { id: 'moneyfronts', label: '11. Money Fronts (Car Wash, Smoke on the Water, Higgins)', color: '#5ec9c4', tasks: [
+    { id: 'mf_carwash', name: 'Hands On Car Wash: check Heat, collect safe, run a job', note: 'Legal job if Heat is high, illegal ($35K) if it isn\'t. All laundered cash pays out here.' },
+    { id: 'mf_smoke', name: 'Smoke on the Water: check Heat, collect safe, run a job', note: 'Entrance is a highlighted door at the BACK of the building.' },
+    { id: 'mf_higgins', name: 'Higgins Helitours: check Heat, collect safe, run a job', note: 'Comes with its own Maverick helicopter you can call in.' },
   ]},
 ];
 
