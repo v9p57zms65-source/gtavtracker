@@ -327,12 +327,14 @@ let data = {
 
 function ensureOrder(){
   if (!data.sectionOrder) data.sectionOrder = SECTIONS.map(s => s.id);
+  if (!data.taskOrder) data.taskOrder = {};
+  if (!data.collapsed) data.collapsed = {};
   // include any sections that exist in SECTIONS but not yet in sectionOrder (e.g. after an update)
   SECTIONS.forEach(s => { if (!data.sectionOrder.includes(s.id)) data.sectionOrder.push(s.id); });
   SECTIONS.forEach(sec => {
     if (!data.taskOrder[sec.id]) data.taskOrder[sec.id] = sec.tasks.map(t => t.id);
     const known = sec.tasks.map(t => t.id);
-    data.taskOrder[sec.id].forEach(id => { if (!known.includes(id)) { const i = data.taskOrder[sec.id].indexOf(id); data.taskOrder[sec.id].splice(i,1); } });
+    data.taskOrder[sec.id] = data.taskOrder[sec.id].filter(id => known.includes(id));
     known.forEach(id => { if (!data.taskOrder[sec.id].includes(id)) data.taskOrder[sec.id].push(id); });
   });
 }
