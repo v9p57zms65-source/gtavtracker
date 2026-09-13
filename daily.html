@@ -283,11 +283,7 @@ const SECTIONS = [
     { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', textColor: '#ff8a3d' },
     { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', textColor: '#ff8a3d', optional: true },
     { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', textColor: '#3d9bdc' },
-    { id: 'salvage_safe', name: 'Salvage Yard: collect Office Safe', note: '~$24,000/day passive.', textColor: '#c9c9d0' },
-    { id: 'salvage_tow', name: 'Salvage Yard: run a tow / check dismantling queue', note: 'Runs passively even offline.', textColor: '#c9c9d0' },
-    { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).', textColor: '#c9c9d0' },
     { id: 'garment_safe', name: 'Garment Factory: collect safe', note: 'Smallest passive earner (~$2,000/day).', textColor: '#c9c9d0' },
-    { id: 'arcade_safe', name: 'Arcade: collect cabinet income', note: '~$5,000/day when cabinets are maxed.', textColor: '#c9c9d0' },
   ]},
 ];
 
@@ -299,6 +295,9 @@ const ROADMAP_STEPS = [
   { id: 'r_moc', label: 'MOC + Weapon & Vehicle Workshop', price: 2180000, note: 'Mobile weaponized-vehicle workshop and an exceptionally durable truck cab.' },
   { id: 'r_ignus', label: 'Weaponized Ignus + HSW + Missile Lock-On Jammer', price: 5400000, note: 'Endgame road car: extreme speed, weapon, and jammer. A predator, not a tank.' },
   { id: 'r_avenger', label: 'Optional: Avenger + Operations Terminal', price: 4900000, note: 'Only buy if you want the Avenger and Project Overthrow missions. It unlocks the Raiju trade price, but is not worthwhile solely for that discount.', optional: true },
+  { id: 'r_arcade', label: 'Arcade', price: 1235000, note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
+  { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
+  { id: 'r_bail', label: 'Bail Office', price: 1650000, note: 'Cheapest is Paleto Bay. 2-agent bail enforcement dispatch. Add its daily task back once bought.' },
 ];
 
 // ---------- SUPABASE ----------
