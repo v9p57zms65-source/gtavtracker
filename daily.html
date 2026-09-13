@@ -192,6 +192,21 @@ header::after{
 .roadmap-total strong{display:block;color:var(--green);font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1;}
 .roadmap-total span{color:var(--dim);font-size:11.5px;text-align:right;line-height:1.45;}
 
+.sort-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:0 2px;}
+.sort-label{font-size:11px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.sort-btn{
+  font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:20px;
+  background:var(--panel);border:1px solid var(--border);color:var(--dim);
+  cursor:pointer;user-select:none;transition:.15s;
+}
+.sort-btn:hover{background:var(--panel2);}
+.sort-btn.active{background:var(--green-dark);color:#fff;border-color:var(--green);}
+
+.tname-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.tname-row .tname{flex:1;}
+.tprice{color:#5ec9c4;font-weight:800;font-size:13px;white-space:nowrap;flex:none;}
+.tname-row.done .tprice{color:var(--dim);}
+
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
@@ -522,15 +537,37 @@ function renderHistory(){
 function money(n){ return 'GTA$' + (n/1000000).toFixed(2) + 'M'; }
 function renderRoadmap(){
   if (!data.roadmap) data.roadmap = {};
+  if (!data.roadmapSort) data.roadmapSort = 'default';
   const container = document.getElementById('roadmapList');
   const core = ROADMAP_STEPS.filter(t => !t.optional);
   const remaining = core.filter(t => !data.roadmap[t.id]).reduce((sum,t) => sum + t.price, 0);
   const completed = core.filter(t => data.roadmap[t.id]).length;
-  container.innerHTML = `<div class="roadmap-total"><div><small>Core purchase target remaining</small><strong>${money(remaining)}</strong></div><span>${completed} / ${core.length} core purchases complete<br>Prices exclude temporary weekly discounts.</span></div>` + ROADMAP_STEPS.map(t => {
+
+  let steps = ROADMAP_STEPS.slice();
+  if (data.roadmapSort === 'price_asc') steps.sort((a,b) => a.price - b.price);
+  else if (data.roadmapSort === 'price_desc') steps.sort((a,b) => b.price - a.price);
+
+  const sortBar = `
+    <div class="sort-bar">
+      <span class="sort-label">Sort:</span>
+      <span class="sort-btn ${data.roadmapSort==='default'?'active':''}" data-sortmode="default">Default</span>
+      <span class="sort-btn ${data.roadmapSort==='price_asc'?'active':''}" data-sortmode="price_asc">Price ↑</span>
+      <span class="sort-btn ${data.roadmapSort==='price_desc'?'active':''}" data-sortmode="price_desc">Price ↓</span>
+    </div>`;
+
+  container.innerHTML = `<div class="roadmap-total"><div><small>Core purchase target remaining</small><strong>${money(remaining)}</strong></div><span>${completed} / ${core.length} core purchases complete<br>Prices exclude temporary weekly discounts.</span></div>`
+    + sortBar
+    + steps.map(t => {
     const isDone = !!data.roadmap[t.id];
     return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
       <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-      <div class="tinfo"><div class="tname ${isDone?'done':''}">${esc(t.label)} <span style="color:#5ec9c4;white-space:nowrap;">${money(t.price)}</span></div><div class="tnote">${esc(t.note)}</div>${t.optional?'<span class="tbadge opt">Optional</span>':''}</div>
+      <div class="tinfo">
+        <div class="tname-row ${isDone?'done':''}">
+          <span class="tname ${isDone?'done':''}">${esc(t.label)}</span>
+          <span class="tprice">${money(t.price)}</span>
+        </div>
+        <div class="tnote">${esc(t.note)}</div>${t.optional?'<span class="tbadge opt">Optional</span>':''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -587,6 +624,13 @@ document.addEventListener('click', (e) => {
     const id = roadmapEl.dataset.roadmapid;
     if (!data.roadmap) data.roadmap = {};
     data.roadmap[id] = !data.roadmap[id];
+    queueSave();
+    renderRoadmap();
+    return;
+  }
+  const sortBtn = e.target.closest('[data-sortmode]');
+  if (sortBtn) {
+    data.roadmapSort = sortBtn.dataset.sortmode;
     queueSave();
     renderRoadmap();
     return;
