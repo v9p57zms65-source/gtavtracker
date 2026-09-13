@@ -207,9 +207,8 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 
   <div class="tabs">
     <div class="tab active" data-view="today">Today</div>
-    <div class="tab" data-view="history">History</div>
-    <div class="tab" data-view="mansion">Mansion Goal</div>
     <div class="tab" data-view="roadmap">Long-Term</div>
+    <div class="tab" data-view="history">History</div>
   </div>
 
   <!-- TODAY -->
@@ -224,15 +223,6 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
   <!-- HISTORY -->
   <div class="view" id="view-history">
     <div id="historyList"></div>
-  </div>
-
-  <!-- MANSION -->
-  <div class="view" id="view-mansion">
-    <div class="goal-card">
-      <div class="goal-title">Get the Mansion</div>
-      <div class="goal-sub">One-time goal, not daily. Doesn't reset — check items off as you actually do them.</div>
-      <div id="mansionList"></div>
-    </div>
   </div>
 
   <!-- LONG-TERM PVP ROADMAP -->
@@ -301,15 +291,6 @@ const SECTIONS = [
   ]},
 ];
 
-const MANSION_STEPS = [
-  { id: 'm_pick', label: 'Decide which Mansion (Tongva Estate / Vinewood Residence / Richman Villa)', note: 'All three have identical interiors — pure location preference.' },
-  { id: 'm_save', label: 'Save enough cash ($11.5M–$12.8M base)' },
-  { id: 'm_buy', label: 'Buy the Mansion' },
-  { id: 'm_armory', label: 'Buy Armory upgrade ($720,000)' },
-  { id: 'm_workshop', label: 'Buy Vehicle Workshop upgrade ($880,000)' },
-  { id: 'm_skip', label: 'Skip the Arcade add-on (needs a separate Arcade you don\'t have) and Security unless griefed often' },
-];
-
 const ROADMAP_STEPS = [
   { id: 'r_nightshark', label: 'Nightshark', price: 1245000, note: 'Armored escape vehicle. First priority: it handles prolonged missile pressure far better than your Virtue.' },
   { id: 'r_hangar', label: 'Fort Zancudo Hangar + Aircraft Workshop', price: 3800000, note: 'Raiju storage and customization, plus access to Fort Zancudo. Uses Hangar 3499 with the workshop.' },
@@ -346,7 +327,6 @@ let data = {
   currentDate: todayStr(),
   today: {},       // taskId -> bool (resets daily)
   history: {},      // date -> { checks: {}, done: n, total: n }
-  mansion: {},      // taskId -> bool, never resets
   roadmap: {},      // long-term PvP garage purchases, never resets
   sectionOrder: null,       // array of section ids, in display order. null = use default SECTIONS order
   taskOrder: {},            // sectionId -> array of task ids, in display order. missing = use default order
@@ -541,24 +521,6 @@ function renderHistory(){
   }).join('');
 }
 
-function renderMansion(){
-  const container = document.getElementById('mansionList');
-  container.innerHTML = MANSION_STEPS.map(t => {
-    const isDone = !!data.mansion[t.id];
-    return `
-      <div class="task ${isDone?'done':''}" data-mansionid="${t.id}" style="background:rgba(255,255,255,.03);">
-        <div class="check ${isDone?'on':''}">
-          <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
-        </div>
-        <div class="tinfo">
-          <div class="tname ${isDone?'done':''}">${esc(t.label)}</div>
-          ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
 function money(n){ return 'GTA$' + (n/1000000).toFixed(2) + 'M'; }
 function renderRoadmap(){
   if (!data.roadmap) data.roadmap = {};
@@ -578,7 +540,6 @@ function renderRoadmap(){
 function renderAll(){
   renderToday();
   renderHistory();
-  renderMansion();
   renderRoadmap();
 }
 
@@ -621,14 +582,6 @@ document.addEventListener('click', (e) => {
 
     queueSave();
     renderToday();
-    return;
-  }
-  const mansionEl = e.target.closest('[data-mansionid]');
-  if (mansionEl) {
-    const id = mansionEl.dataset.mansionid;
-    data.mansion[id] = !data.mansion[id];
-    queueSave();
-    renderMansion();
     return;
   }
   const roadmapEl = e.target.closest('[data-roadmapid]');
