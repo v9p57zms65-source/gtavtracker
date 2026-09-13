@@ -255,19 +255,23 @@ const SECTIONS = [
     { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: 'Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
     { id: 'docforge', name: 'Document Forgery: source & sell', note: 'Weakest earner of the 5 — optional, low priority.', optional: true },
   ]},
+  { id: 'acid', label: 'Acid Lab', color: '#c4e538', tasks: [
+    { id: 'acid_boost', name: 'Trigger the chemistry-table boost', note: 'Walk up to the table inside. Once/day, resets 6am GMT.' },
+    { id: 'acid_supply', name: 'Buy/check supplies', note: 'Keep production running.' },
+    { id: 'acid_sell', name: 'Sell if stocked', note: 'Always a single delivery vehicle regardless of stock.' },
+  ]},
+  { id: 'nightclub', label: 'Nightclub', color: '#ff3dd8', tasks: [
+    { id: 'nightclub_safe', name: 'Collect safe', note: 'Best passive earner — up to $50,000/day at 95-100% popularity.' },
+    { id: 'nc_tech', name: 'Check technician assignments (5 slots)', note: 'Prioritize Cocaine/Meth/Bunker/Counterfeit. Skip Weed & Document Forgery.' },
+    { id: 'nc_popularity', name: 'Check popularity, run a Promote mission if slipping', note: 'Keep it above 90% for full safe payout.', optional: true },
+    { id: 'nc_warehouse_sell', name: 'Check warehouse stock, sell if worth it', note: 'Always a single vehicle, no risk.' },
+  ]},
   { id: 'moneyfronts', label: 'Money Laundering (Money Fronts)', color: '#5ec9c4', tasks: [
     { id: 'mf_carwash', name: 'Hands On Car Wash: collect safe, check Heat, run a job', note: 'Legal job if Heat is high, illegal ($35K) if it isn\'t. All laundered cash from all 3 fronts pays out here.' },
     { id: 'mf_smoke', name: 'Smoke on the Water: check Heat, run a job', note: 'Entrance is a highlighted door at the BACK of the building. No separate safe here — earnings pay out at the Car Wash.' },
     { id: 'mf_higgins', name: 'Higgins Helitours: check Heat, run a job', note: 'Comes with its own Maverick helicopter you can call in. No separate safe here — earnings pay out at the Car Wash.' },
   ]},
-  { id: 'ceo', label: 'CEO Operations', color: '#8b8b95', tasks: [
-    { id: 'acid_boost', name: 'Acid Lab: trigger chemistry-table boost', note: 'Walk up to the table inside. Once/day, resets 6am GMT.', textColor: '#c4e538' },
-    { id: 'acid_supply', name: 'Acid Lab: buy/check supplies', note: 'Keep production running.', textColor: '#c4e538' },
-    { id: 'acid_sell', name: 'Acid Lab: sell if stocked', note: 'Always a single delivery vehicle regardless of stock.', textColor: '#c4e538' },
-    { id: 'nightclub_safe', name: 'Nightclub: collect safe', note: 'Best passive earner — up to $50,000/day at 95-100% popularity.', textColor: '#ff3dd8' },
-    { id: 'nc_tech', name: 'Nightclub: check technician assignments (5 slots)', note: 'Prioritize Cocaine/Meth/Bunker/Counterfeit. Skip Weed & Document Forgery.', textColor: '#ff3dd8' },
-    { id: 'nc_popularity', name: 'Nightclub: check popularity, run a Promote mission if slipping', note: 'Keep it above 90% for full safe payout.', textColor: '#ff3dd8', optional: true },
-    { id: 'nc_warehouse_sell', name: 'Nightclub: check warehouse stock, sell if worth it', note: 'Always a single vehicle, no risk.', textColor: '#ff3dd8' },
+  { id: 'ceo', label: 'CEO Operations', color: '#6c7bff', tasks: [
     { id: 'agency_safe', name: 'Agency: collect safe', note: 'Up to $20,000/day once maxed. Caps at $250,000 stored.', textColor: '#ff3d7f' },
     { id: 'sec_contract', name: 'Agency: run a Security Contract (Severe tier)', note: '~$320K/hr. Pick from computer for guaranteed tier choice.', textColor: '#ff3d7f' },
     { id: 'payphone', name: 'Agency: check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', textColor: '#ff3d7f', optional: true },
