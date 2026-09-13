@@ -187,6 +187,10 @@ header::after{
 }
 .goal-title{font-family:'Archivo Black',sans-serif; font-size:18px; color:var(--gold); text-transform:uppercase; letter-spacing:.4px;}
 .goal-sub{font-size:12.5px; color:var(--dim); margin-top:4px; margin-bottom:14px;}
+.roadmap-total{display:flex;justify-content:space-between;align-items:end;gap:14px;background:rgba(123,193,66,.09);border:1px solid rgba(123,193,66,.32);border-radius:10px;padding:13px 14px;margin-bottom:12px;}
+.roadmap-total small{display:block;color:var(--dim);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;}
+.roadmap-total strong{display:block;color:var(--green);font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1;}
+.roadmap-total span{color:var(--dim);font-size:11.5px;text-align:right;line-height:1.45;}
 
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
 </style>
@@ -205,6 +209,7 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
     <div class="tab active" data-view="today">Today</div>
     <div class="tab" data-view="history">History</div>
     <div class="tab" data-view="mansion">Mansion Goal</div>
+    <div class="tab" data-view="roadmap">Long-Term</div>
   </div>
 
   <!-- TODAY -->
@@ -227,6 +232,15 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
       <div class="goal-title">Get the Mansion</div>
       <div class="goal-sub">One-time goal, not daily. Doesn't reset — check items off as you actually do them.</div>
       <div id="mansionList"></div>
+    </div>
+  </div>
+
+  <!-- LONG-TERM PVP ROADMAP -->
+  <div class="view" id="view-roadmap">
+    <div class="goal-card" style="background:linear-gradient(135deg,#101a20,#0d1014);border-color:rgba(94,201,196,.35);">
+      <div class="goal-title" style="color:#5ec9c4;">PvP Garage</div>
+      <div class="goal-sub">Long-term purchases — separate from the daily loop. Your jammer-equipped Virtue and fully upgraded Oppressor Mk II are already covered.</div>
+      <div id="roadmapList"></div>
     </div>
   </div>
 
@@ -296,6 +310,16 @@ const MANSION_STEPS = [
   { id: 'm_skip', label: 'Skip the Arcade add-on (needs a separate Arcade you don\'t have) and Security unless griefed often' },
 ];
 
+const ROADMAP_STEPS = [
+  { id: 'r_nightshark', label: 'Nightshark', price: 1245000, note: 'Armored escape vehicle. First priority: it handles prolonged missile pressure far better than your Virtue.' },
+  { id: 'r_hangar', label: 'Fort Zancudo Hangar + Aircraft Workshop', price: 3800000, note: 'Raiju storage and customization, plus access to Fort Zancudo. Uses Hangar 3499 with the workshop.' },
+  { id: 'r_raiju', label: 'F-160 Raiju', price: 8500000, note: 'Stealth VTOL and your air-superiority centerpiece. Buy at standard price unless you also want an Avenger.' },
+  { id: 'r_akula', label: 'Akula', price: 4500000, note: 'Stealth helicopter for disappearing, repositioning, and attacking on your terms.' },
+  { id: 'r_moc', label: 'MOC + Weapon & Vehicle Workshop', price: 2180000, note: 'Mobile weaponized-vehicle workshop and an exceptionally durable truck cab.' },
+  { id: 'r_ignus', label: 'Weaponized Ignus + HSW + Missile Lock-On Jammer', price: 5400000, note: 'Endgame road car: extreme speed, weapon, and jammer. A predator, not a tank.' },
+  { id: 'r_avenger', label: 'Optional: Avenger + Operations Terminal', price: 4900000, note: 'Only buy if you want the Avenger and Project Overthrow missions. It unlocks the Raiju trade price, but is not worthwhile solely for that discount.', optional: true },
+];
+
 // ---------- SUPABASE ----------
 const SUPABASE_URL = 'https://einodrrumonmokcpeswi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpbm9kcnJ1bW9ubW9rY3Blc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0Mjk0NDgsImV4cCI6MjEwMTAwNTQ0OH0.mb-pM_UmDVJYsAo6U73fKOqeJbCbNpKL5zNgVDSt0qo';
@@ -323,6 +347,7 @@ let data = {
   today: {},       // taskId -> bool (resets daily)
   history: {},      // date -> { checks: {}, done: n, total: n }
   mansion: {},      // taskId -> bool, never resets
+  roadmap: {},      // long-term PvP garage purchases, never resets
   sectionOrder: null,       // array of section ids, in display order. null = use default SECTIONS order
   taskOrder: {},            // sectionId -> array of task ids, in display order. missing = use default order
   collapsed: {}             // sectionId -> bool
@@ -332,6 +357,7 @@ function ensureOrder(){
   if (!data.sectionOrder) data.sectionOrder = SECTIONS.map(s => s.id);
   if (!data.taskOrder) data.taskOrder = {};
   if (!data.collapsed) data.collapsed = {};
+  if (!data.roadmap) data.roadmap = {};
   // include any sections that exist in SECTIONS but not yet in sectionOrder (e.g. after an update)
   SECTIONS.forEach(s => { if (!data.sectionOrder.includes(s.id)) data.sectionOrder.push(s.id); });
   SECTIONS.forEach(sec => {
@@ -533,10 +559,27 @@ function renderMansion(){
   }).join('');
 }
 
+function money(n){ return 'GTA$' + (n/1000000).toFixed(2) + 'M'; }
+function renderRoadmap(){
+  if (!data.roadmap) data.roadmap = {};
+  const container = document.getElementById('roadmapList');
+  const core = ROADMAP_STEPS.filter(t => !t.optional);
+  const remaining = core.filter(t => !data.roadmap[t.id]).reduce((sum,t) => sum + t.price, 0);
+  const completed = core.filter(t => data.roadmap[t.id]).length;
+  container.innerHTML = `<div class="roadmap-total"><div><small>Core purchase target remaining</small><strong>${money(remaining)}</strong></div><span>${completed} / ${core.length} core purchases complete<br>Prices exclude temporary weekly discounts.</span></div>` + ROADMAP_STEPS.map(t => {
+    const isDone = !!data.roadmap[t.id];
+    return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
+      <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="tinfo"><div class="tname ${isDone?'done':''}">${esc(t.label)} <span style="color:#5ec9c4;white-space:nowrap;">${money(t.price)}</span></div><div class="tnote">${esc(t.note)}</div>${t.optional?'<span class="tbadge opt">Optional</span>':''}</div>
+    </div>`;
+  }).join('');
+}
+
 function renderAll(){
   renderToday();
   renderHistory();
   renderMansion();
+  renderRoadmap();
 }
 
 // ---------- EVENTS ----------
@@ -586,6 +629,15 @@ document.addEventListener('click', (e) => {
     data.mansion[id] = !data.mansion[id];
     queueSave();
     renderMansion();
+    return;
+  }
+  const roadmapEl = e.target.closest('[data-roadmapid]');
+  if (roadmapEl) {
+    const id = roadmapEl.dataset.roadmapid;
+    if (!data.roadmap) data.roadmap = {};
+    data.roadmap[id] = !data.roadmap[id];
+    queueSave();
+    renderRoadmap();
     return;
   }
 });
