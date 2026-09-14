@@ -375,6 +375,7 @@ function rolloverIfNewDay(){
     data.history[data.currentDate] = { checks: data.today, done: doneCount, total: total };
     data.today = {};
     data.currentDate = t;
+    data.collapsed = {}; // fresh day, expand every category again
   }
 }
 
