@@ -68,17 +68,19 @@ header::after{
 .hdate{position:relative; z-index:2; color:#fff; font-size:13px; margin-top:12px; font-weight:700; letter-spacing:.3px;}
 
 /* ---- Tabs ---- */
-.tabs{display:flex; gap:8px; margin-bottom:16px;}
+.tabs{display:flex; gap:6px; margin-bottom:16px; overflow-x:auto;}
 .tab{
   flex:1;
+  min-width:0;
   text-align:center;
-  padding:10px 8px;
+  padding:9px 4px;
   border-radius:10px;
   background:var(--panel);
   border:1px solid var(--border);
   font-weight:700;
-  font-size:12.5px;
-  letter-spacing:.3px;
+  font-size:11.5px;
+  letter-spacing:.2px;
+  white-space:nowrap;
   color:var(--dim);
   cursor:pointer;
   transition:.15s;
@@ -223,6 +225,7 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
   <div class="tabs">
     <div class="tab active" data-view="today">Today</div>
     <div class="tab" data-view="roadmap">Long-Term</div>
+    <div class="tab" data-view="heists">Heists</div>
     <div class="tab" data-view="history">History</div>
   </div>
 
@@ -240,6 +243,16 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
     <div id="historyList"></div>
   </div>
 
+  <!-- HEISTS & JOBS -->
+  <div class="view" id="view-heists">
+    <p class="goal-sub" style="margin:0 0 14px;">Every major Heist, in the order it unlocks, plus notable standalone Jobs. Tap a category to collapse it, tap a Heist with sub-items to reveal its Acts/Approaches.</p>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="heistFill"></div></div>
+      <div class="progress-text" id="heistProgtext">0 / 0</div>
+    </div>
+    <div id="heistList"></div>
+  </div>
+
   <!-- LONG-TERM PVP ROADMAP -->
   <div class="view" id="view-roadmap">
     <div class="goal-card" style="background:linear-gradient(135deg,#101a20,#0d1014);border-color:rgba(94,201,196,.35);">
@@ -251,7 +264,7 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 
   <footer>
     Progress syncs automatically across your devices.<br>
-    "Today" resets once per real-world day — whatever's checked when the date rolls over gets logged to History.
+    "Today" resets once per real-world day — whatever's checked when the date rolls over gets logged to History. Heist payouts reflect Title Update 1.73 (Kortz Center Heist, July 2026).
   </footer>
 </div>
 
@@ -313,6 +326,46 @@ const ROADMAP_STEPS = [
   { id: 'r_arcade', label: 'Arcade', price: 1235000, note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
   { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
   { id: 'r_bail', label: 'Bail Office', price: 1650000, note: 'Cheapest is Paleto Bay. 2-agent bail enforcement dispatch. Once bought, add BOTH its daily task and Madrazo\'s Hit ($30K/day, no other requirement) back to the daily list.' },
+];
+
+const HEIST_DATA = {
+  early: [
+    {id:'fleeca', name:'The Fleeca Job', year:'2015', crew:'2 players', req:'Rank 12 + High-End Apartment', note:'The tutorial heist — bank vault job in Los Santos. Short and easy.'},
+    {id:'prison', name:'The Prison Break', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Extract Prof. Rashkovsky from Bolingbroke Penitentiary. Widely considered the most tedious of the originals.'},
+    {id:'humane', name:'The Humane Labs Raid', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Steal an experimental nerve agent from a secure lab.'},
+    {id:'seriesa', name:'Series A Funding', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Trevor Philips Industries debut — protect Trevor while sourcing product for a deal.'},
+    {id:'pacific', name:'The Pacific Standard Job', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'The finale of the original 5 — rob the Pacific Standard Bank in Downtown Vinewood.'},
+  ],
+  mid: [
+    {id:'doomsday', name:'The Doomsday Heist', year:'2017', crew:'2-4 players', req:'Facility (from $1,250,000)', note:'Three acts, run in order the first time. Total payout up to $5.25M on Hard across all three.',
+      subs:[
+        {id:'dd1', label:'Act 1: The Data Breaches'},
+        {id:'dd2', label:'Act 2: The Bogdan Problem'},
+        {id:'dd3', label:'Act 3: The Doomsday Scenario (highest-paying act)'},
+      ]},
+    {id:'casino', name:'The Diamond Casino Heist', year:'2019', crew:'2-4 players', req:'Arcade', note:'Up to ~$4.7M on a first weekly run (Diamond target). Payout is the same across approaches — vault contents decide the money, approach decides your risk profile.',
+      subs:[
+        {id:'cas1', label:'Approach: Silent & Sneaky (full stealth)'},
+        {id:'cas2', label:'Approach: Big Con (disguise-based)'},
+        {id:'cas3', label:'Approach: Aggressive (loud, guns blazing)'},
+      ]},
+    {id:'cayo', name:'The Cayo Perico Heist', year:'2020', crew:'Solo–4 players', req:'Kosatka', note:'The only heist fully soloable from setup to finale. ~$700K-$1M per solo run post-2026 payout adjustment.'},
+    {id:'contract', name:'The Contract / The Data Leaks', year:'2021', crew:'2-4 players', req:'Agency', note:'Dr. Dre and Franklin Clinton mission strand, culminating in The Data Leaks finale.'},
+  ],
+  late: [
+    {id:'cluckin', name:"Cluckin' Bell Farm Raid", year:'2024', crew:'Solo-friendly', req:'No property required — genuinely free to access', note:'$400K solo, $600K on first completion of the week. Good beginner-friendly heist since it needs no property investment at all.'},
+    {id:'kortz', name:'The Kortz Center Heist', year:'2026', crew:'2-4 players', req:'Mansion + Art Studio add-on', note:"Rockstar's newest heist and widely considered the last major one before GTA Online's focus shifts to GTA 6. Art-theft heist in Pacific Bluffs."},
+  ],
+  other: [
+    {id:'knoway', name:'KnoWay Out', year:'2026', crew:'Contact Mission', note:'Included in the current weekly completion bonus rotation alongside the full Heists.'},
+    {id:'oscar', name:'Oscar Guzman Flies Again', year:'2026', crew:'Contact Mission', note:'Also part of the current weekly bonus rotation — a notable standalone job even though it is not a full multi-setup Heist.'},
+  ]
+};
+const HEIST_ERAS = [
+  { key: 'early', label: 'Early Game — Rank 12, High-End Apartment (2015 "Heists" update)', color: '#7bc142' },
+  { key: 'mid', label: 'Mid Game — Requires specific properties', color: '#ff8a3d' },
+  { key: 'late', label: 'Late Game — Newest content', color: '#6c7bff' },
+  { key: 'other', label: 'Other Notable One-Time Jobs', color: '#5ec9c4' },
 ];
 
 // ---------- SUPABASE ----------
@@ -385,42 +438,63 @@ function loadLocal(){
 }
 function saveLocal(){ localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); }
 
-async function fetchRemote(){
+async function fetchRemote(rowId){
   try {
-    const res = await fetch(`${REST_URL}?id=eq.${ROW_ID}&select=data`, { headers: SB_HEADERS });
+    const res = await fetch(`${REST_URL}?id=eq.${rowId}&select=data`, { headers: SB_HEADERS });
     if(!res.ok) throw new Error('fetch failed');
     const rows = await res.json();
     if(rows && rows.length && rows[0].data) return rows[0].data;
     return null;
   } catch(e){ console.warn('remote fetch failed', e); return null; }
 }
-async function pushRemote(){
+async function pushRemote(rowId, payload){
   try {
     await fetch(REST_URL, {
       method: 'POST', headers: SB_HEADERS,
-      body: JSON.stringify([{ id: ROW_ID, data: data, updated_at: new Date().toISOString() }])
+      body: JSON.stringify([{ id: rowId, data: payload, updated_at: new Date().toISOString() }])
     });
   } catch(e){ console.warn('remote push failed', e); }
 }
 function queueSave(){
   saveLocal();
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(pushRemote, 600);
+  saveTimeout = setTimeout(() => pushRemote(ROW_ID, data), 600);
+}
+
+// --- Heists tab: separate state, synced to its own existing Supabase row so prior progress carries over ---
+const HEIST_ROW_ID = 'gta-online-heists';
+const HEIST_LOCAL_KEY = 'gta_online_heist_tracker_v1'; // same key the old standalone heists.html used
+let heistState = {};
+let heistSaveTimeout = null;
+
+function loadHeistLocal(){
+  try { return JSON.parse(localStorage.getItem(HEIST_LOCAL_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveHeistLocal(){ localStorage.setItem(HEIST_LOCAL_KEY, JSON.stringify(heistState)); }
+function queueSaveHeists(){
+  saveHeistLocal();
+  clearTimeout(heistSaveTimeout);
+  heistSaveTimeout = setTimeout(() => pushRemote(HEIST_ROW_ID, heistState), 600);
 }
 
 async function initState(){
   const local = loadLocal();
   if (local) data = local;
   rolloverIfNewDay();
+  heistState = loadHeistLocal();
   renderAll();
 
-  const remote = await fetchRemote();
+  const [remote, heistRemote] = await Promise.all([fetchRemote(ROW_ID), fetchRemote(HEIST_ROW_ID)]);
   if (remote) {
     data = remote;
     rolloverIfNewDay();
     saveLocal();
-    renderAll();
   }
+  if (heistRemote) {
+    heistState = heistRemote;
+    saveHeistLocal();
+  }
+  renderAll();
 }
 
 // ---------- RENDER ----------
@@ -574,10 +648,68 @@ function renderRoadmap(){
   }).join('');
 }
 
+function renderHeists(){
+  if (!heistState._collapsed) heistState._collapsed = {};
+  if (!heistState._open) heistState._open = {};
+
+  let total = 0, done = 0;
+  HEIST_ERAS.forEach(era => {
+    HEIST_DATA[era.key].forEach(h => {
+      total++; if (heistState[h.id]) done++;
+      if (h.subs) h.subs.forEach(s => { total++; if (heistState[s.id]) done++; });
+    });
+  });
+  document.getElementById('heistProgtext').textContent = done + ' / ' + total;
+  document.getElementById('heistFill').style.width = (total ? (done/total*100) : 0) + '%';
+
+  const container = document.getElementById('heistList');
+  container.innerHTML = HEIST_ERAS.map(era => {
+    const items = HEIST_DATA[era.key];
+    const eraDone = items.filter(h => heistState[h.id]).length;
+    const isCollapsed = !!heistState._collapsed[era.key];
+    return `
+    <div class="section ${isCollapsed?'collapsed':''}">
+      <div class="section-head" data-eratoggle="${era.key}">
+        <span class="dot" style="background:${era.color}"></span>
+        <span class="label-text">${esc(era.label)} <span style="color:${era.color};font-weight:800;">(${eraDone}/${items.length})</span></span>
+        <span class="chevron">&#9656;</span>
+      </div>
+      <div class="section-body">
+        ${items.map(h => {
+          const isDone = !!heistState[h.id];
+          const isOpen = !!heistState._open[h.id];
+          const subsHtml = h.subs ? h.subs.map(s => {
+            const sDone = !!heistState[s.id];
+            return `<div class="task" data-subid="${s.id}" style="background:transparent;border:none;padding:6px 0 6px 34px;margin-bottom:0;">
+              <div class="check ${sDone?'on':''}" style="width:17px;height:17px;"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+              <div class="tinfo"><span class="tname ${sDone?'done':''}" style="font-size:12.5px;">${esc(s.label)}</span></div>
+            </div>`;
+          }).join('') : '';
+          return `
+          <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
+            <div class="check ${isDone?'on':''}" data-heistcheck><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+            <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
+              <div class="tname-row">
+                <span class="tname ${isDone?'done':''}">${esc(h.name)}</span>
+                <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
+              </div>
+              <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(h.note)}</div>
+              ${h.subs ? `<span class="tbadge opt">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
+            </div>
+          </div>
+          ${h.subs && isOpen ? subsHtml : ''}
+        `;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderAll(){
   renderToday();
   renderHistory();
   renderRoadmap();
+  renderHeists();
 }
 
 // ---------- EVENTS ----------
@@ -635,6 +767,37 @@ document.addEventListener('click', (e) => {
     data.roadmapSort = sortBtn.dataset.sortmode;
     queueSave();
     renderRoadmap();
+    return;
+  }
+  const eraToggle = e.target.closest('[data-eratoggle]');
+  if (eraToggle) {
+    const key = eraToggle.dataset.eratoggle;
+    heistState._collapsed[key] = !heistState._collapsed[key];
+    queueSaveHeists();
+    renderHeists();
+    return;
+  }
+  const subEl = e.target.closest('[data-subid]');
+  if (subEl) {
+    const id = subEl.dataset.subid;
+    heistState[id] = !heistState[id];
+    queueSaveHeists();
+    renderHeists();
+    return;
+  }
+  const heistCheck = e.target.closest('[data-heistcheck]');
+  if (heistCheck) {
+    const id = heistCheck.closest('[data-heistid]').dataset.heistid;
+    heistState[id] = !heistState[id];
+    queueSaveHeists();
+    renderHeists();
+    return;
+  }
+  const heistExpand = e.target.closest('[data-heistexpand]');
+  if (heistExpand) {
+    const id = heistExpand.dataset.heistexpand;
+    heistState._open[id] = !heistState._open[id];
+    renderHeists();
     return;
   }
 });
