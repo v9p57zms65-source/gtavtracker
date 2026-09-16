@@ -210,10 +210,32 @@ header::after{
 .tname-row.done .tprice{color:var(--dim);}
 
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
+
+.ptr-indicator{
+  position:fixed; top:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:center;
+  height:60px; margin-top:-60px;
+  z-index:100;
+  color:var(--dim); font-size:12px; font-weight:700;
+  transition:margin-top .2s;
+  pointer-events:none;
+}
+.ptr-spinner{
+  width:20px; height:20px; margin-right:8px;
+  border:2px solid var(--border); border-top-color:var(--green);
+  border-radius:50%;
+  transition:transform .1s;
+}
+.ptr-spinner.spinning{animation:ptr-spin .7s linear infinite;}
+@keyframes ptr-spin{to{transform:rotate(360deg);}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 </head>
 <body>
+<div class="ptr-indicator" id="ptrIndicator">
+  <div class="ptr-spinner" id="ptrSpinner"></div>
+  <span id="ptrText">Pull to refresh</span>
+</div>
 <div class="wrap">
 
   <header>
@@ -808,6 +830,73 @@ setInterval(() => {
   rolloverIfNewDay();
   if (before !== data.currentDate) { queueSave(); renderAll(); }
 }, 60000);
+
+// ---------- PULL TO REFRESH ----------
+// Native Safari pull-to-refresh doesn't work once this is installed as a standalone home-screen app,
+// so this is a hand-built version that actually re-fetches from Supabase, not just a page reload.
+const PTR_THRESHOLD = 70;
+let ptrStartY = 0;
+let ptrPulling = false;
+let ptrRefreshing = false;
+const ptrIndicator = document.getElementById('ptrIndicator');
+const ptrSpinner = document.getElementById('ptrSpinner');
+const ptrText = document.getElementById('ptrText');
+
+document.addEventListener('touchstart', (e) => {
+  if (window.scrollY <= 0 && !ptrRefreshing) {
+    ptrStartY = e.touches[0].clientY;
+    ptrPulling = true;
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!ptrPulling || ptrRefreshing) return;
+  const dy = e.touches[0].clientY - ptrStartY;
+  if (dy <= 0) { ptrIndicator.style.marginTop = '-60px'; return; }
+  const pull = Math.min(dy * 0.5, 90);
+  ptrIndicator.style.marginTop = (pull - 60) + 'px';
+  ptrSpinner.style.transform = `rotate(${pull * 3}deg)`;
+  ptrText.textContent = pull >= PTR_THRESHOLD ? 'Release to refresh' : 'Pull to refresh';
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
+  ptrPulling = false;
+  const currentMargin = parseFloat(ptrIndicator.style.marginTop || '-60');
+  const pulled = currentMargin + 60;
+  if (pulled >= PTR_THRESHOLD) {
+    doFullRefresh();
+  } else {
+    ptrIndicator.style.marginTop = '-60px';
+  }
+});
+
+async function doFullRefresh(){
+  ptrRefreshing = true;
+  ptrIndicator.style.marginTop = '0px';
+  ptrSpinner.classList.add('spinning');
+  ptrSpinner.style.transform = '';
+  ptrText.textContent = 'Refreshing...';
+
+  const [remote, heistRemote] = await Promise.all([fetchRemote(ROW_ID), fetchRemote(HEIST_ROW_ID)]);
+  if (remote) {
+    data = remote;
+    rolloverIfNewDay();
+    saveLocal();
+  }
+  if (heistRemote) {
+    heistState = heistRemote;
+    saveHeistLocal();
+  }
+  renderAll();
+
+  ptrText.textContent = 'Updated';
+  setTimeout(() => {
+    ptrIndicator.style.marginTop = '-60px';
+    ptrSpinner.classList.remove('spinning');
+    ptrRefreshing = false;
+  }, 500);
+}
 
 initState();
 </script>
