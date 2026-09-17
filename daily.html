@@ -340,17 +340,49 @@ const SECTIONS = [
 ];
 
 const ROADMAP_STEPS = [
-  { id: 'r_nightshark', label: 'Nightshark', price: 1245000, note: 'Armored escape vehicle. First priority: it handles prolonged missile pressure far better than your Virtue.' },
-  { id: 'r_raiju', label: 'F-160 Raiju', price: 8500000, note: 'Stealth VTOL and your air-superiority centerpiece. Buy at standard price unless you also want an Avenger.' },
-  { id: 'r_akula', label: 'Akula', price: 4500000, note: 'Stealth helicopter for disappearing, repositioning, and attacking on your terms.' },
-  { id: 'r_moc', label: 'MOC + Weapon & Vehicle Workshop', price: 2180000, note: 'Mobile weaponized-vehicle workshop and an exceptionally durable truck cab.' },
-  { id: 'r_ignus', label: 'Weaponized Ignus + HSW + Missile Lock-On Jammer', price: 5400000, note: 'Endgame road car: extreme speed, weapon, and jammer. A predator, not a tank.' },
-  { id: 'r_toreador', label: 'Pegassi Toreador', price: 4250000, note: 'From your own Combat Codex: unlimited homing missiles + torpedoes, submersible, one of the strongest all-round PvP vehicles in the game. Was never actually added here until now.' },
-  { id: 'r_avenger', label: 'Avenger + Operations Terminal', price: 4900000, note: 'Unlocks the Avenger and Project Overthrow missions, plus the Raiju trade price discount.' },
-  { id: 'r_coquette', label: 'Coquette Classic', price: 665000, note: 'Legendary Motorsport. Sports Classics — good looking, but genuinely fragile: 1 homing missile or sticky bomb destroys it, 2 explosive Mk2 sniper rounds at most.' },
-  { id: 'r_arcade', label: 'Arcade', price: 1235000, note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
-  { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
-  { id: 'r_facility', label: 'Facility', price: 1250000, note: 'Paleto Bay, cheapest of 9. Unlocks Doomsday Heist only, interiors identical everywhere so location doesn\'t change income. Lago Zancudo is the pricier alternative if you want Fort Zancudo jet proximity.' },
+  // --- Already owned: full retroactive audit, kept here permanently so nothing gets deleted again.
+  // Check these off yourself since I can't set checkbox state remotely - only add/edit the list itself.
+  { id: 'o_bunker', label: 'Bunker (Gunrunning)', price: 0, category: 'owned', note: 'Fully upgraded.' },
+  { id: 'o_coke', label: 'Cocaine Lockup', price: 0, category: 'owned', note: 'MC business.' },
+  { id: 'o_meth', label: 'Meth Lab', price: 0, category: 'owned', note: 'MC business.' },
+  { id: 'o_weed', label: 'Weed Farm', price: 0, category: 'owned', note: 'MC business.' },
+  { id: 'o_counterfeit', label: 'Counterfeit Cash Factory', price: 0, category: 'owned', note: 'MC business.' },
+  { id: 'o_docforge', label: 'Document Forgery Office', price: 0, category: 'owned', note: 'MC business.' },
+  { id: 'o_nightclub', label: 'Nightclub', price: 0, category: 'owned', note: 'Fully upgraded, with warehouse.' },
+  { id: 'o_acid', label: 'Acid Lab', price: 0, category: 'owned', note: '' },
+  { id: 'o_terrorbyte', label: 'Terrorbyte', price: 0, category: 'owned', note: 'Mobile business hub + Weapon Workshop.' },
+  { id: 'o_agency', label: 'Agency (Hawick)', price: 0, category: 'owned', note: 'With Vehicle Workshop for Imani Tech.' },
+  { id: 'o_kosatka', label: 'Kosatka', price: 0, category: 'owned', note: 'Not actively running Cayo, but owned.' },
+  { id: 'o_ceooffice', label: 'CEO Office (Arcadius Business Center)', price: 0, category: 'owned', note: 'Obtained free via weekly promo.' },
+  { id: 'o_specialcargo', label: 'Special Cargo Warehouse (West Vinewood Backlot, Large)', price: 0, category: 'owned', note: '' },
+  { id: 'o_vehiclecargo', label: 'Vehicle Cargo Warehouse (La Puerta)', price: 0, category: 'owned', note: '' },
+  { id: 'o_mckenzie', label: 'McKenzie Field Hangar', price: 0, category: 'owned', note: 'Oscar Guzman Flies Again content.' },
+  { id: 'o_hangar', label: 'Hangar 3497 + Aircraft Workshop', price: 0, category: 'owned', note: 'Air Freight Cargo + aircraft customization.' },
+  { id: 'o_garment', label: 'Garment Factory', price: 0, category: 'owned', note: 'Darnell Bros.' },
+  { id: 'o_autoshop', label: 'Auto Shop', price: 0, category: 'owned', note: '' },
+  { id: 'o_mansion', label: 'Mansion + Art Studio', price: 0, category: 'owned', note: 'Kortz Center Heist content.' },
+  { id: 'o_carwash', label: 'Hands On Car Wash', price: 0, category: 'owned', note: 'Money Fronts.' },
+  { id: 'o_smoke', label: 'Smoke on the Water', price: 0, category: 'owned', note: 'Money Fronts.' },
+  { id: 'o_higgins', label: 'Higgins Helitours', price: 0, category: 'owned', note: 'Money Fronts.' },
+  { id: 'o_bail', label: 'Bail Office', price: 0, category: 'owned', note: 'Paleto Bay.' },
+  { id: 'o_oppressor', label: 'Oppressor Mk II', price: 0, category: 'owned', note: 'Your main combat/mobility vehicle.' },
+  // --- Still to buy / PvP wishlist
+  { id: 'r_nightshark', label: 'Nightshark', price: 1245000, category: 'pvp', note: 'Armored escape vehicle. First priority: it handles prolonged missile pressure far better than your Virtue.' },
+  { id: 'r_raiju', label: 'F-160 Raiju', price: 8500000, category: 'pvp', note: 'Stealth VTOL and your air-superiority centerpiece. Buy at standard price unless you also want an Avenger.' },
+  { id: 'r_akula', label: 'Akula', price: 4500000, category: 'pvp', note: 'Stealth helicopter for disappearing, repositioning, and attacking on your terms.' },
+  { id: 'r_moc', label: 'MOC + Weapon & Vehicle Workshop', price: 2180000, category: 'pvp', note: 'Mobile weaponized-vehicle workshop and an exceptionally durable truck cab.' },
+  { id: 'r_ignus', label: 'Weaponized Ignus + HSW + Missile Lock-On Jammer', price: 5400000, category: 'pvp', note: 'Endgame road car: extreme speed, weapon, and jammer. A predator, not a tank.' },
+  { id: 'r_toreador', label: 'Pegassi Toreador', price: 4250000, category: 'pvp', note: 'From your own Combat Codex: unlimited homing missiles + torpedoes, submersible, one of the strongest all-round PvP vehicles in the game.' },
+  { id: 'r_avenger', label: 'Avenger + Operations Terminal', price: 4900000, category: 'pvp', note: 'Unlocks the Avenger and Project Overthrow missions, plus the Raiju trade price discount.' },
+  { id: 'r_coquette', label: 'Coquette Classic', price: 665000, category: 'pvp', note: 'Legendary Motorsport. Sports Classics — good looking, but genuinely fragile: 1 homing missile or sticky bomb destroys it, 2 explosive Mk2 sniper rounds at most.' },
+  { id: 'r_arcade', label: 'Arcade', price: 1235000, category: 'business', note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
+  { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, category: 'business', note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
+  { id: 'r_facility', label: 'Facility', price: 1250000, category: 'business', note: 'Paleto Bay, cheapest of 9. Unlocks Doomsday Heist only, interiors identical everywhere so location doesn\'t change income. Lago Zancudo is the pricier alternative if you want Fort Zancudo jet proximity.' },
+];
+const ROADMAP_CATEGORIES = [
+  { key: 'owned', label: 'Already Owned (check these off yourself)', color: '#7bc142' },
+  { key: 'business', label: 'Businesses & Properties Still To Buy', color: '#5ec9c4' },
+  { key: 'pvp', label: 'PvP Garage — Combat Vehicles Still To Buy', color: '#6c7bff' },
 ];
 
 const HEIST_DATA = {
@@ -639,14 +671,11 @@ function money(n){ return 'GTA$' + (n/1000000).toFixed(2) + 'M'; }
 function renderRoadmap(){
   if (!data.roadmap) data.roadmap = {};
   if (!data.roadmapSort) data.roadmapSort = 'default';
-  const container = document.getElementById('roadmapList');
-  const core = ROADMAP_STEPS.filter(t => !t.optional);
-  const remaining = core.filter(t => !data.roadmap[t.id]).reduce((sum,t) => sum + t.price, 0);
-  const completed = core.filter(t => data.roadmap[t.id]).length;
+  if (!data.roadmapCollapsed) data.roadmapCollapsed = {};
 
-  let steps = ROADMAP_STEPS.slice();
-  if (data.roadmapSort === 'price_asc') steps.sort((a,b) => a.price - b.price);
-  else if (data.roadmapSort === 'price_desc') steps.sort((a,b) => b.price - a.price);
+  const buyable = ROADMAP_STEPS.filter(t => t.category !== 'owned' && !t.optional);
+  const remaining = buyable.filter(t => !data.roadmap[t.id]).reduce((sum,t) => sum + t.price, 0);
+  const completedBuyable = buyable.filter(t => data.roadmap[t.id]).length;
 
   const sortBar = `
     <div class="sort-bar">
@@ -656,21 +685,40 @@ function renderRoadmap(){
       <span class="sort-btn ${data.roadmapSort==='price_desc'?'active':''}" data-sortmode="price_desc">Price ↓</span>
     </div>`;
 
-  container.innerHTML = `<div class="roadmap-total"><div><small>Core purchase target remaining</small><strong>${money(remaining)}</strong></div><span>${completed} / ${core.length} core purchases complete<br>Prices exclude temporary weekly discounts.</span></div>`
-    + sortBar
-    + steps.map(t => {
-    const isDone = !!data.roadmap[t.id];
-    return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
-      <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-      <div class="tinfo">
-        <div class="tname-row ${isDone?'done':''}">
-          <span class="tname ${isDone?'done':''}">${esc(t.label)}</span>
-          <span class="tprice">${money(t.price)}</span>
-        </div>
-        <div class="tnote">${esc(t.note)}</div>${t.optional?'<span class="tbadge opt">Optional</span>':''}
+  const header = `<div class="roadmap-total"><div><small>Still-to-buy total remaining</small><strong>${money(remaining)}</strong></div><span>${completedBuyable} / ${buyable.length} still-to-buy items complete<br>Prices exclude temporary weekly discounts.</span></div>`;
+
+  const groups = ROADMAP_CATEGORIES.map(cat => {
+    let items = ROADMAP_STEPS.filter(t => t.category === cat.key);
+    if (data.roadmapSort === 'price_asc') items = items.slice().sort((a,b) => a.price - b.price);
+    else if (data.roadmapSort === 'price_desc') items = items.slice().sort((a,b) => b.price - a.price);
+    const done = items.filter(t => data.roadmap[t.id]).length;
+    const isCollapsed = !!data.roadmapCollapsed[cat.key];
+    return `
+    <div class="section ${isCollapsed?'collapsed':''}">
+      <div class="section-head" data-roadmapcattoggle="${cat.key}">
+        <span class="dot" style="background:${cat.color}"></span>
+        <span class="label-text">${esc(cat.label)} <span style="color:${cat.color};font-weight:800;">(${done}/${items.length})</span></span>
+        <span class="chevron">&#9656;</span>
+      </div>
+      <div class="section-body">
+        ${items.map(t => {
+          const isDone = !!data.roadmap[t.id];
+          return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
+            <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+            <div class="tinfo">
+              <div class="tname-row ${isDone?'done':''}">
+                <span class="tname ${isDone?'done':''}">${esc(t.label)}</span>
+                ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
+              </div>
+              ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
+
+  document.getElementById('roadmapList').innerHTML = header + sortBar + groups;
 }
 
 function renderHeists(){
@@ -800,6 +848,15 @@ document.addEventListener('click', (e) => {
     heistState._collapsed[key] = !heistState._collapsed[key];
     queueSaveHeists();
     renderHeists();
+    return;
+  }
+  const roadmapCatToggle = e.target.closest('[data-roadmapcattoggle]');
+  if (roadmapCatToggle) {
+    const key = roadmapCatToggle.dataset.roadmapcattoggle;
+    if (!data.roadmapCollapsed) data.roadmapCollapsed = {};
+    data.roadmapCollapsed[key] = !data.roadmapCollapsed[key];
+    queueSave();
+    renderRoadmap();
     return;
   }
   const subEl = e.target.closest('[data-subid]');
