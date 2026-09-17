@@ -343,7 +343,8 @@ const ROADMAP_STEPS = [
   { id: 'r_akula', label: 'Akula', price: 4500000, note: 'Stealth helicopter for disappearing, repositioning, and attacking on your terms.' },
   { id: 'r_moc', label: 'MOC + Weapon & Vehicle Workshop', price: 2180000, note: 'Mobile weaponized-vehicle workshop and an exceptionally durable truck cab.' },
   { id: 'r_ignus', label: 'Weaponized Ignus + HSW + Missile Lock-On Jammer', price: 5400000, note: 'Endgame road car: extreme speed, weapon, and jammer. A predator, not a tank.' },
-  { id: 'r_avenger', label: 'Optional: Avenger + Operations Terminal', price: 4900000, note: 'Only buy if you want the Avenger and Project Overthrow missions. It unlocks the Raiju trade price, but is not worthwhile solely for that discount.', optional: true },
+  { id: 'r_toreador', label: 'Pegassi Toreador', price: 4250000, note: 'From your own Combat Codex: unlimited homing missiles + torpedoes, submersible, one of the strongest all-round PvP vehicles in the game. Was never actually added here until now.' },
+  { id: 'r_avenger', label: 'Avenger + Operations Terminal', price: 4900000, note: 'Unlocks the Avenger and Project Overthrow missions, plus the Raiju trade price discount.' },
   { id: 'r_coquette', label: 'Coquette Classic', price: 665000, note: 'Legendary Motorsport. Sports Classics — good looking, but genuinely fragile: 1 homing missile or sticky bomb destroys it, 2 explosive Mk2 sniper rounds at most.' },
   { id: 'r_arcade', label: 'Arcade', price: 1235000, note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
   { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
@@ -873,30 +874,22 @@ document.addEventListener('touchend', () => {
 });
 
 async function doFullRefresh(){
-  ptrRefreshing = true;
   ptrIndicator.style.marginTop = '0px';
   ptrSpinner.classList.add('spinning');
   ptrSpinner.style.transform = '';
   ptrText.textContent = 'Refreshing...';
 
-  const [remote, heistRemote] = await Promise.all([fetchRemote(ROW_ID), fetchRemote(HEIST_ROW_ID)]);
-  if (remote) {
-    data = remote;
-    rolloverIfNewDay();
-    saveLocal();
-  }
-  if (heistRemote) {
-    heistState = heistRemote;
-    saveHeistLocal();
-  }
-  renderAll();
+  // Reload the actual page from network, not just re-sync Supabase data.
+  // New tasks/roadmap items live in this file's own code, not in the saved data,
+  // so re-fetching only the data (the old behavior here) could never surface them.
+  try {
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch(e) { /* ignore, reload will still fetch from network either way */ }
 
-  ptrText.textContent = 'Updated';
-  setTimeout(() => {
-    ptrIndicator.style.marginTop = '-60px';
-    ptrSpinner.classList.remove('spinning');
-    ptrRefreshing = false;
-  }, 500);
+  location.reload();
 }
 
 initState();
