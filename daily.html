@@ -296,6 +296,7 @@ const SECTIONS = [
   { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
     { id: 'gs_cache', name: "Find G's Cache", note: "Purple crate w/ question mark, 15 possible spots. ~$15-22K + ammo + snacks. Resets daily." },
     { id: 'stash_house', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
+    { id: 'madrazo_hit', name: "Do today's Madrazo Hit", note: 'Purple dollar icon. $20,000 + $10,000 bonus for using his specified weapon = $30,000/day.' },
     { id: 'street_dealer', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
   ]},
   { id: 'mansion', label: 'Mansion', color: '#f0c14b', tasks: [
@@ -334,6 +335,7 @@ const SECTIONS = [
     { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', textColor: '#3d9bdc' },
     { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', textColor: '#ff8a3d', optional: true },
     { id: 'garment_safe', name: 'Garment Factory: collect safe', note: 'Smallest passive earner (~$2,000/day).', textColor: '#c9c9d0' },
+    { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).', textColor: '#c9c9d0' },
   ]},
 ];
 
@@ -348,7 +350,6 @@ const ROADMAP_STEPS = [
   { id: 'r_coquette', label: 'Coquette Classic', price: 665000, note: 'Legendary Motorsport. Sports Classics — good looking, but genuinely fragile: 1 homing missile or sticky bomb destroys it, 2 explosive Mk2 sniper rounds at most.' },
   { id: 'r_arcade', label: 'Arcade', price: 1235000, note: 'Cheapest is Pixel Pete\'s, Paleto Bay. Unlocks Diamond Casino Heist access + Master Control Terminal. Add its daily task back once bought.' },
   { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
-  { id: 'r_bail', label: 'Bail Office', price: 1650000, note: 'Cheapest is Paleto Bay. 2-agent bail enforcement dispatch. Once bought, add BOTH its daily task and Madrazo\'s Hit ($30K/day, no other requirement) back to the daily list.' },
   { id: 'r_facility', label: 'Facility', price: 1250000, note: 'Paleto Bay, cheapest of 9. Unlocks Doomsday Heist only, interiors identical everywhere so location doesn\'t change income. Lago Zancudo is the pricier alternative if you want Fort Zancudo jet proximity.' },
 ];
 
