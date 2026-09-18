@@ -83,13 +83,13 @@ body{
 /* on browser stacking-context handling - that was the actual bug hiding this on both Mac and iPhone. */
 body::before{
   content:"";
-  position:fixed; inset:0;
+  position:fixed; inset:-60px;
   z-index:0;
   pointer-events:none;
   background-image:url("busy-bg.png");
   background-size:cover;
   background-position:center;
-  filter:blur(2px) saturate(115%);
+  filter:blur(55px) saturate(130%);
   opacity:.92;
   transition: opacity .2s;
 }
