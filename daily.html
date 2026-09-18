@@ -81,7 +81,7 @@ body{
 body::before{
   content:"";
   position:fixed; inset:0;
-  z-index:-1;
+  z-index:-2;
   pointer-events:none;
   background:
     radial-gradient(38% 30% at 12% 8%, rgba(255,61,127,.28), transparent 70%),
@@ -91,9 +91,27 @@ body::before{
   filter:blur(10px);
   transition: opacity .2s;
 }
+/* Crisp, unblurred fine-grain texture, deliberately NOT blurred itself - this is what gives the glass
+   panels' own backdrop-filter something with actual fine detail to visibly soften. Blurred color blobs
+   alone look identical whether blurred or not, since there's no fine detail in them to smooth away. */
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  mix-blend-mode:overlay;
+  transition: opacity .2s;
+}
 :root[data-theme="light"] body::before{ opacity: .55; }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) body::before { opacity: .55; }
+}
+:root[data-theme="light"] body::after{ opacity:.035; mix-blend-mode:multiply; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) body::after { opacity:.035; mix-blend-mode:multiply; }
 }
 .wrap{max-width:820px;margin:0 auto;padding:18px 14px 90px;}
 
