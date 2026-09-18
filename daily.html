@@ -27,8 +27,39 @@
   --gold:#f0c14b;
   --red:#e0473f;
 }
+/* Follow system light/dark automatically, unless the manual toggle has set an explicit override */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]){
+    --bg:#f4f4f6;
+    --panel:#ffffff;
+    --panel2:#eceef2;
+    --border:rgba(0,0,0,.09);
+    --text:#16161a;
+    --dim:#6b6b75;
+    --green:#4f8f1e;
+    --green-dark:#3a6b16;
+    --pink:#d81b6a;
+    --orange:#c85f14;
+    --gold:#a5790a;
+    --red:#c23127;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f4f4f6;
+  --panel:#ffffff;
+  --panel2:#eceef2;
+  --border:rgba(0,0,0,.09);
+  --text:#16161a;
+  --dim:#6b6b75;
+  --green:#4f8f1e;
+  --green-dark:#3a6b16;
+  --pink:#d81b6a;
+  --orange:#c85f14;
+  --gold:#a5790a;
+  --red:#c23127;
+}
 *{box-sizing:border-box;}
-html{background:var(--bg);height:100%;}
+html{background:var(--bg);height:100%; transition: background .2s;}
 body{
   margin:0;
   background:var(--bg);
@@ -36,6 +67,7 @@ body{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
   min-height:100vh; min-height:100dvh;
   padding-top:env(safe-area-inset-top);
+  transition: background .2s, color .2s;
 }
 .wrap{max-width:820px;margin:0 auto;padding:18px 14px 90px;}
 
@@ -72,6 +104,19 @@ header::after{
 }
 .hsub{position:relative; z-index:2; color:#f3f3f3; font-size:12.5px; margin-top:6px; opacity:.9;}
 .hdate{position:relative; z-index:2; color:#fff; font-size:13px; margin-top:12px; font-weight:700; letter-spacing:.3px;}
+
+.theme-toggle{
+  display:flex; gap:4px;
+  background:var(--panel); border:1px solid var(--border); border-radius:20px;
+  padding:3px; width:fit-content; margin:0 0 14px auto;
+}
+.theme-opt{
+  padding:6px 12px; border-radius:16px; font-size:12px; font-weight:700;
+  color:var(--dim); cursor:pointer; user-select:none; transition:.15s;
+  display:flex; align-items:center; gap:5px;
+}
+.theme-opt:hover{color:var(--text);}
+.theme-opt.active{background:var(--green-dark); color:#fff;}
 
 /* ---- Tabs ---- */
 .tabs{display:flex; gap:6px; margin-bottom:16px; overflow-x:auto;}
@@ -187,7 +232,7 @@ header::after{
 
 /* ---- Mansion goal ---- */
 .goal-card{
-  background:linear-gradient(135deg,#1a1420,#0f0d12);
+  background:linear-gradient(135deg,var(--panel2),var(--panel));
   border:1px solid rgba(240,193,75,.3);
   border-radius:14px;
   padding:18px;
@@ -250,6 +295,12 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
     <div class="hdate" id="dateDisplay"></div>
   </header>
 
+  <div class="theme-toggle" id="themeToggle">
+    <span class="theme-opt" data-theme-choice="auto">&#9788; Auto</span>
+    <span class="theme-opt" data-theme-choice="light">&#9728; Light</span>
+    <span class="theme-opt" data-theme-choice="dark">&#9790; Dark</span>
+  </div>
+
   <div class="tabs">
     <div class="tab active" data-view="today">Today</div>
     <div class="tab" data-view="roadmap">Long-Term</div>
@@ -283,7 +334,7 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 
   <!-- LONG-TERM PVP ROADMAP -->
   <div class="view" id="view-roadmap">
-    <div class="goal-card" style="background:linear-gradient(135deg,#101a20,#0d1014);border-color:rgba(94,201,196,.35);">
+    <div class="goal-card" style="background:linear-gradient(135deg,var(--panel2),var(--panel));border-color:rgba(94,201,196,.35);">
       <div class="goal-title" style="color:#5ec9c4;">PvP Garage</div>
       <div class="goal-sub">Long-term purchases — separate from the daily loop. Your jammer-equipped Virtue and fully upgraded Oppressor Mk II are already covered.</div>
       <div id="roadmapList"></div>
@@ -297,6 +348,36 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 </div>
 
 <script>
+// ---------- THEME (light/dark/auto, synced with device system setting unless overridden) ----------
+const THEME_KEY = 'gta_daily_theme_v1';
+
+function applyTheme(choice){
+  const root = document.documentElement;
+  if (choice === 'light' || choice === 'dark') {
+    root.setAttribute('data-theme', choice);
+  } else {
+    root.removeAttribute('data-theme'); // 'auto': let the prefers-color-scheme media query decide
+  }
+  document.querySelectorAll('.theme-opt').forEach(el => {
+    el.classList.toggle('active', el.dataset.themeChoice === choice);
+  });
+}
+
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || 'auto';
+  applyTheme(saved);
+}
+
+document.getElementById('themeToggle').addEventListener('click', (e) => {
+  const opt = e.target.closest('[data-theme-choice]');
+  if (!opt) return;
+  const choice = opt.dataset.themeChoice;
+  localStorage.setItem(THEME_KEY, choice);
+  applyTheme(choice);
+});
+
+initTheme();
+
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
   { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
