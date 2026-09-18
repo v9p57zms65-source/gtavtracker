@@ -25,6 +25,7 @@
   --border:rgba(255,255,255,.07);
   --text:#eef0f4;
   --dim:#c9c9d1;
+  --text-shadow: 0 1px 3px rgba(0,0,0,.65), 0 1px 12px rgba(0,0,0,.35);
   --green:#7bc142;
   --green-dark:#4f7a2a;
   --pink:#ff3d7f;
@@ -44,6 +45,7 @@
     --border:rgba(0,0,0,.08);
     --text:#16161a;
     --dim:#45454e;
+    --text-shadow: 0 1px 2px rgba(255,255,255,.75), 0 1px 10px rgba(255,255,255,.55);
     --green:#4f8f1e;
     --green-dark:#3a6b16;
     --pink:#d81b6a;
@@ -62,6 +64,7 @@
   --border:rgba(0,0,0,.08);
   --text:#16161a;
   --dim:#45454e;
+  --text-shadow: 0 1px 2px rgba(255,255,255,.75), 0 1px 10px rgba(255,255,255,.55);
   --green:#4f8f1e;
   --green-dark:#3a6b16;
   --pink:#d81b6a;
@@ -80,6 +83,7 @@ body{
   padding-top:env(safe-area-inset-top);
   transition: color .2s;
   position:relative;
+  text-shadow: var(--text-shadow);
 }
 /* Soft, fixed color fields behind the whole app so the glass panels have something to refract/blur - */
 /* without this, backdrop-filter on a flat single-color background looks identical to no blur at all. */
@@ -298,7 +302,7 @@ header::after{
 .tinfo{flex:1;}
 .tname{font-weight:700; font-size:14px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:12px; color:var(--dim); margin-top:2px; line-height:1.5;}
+.tnote{font-size:12px; color:var(--dim); margin-top:2px; line-height:1.5; text-shadow: var(--text-shadow), var(--text-shadow);}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
