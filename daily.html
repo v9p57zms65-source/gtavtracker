@@ -17,13 +17,14 @@
 
 :root{
   --bg:#0a0a0c;
-  --panel:rgba(30,30,36,.55);
-  --panel2:rgba(40,40,48,.6);
-  --glass-border:rgba(255,255,255,.14);
-  --glass-highlight:rgba(255,255,255,.09);
+  --panel:rgba(30,30,36,.18);
+  --panel2:rgba(45,45,54,.24);
+  --glass-border:rgba(255,255,255,.24);
+  --glass-highlight:rgba(255,255,255,.24);
+  --glass-blur: blur(36px) saturate(220%) brightness(1.08);
   --border:rgba(255,255,255,.07);
   --text:#eef0f4;
-  --dim:#a2a2ac;
+  --dim:#c9c9d1;
   --green:#7bc142;
   --green-dark:#4f7a2a;
   --pink:#ff3d7f;
@@ -35,13 +36,14 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]){
     --bg:#eef0f4;
-    --panel:rgba(255,255,255,.55);
-    --panel2:rgba(255,255,255,.7);
-    --glass-border:rgba(255,255,255,.6);
-    --glass-highlight:rgba(255,255,255,.8);
+    --panel:rgba(255,255,255,.28);
+    --panel2:rgba(255,255,255,.38);
+    --glass-border:rgba(255,255,255,.75);
+    --glass-highlight:rgba(255,255,255,.9);
+    --glass-blur: blur(36px) saturate(220%) brightness(1.08);
     --border:rgba(0,0,0,.08);
     --text:#16161a;
-    --dim:#5a5a63;
+    --dim:#45454e;
     --green:#4f8f1e;
     --green-dark:#3a6b16;
     --pink:#d81b6a;
@@ -52,13 +54,14 @@
 }
 :root[data-theme="light"]{
   --bg:#eef0f4;
-  --panel:rgba(255,255,255,.55);
-  --panel2:rgba(255,255,255,.7);
-  --glass-border:rgba(255,255,255,.6);
-  --glass-highlight:rgba(255,255,255,.8);
+  --panel:rgba(255,255,255,.28);
+  --panel2:rgba(255,255,255,.38);
+  --glass-border:rgba(255,255,255,.75);
+  --glass-highlight:rgba(255,255,255,.9);
+  --glass-blur: blur(36px) saturate(220%) brightness(1.08);
   --border:rgba(0,0,0,.08);
   --text:#16161a;
-  --dim:#5a5a63;
+  --dim:#45454e;
   --green:#4f8f1e;
   --green-dark:#3a6b16;
   --pink:#d81b6a;
@@ -122,8 +125,8 @@ body::after{
 /* ---- Liquid Glass surface treatment, applied to every card-like element ---- */
 .glass{
   background:var(--panel);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 24px rgba(0,0,0,.18);
 }
@@ -165,8 +168,8 @@ header::after{
 .theme-toggle{
   display:flex; gap:4px;
   background:var(--panel);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 18px rgba(0,0,0,.16);
   border-radius:20px;
@@ -189,8 +192,8 @@ header::after{
   padding:9px 4px;
   border-radius:10px;
   background:var(--panel);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   font-weight:700;
@@ -211,8 +214,8 @@ header::after{
 .progress-wrap{
   display:flex; align-items:center; gap:12px;
   background:var(--panel);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 22px rgba(0,0,0,.16);
   border-radius:12px;
@@ -270,8 +273,8 @@ header::after{
 .task{
   display:flex; align-items:flex-start; gap:12px;
   background:var(--panel);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   border-radius:10px;
@@ -306,8 +309,8 @@ header::after{
 .hist-row{
   display:flex; align-items:center; justify-content:space-between;
   background:var(--panel);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   border-radius:10px;
@@ -321,8 +324,8 @@ header::after{
 /* ---- Mansion goal ---- */
 .goal-card{
   background:linear-gradient(135deg, var(--panel2), var(--panel));
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 10px 26px rgba(0,0,0,.2);
   border-radius:14px;
@@ -334,8 +337,8 @@ header::after{
 .roadmap-total{
   display:flex;justify-content:space-between;align-items:end;gap:14px;
   background:rgba(123,193,66,.12);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border:1px solid rgba(123,193,66,.32);border-radius:10px;padding:13px 14px;margin-bottom:12px;
 }
 .roadmap-total small{display:block;color:var(--dim);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;}
@@ -741,16 +744,33 @@ async function initState(){
 // ---------- RENDER ----------
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+function renderFilterBar(currentMode, attrName){
+  const modes = [ ['all','All'], ['done','Completed'], ['incomplete','Incomplete'] ];
+  return `<div class="sort-bar">
+    <span class="sort-label">Show:</span>
+    ${modes.map(([key,label]) => `<span class="sort-btn ${currentMode===key?'active':''}" data-${attrName}="${key}">${label}</span>`).join('')}
+  </div>`;
+}
+function passesFilter(mode, isDone){
+  if (mode === 'done') return isDone;
+  if (mode === 'incomplete') return !isDone;
+  return true;
+}
+
 function renderToday(){
   ensureOrder();
+  if (!data.todayFilter) data.todayFilter = 'all';
   const container = document.getElementById('todayList');
   const orderedSections = data.sectionOrder.map(id => SECTIONS.find(s => s.id === id)).filter(Boolean);
+  const filterBar = renderFilterBar(data.todayFilter, 'todayfilter');
 
-  container.innerHTML = orderedSections.map(sec => {
+  container.innerHTML = filterBar + orderedSections.map(sec => {
     const isCollapsed = !!data.collapsed[sec.id];
     const orderedTaskIds = data.taskOrder[sec.id] || sec.tasks.map(t => t.id);
     const tasksById = Object.fromEntries(sec.tasks.map(t => [t.id, t]));
     const doneInSection = orderedTaskIds.filter(id => data.today[id]).length;
+    const visibleIds = orderedTaskIds.filter(tid => passesFilter(data.todayFilter, !!data.today[tid]));
+    if (visibleIds.length === 0) return ''; // whole category hidden if nothing matches the filter
     return `
     <div class="section ${isCollapsed ? 'collapsed' : ''}" data-sectionid="${sec.id}">
       <div class="section-head" data-sectiontoggle="${sec.id}">
@@ -760,7 +780,7 @@ function renderToday(){
         <span class="chevron">&#9656;</span>
       </div>
       <div class="section-body" data-tasklist="${sec.id}">
-        ${orderedTaskIds.map(tid => {
+        ${visibleIds.map(tid => {
           const t = tasksById[tid];
           if (!t) return '';
           const isDone = !!data.today[t.id];
@@ -792,19 +812,17 @@ function renderToday(){
   initSortables();
 }
 
-let sectionSortable = null;
-let taskSortables = [];
+let sortableGroups = {}; // groupName -> array of Sortable instances
 
-function initSortables(){
-  const container = document.getElementById('todayList');
-  if (sectionSortable) { sectionSortable.destroy(); sectionSortable = null; }
-  taskSortables.forEach(s => s.destroy());
-  taskSortables = [];
+function destroySortableGroup(groupName){
+  (sortableGroups[groupName] || []).forEach(s => { try { s.destroy(); } catch(e){} });
+  sortableGroups[groupName] = [];
+}
 
-  if (!window.Sortable) return; // graceful skip if CDN failed to load
-
-  sectionSortable = Sortable.create(container, {
-    handle: '[data-sectiondrag]',
+function wireSortableContainer(groupName, containerEl, handleSelector, onEnd){
+  if (!window.Sortable || !containerEl) return;
+  const s = Sortable.create(containerEl, {
+    handle: handleSelector,
     animation: 220,
     easing: 'cubic-bezier(.22,1,.36,1)',
     delay: 60,
@@ -814,33 +832,30 @@ function initSortables(){
     fallbackTolerance: 3,
     fallbackClass: 'sortable-fallback',
     dragClass: 'sortable-dragging',
-    onEnd: () => {
-      const newOrder = Array.from(container.children).map(el => el.dataset.sectionid);
-      data.sectionOrder = newOrder;
-      queueSave();
-    }
+    onEnd: onEnd
+  });
+  if (!sortableGroups[groupName]) sortableGroups[groupName] = [];
+  sortableGroups[groupName].push(s);
+}
+
+function initSortables(){
+  destroySortableGroup('today');
+  const container = document.getElementById('todayList');
+  if (!container) return;
+
+  wireSortableContainer('today', container, '[data-sectiondrag]', () => {
+    const newOrder = Array.from(container.children).filter(el => el.dataset.sectionid).map(el => el.dataset.sectionid);
+    data.sectionOrder = newOrder;
+    queueSave();
   });
 
-  document.querySelectorAll('[data-tasklist]').forEach(listEl => {
+  container.querySelectorAll('[data-tasklist]').forEach(listEl => {
     const sectionId = listEl.dataset.tasklist;
-    const s = Sortable.create(listEl, {
-      handle: '[data-taskdrag]',
-      animation: 220,
-      easing: 'cubic-bezier(.22,1,.36,1)',
-      delay: 60,
-      delayOnTouchOnly: true,
-      touchStartThreshold: 4,
-      forceFallback: true,
-      fallbackTolerance: 3,
-      fallbackClass: 'sortable-fallback',
-      dragClass: 'sortable-dragging',
-      onEnd: () => {
-        const newOrder = Array.from(listEl.children).map(el => el.dataset.taskid);
-        data.taskOrder[sectionId] = newOrder;
-        queueSave();
-      }
+    wireSortableContainer('today', listEl, '[data-taskdrag]', () => {
+      const newOrder = Array.from(listEl.children).map(el => el.dataset.taskid);
+      data.taskOrder[sectionId] = newOrder;
+      queueSave();
     });
-    taskSortables.push(s);
   });
 }
 
@@ -868,10 +883,24 @@ function renderHistory(){
 }
 
 function money(n){ return 'GTA$' + (n/1000000).toFixed(2) + 'M'; }
-function renderRoadmap(){
+function ensureRoadmapOrder(){
   if (!data.roadmap) data.roadmap = {};
   if (!data.roadmapSort) data.roadmapSort = 'default';
   if (!data.roadmapCollapsed) data.roadmapCollapsed = {};
+  if (!data.roadmapFilter) data.roadmapFilter = 'all';
+  if (!data.roadmapCatOrder) data.roadmapCatOrder = ROADMAP_CATEGORIES.map(c => c.key);
+  ROADMAP_CATEGORIES.forEach(c => { if (!data.roadmapCatOrder.includes(c.key)) data.roadmapCatOrder.push(c.key); });
+  if (!data.roadmapItemOrder) data.roadmapItemOrder = {};
+  ROADMAP_CATEGORIES.forEach(cat => {
+    const known = ROADMAP_STEPS.filter(t => t.category === cat.key).map(t => t.id);
+    if (!data.roadmapItemOrder[cat.key]) data.roadmapItemOrder[cat.key] = known.slice();
+    data.roadmapItemOrder[cat.key] = data.roadmapItemOrder[cat.key].filter(id => known.includes(id));
+    known.forEach(id => { if (!data.roadmapItemOrder[cat.key].includes(id)) data.roadmapItemOrder[cat.key].push(id); });
+  });
+}
+
+function renderRoadmap(){
+  ensureRoadmapOrder();
 
   const buyable = ROADMAP_STEPS.filter(t => t.category !== 'owned' && !t.optional);
   const remaining = buyable.filter(t => !data.roadmap[t.id]).reduce((sum,t) => sum + t.price, 0);
@@ -884,26 +913,35 @@ function renderRoadmap(){
       <span class="sort-btn ${data.roadmapSort==='price_asc'?'active':''}" data-sortmode="price_asc">Price ↑</span>
       <span class="sort-btn ${data.roadmapSort==='price_desc'?'active':''}" data-sortmode="price_desc">Price ↓</span>
     </div>`;
+  const filterBar = renderFilterBar(data.roadmapFilter, 'roadmapfilter');
 
   const header = `<div class="roadmap-total"><div><small>Still-to-buy total remaining</small><strong>${money(remaining)}</strong></div><span>${completedBuyable} / ${buyable.length} still-to-buy items complete<br>Prices exclude temporary weekly discounts.</span></div>`;
 
-  const groups = ROADMAP_CATEGORIES.map(cat => {
-    let items = ROADMAP_STEPS.filter(t => t.category === cat.key);
+  const isDefaultSort = data.roadmapSort === 'default';
+  const orderedCats = data.roadmapCatOrder.map(k => ROADMAP_CATEGORIES.find(c => c.key === k)).filter(Boolean);
+
+  const groups = orderedCats.map(cat => {
+    let itemIds = data.roadmapItemOrder[cat.key] || [];
+    let items = itemIds.map(id => ROADMAP_STEPS.find(t => t.id === id)).filter(Boolean);
     if (data.roadmapSort === 'price_asc') items = items.slice().sort((a,b) => a.price - b.price);
     else if (data.roadmapSort === 'price_desc') items = items.slice().sort((a,b) => b.price - a.price);
     const done = items.filter(t => data.roadmap[t.id]).length;
     const isCollapsed = !!data.roadmapCollapsed[cat.key];
+    const visibleItems = items.filter(t => passesFilter(data.roadmapFilter, !!data.roadmap[t.id]));
+    if (visibleItems.length === 0) return '';
     return `
-    <div class="section ${isCollapsed?'collapsed':''}">
+    <div class="section ${isCollapsed?'collapsed':''}" data-roadmapcatid="${cat.key}">
       <div class="section-head" data-roadmapcattoggle="${cat.key}">
+        ${isDefaultSort ? '<span class="section-drag" data-roadmapcatdrag>&#9776;</span>' : ''}
         <span class="dot" style="background:${cat.color}"></span>
         <span class="label-text">${esc(cat.label)} <span style="color:${cat.color};font-weight:800;">(${done}/${items.length})</span></span>
         <span class="chevron">&#9656;</span>
       </div>
-      <div class="section-body">
-        ${items.map(t => {
+      <div class="section-body" ${isDefaultSort ? `data-roadmaptasklist="${cat.key}"` : ''}>
+        ${visibleItems.map(t => {
           const isDone = !!data.roadmap[t.id];
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
+            ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
             <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo">
               <div class="tname-row ${isDone?'done':''}">
@@ -918,12 +956,50 @@ function renderRoadmap(){
     </div>`;
   }).join('');
 
-  document.getElementById('roadmapList').innerHTML = header + sortBar + groups;
+  document.getElementById('roadmapList').innerHTML = header + sortBar + filterBar + groups;
+  initRoadmapSortables();
+}
+
+function initRoadmapSortables(){
+  destroySortableGroup('roadmap');
+  if (data.roadmapSort !== 'default') return; // reordering only makes sense in Default sort - price sort would just override it
+
+  const container = document.getElementById('roadmapList');
+  if (!container) return;
+
+  wireSortableContainer('roadmap', container, '[data-roadmapcatdrag]', () => {
+    const newOrder = Array.from(container.children).filter(el => el.dataset.roadmapcatid).map(el => el.dataset.roadmapcatid);
+    data.roadmapCatOrder = newOrder;
+    queueSave();
+  });
+
+  container.querySelectorAll('[data-roadmaptasklist]').forEach(listEl => {
+    const catKey = listEl.dataset.roadmaptasklist;
+    wireSortableContainer('roadmap', listEl, '[data-roadmaptaskdrag]', () => {
+      const newOrder = Array.from(listEl.children).map(el => el.dataset.roadmapid);
+      data.roadmapItemOrder[catKey] = newOrder;
+      queueSave();
+    });
+  });
+}
+
+function ensureHeistOrder(){
+  if (!heistState._collapsed) heistState._collapsed = {};
+  if (!heistState._open) heistState._open = {};
+  if (!heistState._filter) heistState._filter = 'all';
+  if (!heistState._eraOrder) heistState._eraOrder = HEIST_ERAS.map(e => e.key);
+  HEIST_ERAS.forEach(e => { if (!heistState._eraOrder.includes(e.key)) heistState._eraOrder.push(e.key); });
+  if (!heistState._itemOrder) heistState._itemOrder = {};
+  HEIST_ERAS.forEach(era => {
+    const known = HEIST_DATA[era.key].map(h => h.id);
+    if (!heistState._itemOrder[era.key]) heistState._itemOrder[era.key] = known.slice();
+    heistState._itemOrder[era.key] = heistState._itemOrder[era.key].filter(id => known.includes(id));
+    known.forEach(id => { if (!heistState._itemOrder[era.key].includes(id)) heistState._itemOrder[era.key].push(id); });
+  });
 }
 
 function renderHeists(){
-  if (!heistState._collapsed) heistState._collapsed = {};
-  if (!heistState._open) heistState._open = {};
+  ensureHeistOrder();
 
   let total = 0, done = 0;
   HEIST_ERAS.forEach(era => {
@@ -935,20 +1011,27 @@ function renderHeists(){
   document.getElementById('heistProgtext').textContent = done + ' / ' + total;
   document.getElementById('heistFill').style.width = (total ? (done/total*100) : 0) + '%';
 
+  const filterBar = renderFilterBar(heistState._filter, 'heistfilter');
+  const orderedEras = heistState._eraOrder.map(k => HEIST_ERAS.find(e => e.key === k)).filter(Boolean);
+
   const container = document.getElementById('heistList');
-  container.innerHTML = HEIST_ERAS.map(era => {
-    const items = HEIST_DATA[era.key];
+  container.innerHTML = filterBar + orderedEras.map(era => {
+    const itemIds = heistState._itemOrder[era.key] || [];
+    const items = itemIds.map(id => HEIST_DATA[era.key].find(h => h.id === id)).filter(Boolean);
     const eraDone = items.filter(h => heistState[h.id]).length;
     const isCollapsed = !!heistState._collapsed[era.key];
+    const visibleItems = items.filter(h => passesFilter(heistState._filter, !!heistState[h.id]));
+    if (visibleItems.length === 0) return '';
     return `
-    <div class="section ${isCollapsed?'collapsed':''}">
+    <div class="section ${isCollapsed?'collapsed':''}" data-eraid="${era.key}">
       <div class="section-head" data-eratoggle="${era.key}">
+        <span class="section-drag" data-eradrag>&#9776;</span>
         <span class="dot" style="background:${era.color}"></span>
         <span class="label-text">${esc(era.label)} <span style="color:${era.color};font-weight:800;">(${eraDone}/${items.length})</span></span>
         <span class="chevron">&#9656;</span>
       </div>
-      <div class="section-body">
-        ${items.map(h => {
+      <div class="section-body" data-heisttasklist="${era.key}">
+        ${visibleItems.map(h => {
           const isDone = !!heistState[h.id];
           const isOpen = !!heistState._open[h.id];
           const subsHtml = h.subs ? h.subs.map(s => {
@@ -960,6 +1043,7 @@ function renderHeists(){
           }).join('') : '';
           return `
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
+            <span class="task-drag" data-heistdrag>&#9776;</span>
             <div class="check ${isDone?'on':''}" data-heistcheck><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
               <div class="tname-row">
@@ -976,6 +1060,33 @@ function renderHeists(){
       </div>
     </div>`;
   }).join('');
+
+  initHeistSortables();
+}
+
+function initHeistSortables(){
+  destroySortableGroup('heists');
+  const container = document.getElementById('heistList');
+  if (!container) return;
+
+  wireSortableContainer('heists', container, '[data-eradrag]', () => {
+    const newOrder = Array.from(container.children).filter(el => el.dataset.eraid).map(el => el.dataset.eraid);
+    heistState._eraOrder = newOrder;
+    queueSaveHeists();
+  });
+
+  container.querySelectorAll('[data-heisttasklist]').forEach(listEl => {
+    const eraKey = listEl.dataset.heisttasklist;
+    wireSortableContainer('heists', listEl, '[data-heistdrag]', () => {
+      // sub-item rows (data-subid) can end up interleaved when an expanded card is open;
+      // only reorder based on the actual heist rows (data-heistid), ignore sub rows when reading the new order.
+      const newOrder = Array.from(listEl.children)
+        .filter(el => el.dataset.heistid)
+        .map(el => el.dataset.heistid);
+      heistState._itemOrder[eraKey] = newOrder;
+      queueSaveHeists();
+    });
+  });
 }
 
 function renderAll(){
@@ -996,7 +1107,7 @@ document.addEventListener('click', (e) => {
     return;
   }
   // don't toggle collapse/task when clicking a drag handle itself
-  if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]')) return;
+  if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]') || e.target.closest('[data-eradrag]') || e.target.closest('[data-heistdrag]') || e.target.closest('[data-roadmapcatdrag]') || e.target.closest('[data-roadmaptaskdrag]')) return;
 
   const sectionHead = e.target.closest('[data-sectiontoggle]');
   if (sectionHead) {
@@ -1038,6 +1149,27 @@ document.addEventListener('click', (e) => {
   const sortBtn = e.target.closest('[data-sortmode]');
   if (sortBtn) {
     data.roadmapSort = sortBtn.dataset.sortmode;
+    queueSave();
+    renderRoadmap();
+    return;
+  }
+  const todayFilterBtn = e.target.closest('[data-todayfilter]');
+  if (todayFilterBtn) {
+    data.todayFilter = todayFilterBtn.dataset.todayfilter;
+    queueSave();
+    renderToday();
+    return;
+  }
+  const heistFilterBtn = e.target.closest('[data-heistfilter]');
+  if (heistFilterBtn) {
+    heistState._filter = heistFilterBtn.dataset.heistfilter;
+    queueSaveHeists();
+    renderHeists();
+    return;
+  }
+  const roadmapFilterBtn = e.target.closest('[data-roadmapfilter]');
+  if (roadmapFilterBtn) {
+    data.roadmapFilter = roadmapFilterBtn.dataset.roadmapfilter;
     queueSave();
     renderRoadmap();
     return;
