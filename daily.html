@@ -15,11 +15,13 @@
 
 :root{
   --bg:#0a0a0c;
-  --panel:#141417;
-  --panel2:#1b1b20;
+  --panel:rgba(30,30,36,.55);
+  --panel2:rgba(40,40,48,.6);
+  --glass-border:rgba(255,255,255,.14);
+  --glass-highlight:rgba(255,255,255,.09);
   --border:rgba(255,255,255,.07);
   --text:#eef0f4;
-  --dim:#8b8b95;
+  --dim:#a2a2ac;
   --green:#7bc142;
   --green-dark:#4f7a2a;
   --pink:#ff3d7f;
@@ -30,12 +32,14 @@
 /* Follow system light/dark automatically, unless the manual toggle has set an explicit override */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]){
-    --bg:#f4f4f6;
-    --panel:#ffffff;
-    --panel2:#eceef2;
-    --border:rgba(0,0,0,.09);
+    --bg:#eef0f4;
+    --panel:rgba(255,255,255,.55);
+    --panel2:rgba(255,255,255,.7);
+    --glass-border:rgba(255,255,255,.6);
+    --glass-highlight:rgba(255,255,255,.8);
+    --border:rgba(0,0,0,.08);
     --text:#16161a;
-    --dim:#6b6b75;
+    --dim:#5a5a63;
     --green:#4f8f1e;
     --green-dark:#3a6b16;
     --pink:#d81b6a;
@@ -45,12 +49,14 @@
   }
 }
 :root[data-theme="light"]{
-  --bg:#f4f4f6;
-  --panel:#ffffff;
-  --panel2:#eceef2;
-  --border:rgba(0,0,0,.09);
+  --bg:#eef0f4;
+  --panel:rgba(255,255,255,.55);
+  --panel2:rgba(255,255,255,.7);
+  --glass-border:rgba(255,255,255,.6);
+  --glass-highlight:rgba(255,255,255,.8);
+  --border:rgba(0,0,0,.08);
   --text:#16161a;
-  --dim:#6b6b75;
+  --dim:#5a5a63;
   --green:#4f8f1e;
   --green-dark:#3a6b16;
   --pink:#d81b6a;
@@ -68,8 +74,37 @@ body{
   min-height:100vh; min-height:100dvh;
   padding-top:env(safe-area-inset-top);
   transition: background .2s, color .2s;
+  position:relative;
+}
+/* Soft, fixed color fields behind the whole app so the glass panels have something to refract/blur - */
+/* without this, backdrop-filter on a flat single-color background looks identical to no blur at all. */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 12% 8%, rgba(255,61,127,.28), transparent 70%),
+    radial-gradient(35% 28% at 90% 14%, rgba(255,138,61,.24), transparent 70%),
+    radial-gradient(40% 34% at 20% 92%, rgba(94,201,196,.22), transparent 70%),
+    radial-gradient(32% 26% at 85% 85%, rgba(108,123,255,.20), transparent 70%);
+  filter:blur(10px);
+  transition: opacity .2s;
+}
+:root[data-theme="light"] body::before{ opacity: .55; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) body::before { opacity: .55; }
 }
 .wrap{max-width:820px;margin:0 auto;padding:18px 14px 90px;}
+
+/* ---- Liquid Glass surface treatment, applied to every card-like element ---- */
+.glass{
+  background:var(--panel);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 24px rgba(0,0,0,.18);
+}
 
 /* ---- Header ---- */
 header{
@@ -107,7 +142,12 @@ header::after{
 
 .theme-toggle{
   display:flex; gap:4px;
-  background:var(--panel); border:1px solid var(--border); border-radius:20px;
+  background:var(--panel);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 18px rgba(0,0,0,.16);
+  border-radius:20px;
   padding:3px; width:fit-content; margin:0 0 14px auto;
 }
 .theme-opt{
@@ -127,14 +167,17 @@ header::after{
   padding:9px 4px;
   border-radius:10px;
   background:var(--panel);
-  border:1px solid var(--border);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
   font-weight:700;
   font-size:11.5px;
   letter-spacing:.2px;
   white-space:nowrap;
   color:var(--dim);
   cursor:pointer;
-  transition:.15s;
+  transition:.2s;
 }
 .tab.active{background:var(--green-dark); color:#fff; border-color:var(--green);}
 .tab:hover:not(.active){background:var(--panel2);}
@@ -145,10 +188,15 @@ header::after{
 /* ---- Progress bar ---- */
 .progress-wrap{
   display:flex; align-items:center; gap:12px;
-  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  background:var(--panel);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 22px rgba(0,0,0,.16);
+  border-radius:12px;
   padding:12px 14px; margin-bottom:16px;
 }
-.progress-bar{flex:1; height:9px; border-radius:99px; background:#000; overflow:hidden;}
+.progress-bar{flex:1; height:9px; border-radius:99px; background:rgba(0,0,0,.25); overflow:hidden;}
 .progress-fill{height:100%; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:.3s;}
 .progress-text{font-size:12.5px; font-weight:800; color:var(--gold); white-space:nowrap;}
 
@@ -177,6 +225,11 @@ header::after{
 .section-drag:active{cursor:grabbing;}
 .section.sortable-ghost{opacity:.35;}
 .section.sortable-chosen .section-head{background:rgba(255,255,255,.05);}
+.section.sortable-dragging, .section.sortable-fallback{
+  box-shadow:0 12px 28px rgba(0,0,0,.35);
+  transform:scale(1.015);
+  z-index:50;
+}
 
 .task-drag{
   flex:none; color:var(--dim); font-size:13px; padding:4px 2px 4px 0;
@@ -186,16 +239,24 @@ header::after{
 .task-drag:active{cursor:grabbing;}
 .task.sortable-ghost{opacity:.3;}
 .task.sortable-chosen{background:var(--panel2);}
+.task.sortable-dragging, .task.sortable-fallback{
+  box-shadow:0 10px 22px rgba(0,0,0,.35);
+  transform:scale(1.02);
+  z-index:50;
+}
 
 .task{
   display:flex; align-items:flex-start; gap:12px;
   background:var(--panel);
-  border:1px solid var(--border);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
   border-radius:10px;
   padding:11px 13px;
   margin-bottom:6px;
   cursor:pointer;
-  transition:.12s;
+  transition:.16s;
 }
 .task:hover{background:var(--panel2);}
 .task.done{opacity:.5;}
@@ -222,7 +283,12 @@ header::after{
 /* ---- History ---- */
 .hist-row{
   display:flex; align-items:center; justify-content:space-between;
-  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  background:var(--panel);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+  border-radius:10px;
   padding:12px 14px; margin-bottom:8px;
 }
 .hist-date{font-weight:700; font-size:13.5px;}
@@ -232,15 +298,24 @@ header::after{
 
 /* ---- Mansion goal ---- */
 .goal-card{
-  background:linear-gradient(135deg,var(--panel2),var(--panel));
-  border:1px solid rgba(240,193,75,.3);
+  background:linear-gradient(135deg, var(--panel2), var(--panel));
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 10px 26px rgba(0,0,0,.2);
   border-radius:14px;
   padding:18px;
   margin-bottom:16px;
 }
 .goal-title{font-family:'Archivo Black',sans-serif; font-size:18px; color:var(--gold); text-transform:uppercase; letter-spacing:.4px;}
 .goal-sub{font-size:12.5px; color:var(--dim); margin-top:4px; margin-bottom:14px;}
-.roadmap-total{display:flex;justify-content:space-between;align-items:end;gap:14px;background:rgba(123,193,66,.09);border:1px solid rgba(123,193,66,.32);border-radius:10px;padding:13px 14px;margin-bottom:12px;}
+.roadmap-total{
+  display:flex;justify-content:space-between;align-items:end;gap:14px;
+  background:rgba(123,193,66,.12);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border:1px solid rgba(123,193,66,.32);border-radius:10px;padding:13px 14px;margin-bottom:12px;
+}
 .roadmap-total small{display:block;color:var(--dim);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;}
 .roadmap-total strong{display:block;color:var(--green);font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1;}
 .roadmap-total span{color:var(--dim);font-size:11.5px;text-align:right;line-height:1.45;}
@@ -268,16 +343,15 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
   height:60px; margin-top:-60px;
   z-index:100;
   color:var(--dim); font-size:12px; font-weight:700;
-  transition:margin-top .2s;
   pointer-events:none;
 }
+.ptr-indicator.ptr-snap{transition:margin-top .32s cubic-bezier(.22,1,.36,1);}
 .ptr-spinner{
   width:20px; height:20px; margin-right:8px;
   border:2px solid var(--border); border-top-color:var(--green);
   border-radius:50%;
-  transition:transform .1s;
 }
-.ptr-spinner.spinning{animation:ptr-spin .7s linear infinite;}
+.ptr-spinner.spinning{animation:ptr-spin .6s linear infinite;}
 @keyframes ptr-spin{to{transform:rotate(360deg);}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
@@ -709,7 +783,15 @@ function initSortables(){
 
   sectionSortable = Sortable.create(container, {
     handle: '[data-sectiondrag]',
-    animation: 150,
+    animation: 220,
+    easing: 'cubic-bezier(.22,1,.36,1)',
+    delay: 60,
+    delayOnTouchOnly: true,
+    touchStartThreshold: 4,
+    forceFallback: true,
+    fallbackTolerance: 3,
+    fallbackClass: 'sortable-fallback',
+    dragClass: 'sortable-dragging',
     onEnd: () => {
       const newOrder = Array.from(container.children).map(el => el.dataset.sectionid);
       data.sectionOrder = newOrder;
@@ -721,7 +803,15 @@ function initSortables(){
     const sectionId = listEl.dataset.tasklist;
     const s = Sortable.create(listEl, {
       handle: '[data-taskdrag]',
-      animation: 150,
+      animation: 220,
+      easing: 'cubic-bezier(.22,1,.36,1)',
+      delay: 60,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 4,
+      forceFallback: true,
+      fallbackTolerance: 3,
+      fallbackClass: 'sortable-fallback',
+      dragClass: 'sortable-dragging',
       onEnd: () => {
         const newOrder = Array.from(listEl.children).map(el => el.dataset.taskid);
         data.taskOrder[sectionId] = newOrder;
@@ -994,6 +1084,7 @@ document.addEventListener('touchstart', (e) => {
   if (window.scrollY <= 0 && !ptrRefreshing) {
     ptrStartY = e.touches[0].clientY;
     ptrPulling = true;
+    ptrIndicator.classList.remove('ptr-snap'); // no easing while actively tracking the finger
   }
 }, { passive: true });
 
@@ -1001,15 +1092,19 @@ document.addEventListener('touchmove', (e) => {
   if (!ptrPulling || ptrRefreshing) return;
   const dy = e.touches[0].clientY - ptrStartY;
   if (dy <= 0) { ptrIndicator.style.marginTop = '-60px'; return; }
-  const pull = Math.min(dy * 0.5, 90);
+  // Real rubber-band resistance curve (like iOS's native overscroll) instead of a hard linear cap -
+  // pulls further before feeling "stuck", and eases off the harder you pull, rather than a flat clamp.
+  const maxPull = 90;
+  const pull = maxPull * (1 - Math.exp(-dy / 140));
   ptrIndicator.style.marginTop = (pull - 60) + 'px';
-  ptrSpinner.style.transform = `rotate(${pull * 3}deg)`;
+  ptrSpinner.style.transform = `rotate(${pull * 3.2}deg)`;
   ptrText.textContent = pull >= PTR_THRESHOLD ? 'Release to refresh' : 'Pull to refresh';
 }, { passive: true });
 
 document.addEventListener('touchend', () => {
   if (!ptrPulling || ptrRefreshing) { ptrPulling = false; return; }
   ptrPulling = false;
+  ptrIndicator.classList.add('ptr-snap'); // now allow a smooth eased snap, since the finger has released
   const currentMargin = parseFloat(ptrIndicator.style.marginTop || '-60');
   const pulled = currentMargin + 60;
   if (pulled >= PTR_THRESHOLD) {
@@ -1020,6 +1115,7 @@ document.addEventListener('touchend', () => {
 });
 
 async function doFullRefresh(){
+  ptrIndicator.classList.add('ptr-snap');
   ptrIndicator.style.marginTop = '0px';
   ptrSpinner.classList.add('spinning');
   ptrSpinner.style.transform = '';
