@@ -798,7 +798,7 @@ function renderToday(){
           const isDone = !!data.today[t.id];
           const cardColor = t.tint || sec.color;
           const tintStyle = !isDone
-            ? `style="background:linear-gradient(${hexToRgba(cardColor,0.16)},${hexToRgba(cardColor,0.16)}),var(--panel);border-left:3px solid ${hexToRgba(cardColor,0.6)};"`
+            ? `style="background:linear-gradient(${hexToRgba(cardColor,0.4)},${hexToRgba(cardColor,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cardColor,0.9)};"`
             : '';
           const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
           return `
@@ -959,7 +959,7 @@ function renderRoadmap(){
           const isDone = !!data.roadmap[t.id];
           const checkStyle = isDone ? `style="background:${cat.color};border-color:${cat.color};"` : '';
           const cardTintStyle = !isDone
-            ? `background:linear-gradient(${hexToRgba(cat.color,0.14)},${hexToRgba(cat.color,0.14)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.55)};`
+            ? `background:linear-gradient(${hexToRgba(cat.color,0.4)},${hexToRgba(cat.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.9)};`
             : 'background:rgba(255,255,255,.03);';
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="${cardTintStyle}">
             ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
@@ -1065,7 +1065,7 @@ function renderHeists(){
           }).join('') : '';
           const heistCheckStyle = isDone ? `style="background:${era.color};border-color:${era.color};"` : '';
           const heistCardStyle = !isDone
-            ? `style="background:linear-gradient(${hexToRgba(era.color,0.14)},${hexToRgba(era.color,0.14)}),var(--panel);border-left:3px solid ${hexToRgba(era.color,0.55)};"`
+            ? `style="background:linear-gradient(${hexToRgba(era.color,0.4)},${hexToRgba(era.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(era.color,0.9)};"`
             : '';
           return `
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}" ${heistCardStyle}>
