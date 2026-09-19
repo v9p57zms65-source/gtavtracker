@@ -524,9 +524,12 @@ const SECTIONS = [
     { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
     { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', tint: '#3d9bdc' },
     { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', tint: '#ff8a3d', optional: true },
-    { id: 'garment_safe', name: 'Garment Factory: collect safe', note: 'Smallest passive earner (~$2,000/day).', tint: '#c9c9d0' },
     { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).', tint: '#c9c9d0' },
     { id: 'bail_mostwanted', name: "Bail Office: today's Most Wanted target", note: 'Once/day, highest-value bounty. ~$120-130K base (3-4x a Standard bounty), likely higher after a May 2026 payout increase. Deliver alive for full payout, killing cuts it by 75%.', tint: '#c9c9d0' },
+  ]},
+  { id: 'weekly', label: 'Weekly Tasks', color: '#e0473f', tasks: [
+    { id: 'kortz_heist', name: 'Run The Kortz Center Heist', note: 'Resets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting). Any repeat that same week collapses to ~$300K - only worth doing once weekly.', tint: '#e0473f' },
+    { id: 'garment_safe_weekly', name: 'Garment Factory: collect safe (weekly sweep)', note: 'Only ~$2,000/day, so collecting once a week (~$14K total) rather than daily is just less to remember for the same money.', tint: '#e0473f' },
   ]},
 ];
 
@@ -796,10 +799,11 @@ function renderToday(){
           const tintStyle = (t.tint && !isDone)
             ? `style="background:linear-gradient(${hexToRgba(t.tint,0.16)},${hexToRgba(t.tint,0.16)}),var(--panel);border-left:3px solid ${hexToRgba(t.tint,0.6)};"`
             : '';
+          const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
           return `
             <div class="task ${isDone?'done':''}" data-taskid="${t.id}" ${tintStyle}>
               <span class="task-drag" data-taskdrag>&#9776;</span>
-              <div class="check ${isDone?'on':''}" data-checkbtn>
+              <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                 <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
               </div>
               <div class="tinfo" data-checkbtn>
@@ -952,9 +956,10 @@ function renderRoadmap(){
       <div class="section-body" ${isDefaultSort ? `data-roadmaptasklist="${cat.key}"` : ''}>
         ${visibleItems.map(t => {
           const isDone = !!data.roadmap[t.id];
+          const checkStyle = isDone ? `style="background:${cat.color};border-color:${cat.color};"` : '';
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
             ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
-            <div class="check ${isDone?'on':''}"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+            <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo">
               <div class="tname-row ${isDone?'done':''}">
                 <span class="tname ${isDone?'done':''}">${esc(t.label)}</span>
@@ -1048,15 +1053,17 @@ function renderHeists(){
           const isOpen = !!heistState._open[h.id];
           const subsHtml = h.subs ? h.subs.map(s => {
             const sDone = !!heistState[s.id];
+            const subCheckStyle = sDone ? `style="width:17px;height:17px;background:${era.color};border-color:${era.color};"` : `style="width:17px;height:17px;"`;
             return `<div class="task" data-subid="${s.id}" style="background:transparent;border:none;padding:6px 0 6px 34px;margin-bottom:0;">
-              <div class="check ${sDone?'on':''}" style="width:17px;height:17px;"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+              <div class="check ${sDone?'on':''}" ${subCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
               <div class="tinfo"><span class="tname ${sDone?'done':''}" style="font-size:12.5px;">${esc(s.label)}</span></div>
             </div>`;
           }).join('') : '';
+          const heistCheckStyle = isDone ? `style="background:${era.color};border-color:${era.color};"` : '';
           return `
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
             <span class="task-drag" data-heistdrag>&#9776;</span>
-            <div class="check ${isDone?'on':''}" data-heistcheck><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+            <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
               <div class="tname-row">
                 <span class="tname ${isDone?'done':''}">${esc(h.name)}</span>
