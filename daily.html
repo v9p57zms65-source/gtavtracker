@@ -517,16 +517,16 @@ const SECTIONS = [
     { id: 'mf_higgins', name: 'Higgins Helitours: check Heat, run a job', note: 'Comes with its own Maverick helicopter you can call in. No separate safe here — earnings pay out at the Car Wash.' },
   ]},
   { id: 'ceo', label: 'CEO Operations', color: '#6c7bff', tasks: [
-    { id: 'agency_safe', name: 'Agency: collect safe', note: 'Up to $20,000/day once maxed. Caps at $250,000 stored.', textColor: '#ff3d7f' },
-    { id: 'sec_contract', name: 'Agency: run a Security Contract (best of the 3 shown)', note: 'Tiers (Professional/Specialist/Specialist+) are randomly rolled with each contract — you can\'t pick the tier, just the best of whatever 3 show up. Specialist+ pays $60-70K but is genuinely rare luck, not something to expect every time.', textColor: '#ff3d7f' },
-    { id: 'payphone', name: 'Agency: check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', textColor: '#ff3d7f', optional: true },
-    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.', textColor: '#ff8a3d' },
-    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', textColor: '#ff8a3d' },
-    { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', textColor: '#3d9bdc' },
-    { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', textColor: '#ff8a3d', optional: true },
-    { id: 'garment_safe', name: 'Garment Factory: collect safe', note: 'Smallest passive earner (~$2,000/day).', textColor: '#c9c9d0' },
-    { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).', textColor: '#c9c9d0' },
-    { id: 'bail_mostwanted', name: "Bail Office: today's Most Wanted target", note: 'Once/day, highest-value bounty. ~$120-130K base (3-4x a Standard bounty), likely higher after a May 2026 payout increase. Deliver alive for full payout, killing cuts it by 75%.', textColor: '#c9c9d0' },
+    { id: 'agency_safe', name: 'Agency: collect safe', note: 'Up to $20,000/day once maxed. Caps at $250,000 stored.', tint: '#ff3d7f' },
+    { id: 'sec_contract', name: 'Agency: run a Security Contract (best of the 3 shown)', note: 'Tiers (Professional/Specialist/Specialist+) are randomly rolled with each contract — you can\'t pick the tier, just the best of whatever 3 show up. Specialist+ pays $60-70K but is genuinely rare luck, not something to expect every time.', tint: '#ff3d7f' },
+    { id: 'payphone', name: 'Agency: check for a Payphone Hit', note: 'Learn the bonus condition — doubles payout to $85K.', tint: '#ff3d7f', optional: true },
+    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
+    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
+    { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', tint: '#3d9bdc' },
+    { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', tint: '#ff8a3d', optional: true },
+    { id: 'garment_safe', name: 'Garment Factory: collect safe', note: 'Smallest passive earner (~$2,000/day).', tint: '#c9c9d0' },
+    { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).', tint: '#c9c9d0' },
+    { id: 'bail_mostwanted', name: "Bail Office: today's Most Wanted target", note: 'Once/day, highest-value bounty. ~$120-130K base (3-4x a Standard bounty), likely higher after a May 2026 payout increase. Deliver alive for full payout, killing cuts it by 75%.', tint: '#c9c9d0' },
   ]},
 ];
 
@@ -747,6 +747,11 @@ async function initState(){
 
 // ---------- RENDER ----------
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function hexToRgba(hex, alpha){
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 function renderFilterBar(currentMode, attrName){
   const modes = [ ['all','All'], ['done','Completed'], ['incomplete','Incomplete'] ];
@@ -788,14 +793,17 @@ function renderToday(){
           const t = tasksById[tid];
           if (!t) return '';
           const isDone = !!data.today[t.id];
+          const tintStyle = (t.tint && !isDone)
+            ? `style="background:linear-gradient(${hexToRgba(t.tint,0.16)},${hexToRgba(t.tint,0.16)}),var(--panel);border-left:3px solid ${hexToRgba(t.tint,0.6)};"`
+            : '';
           return `
-            <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
+            <div class="task ${isDone?'done':''}" data-taskid="${t.id}" ${tintStyle}>
               <span class="task-drag" data-taskdrag>&#9776;</span>
               <div class="check ${isDone?'on':''}" data-checkbtn>
                 <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
               </div>
               <div class="tinfo" data-checkbtn>
-                <div class="tname ${isDone?'done':''}" ${(t.textColor && !isDone) ? `style="color:${t.textColor}"` : ''}>${esc(t.name)}</div>
+                <div class="tname ${isDone?'done':''}">${esc(t.name)}</div>
                 <div class="tnote">${esc(t.note||'')}</div>
                 ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
               </div>
