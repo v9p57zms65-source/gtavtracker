@@ -13,39 +13,38 @@
 <link rel="manifest" href="manifest-daily.json">
 <meta name="theme-color" content="#0a0a0c">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root{
   --bg:#0a0a0c;
-  --panel:rgba(30,30,36,.18);
-  --panel2:rgba(45,45,54,.24);
-  --glass-border:rgba(255,255,255,.24);
-  --glass-highlight:rgba(255,255,255,.24);
-  --glass-blur: blur(36px) saturate(220%) brightness(1.08);
+  --panel:rgba(32,32,38,.34);
+  --panel2:rgba(48,48,56,.42);
+  --glass-border:rgba(255,255,255,.16);
+  --glass-highlight:rgba(255,255,255,.18);
+  --glass-blur: blur(36px) saturate(200%) brightness(1.05);
   --border:rgba(255,255,255,.07);
-  --text:#eef0f4;
-  --dim:#c9c9d1;
-  --text-shadow: -1px -1px 0 rgba(0,0,0,.85), 1px -1px 0 rgba(0,0,0,.85), -1px 1px 0 rgba(0,0,0,.85), 1px 1px 0 rgba(0,0,0,.85);
+  --text:rgba(255,255,255,.94);
+  --dim:rgba(255,255,255,.62);
   --green:#7bc142;
   --green-dark:#4f7a2a;
   --pink:#ff3d7f;
   --orange:#ff8a3d;
   --gold:#f0c14b;
   --red:#e0473f;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif;
 }
 /* Follow system light/dark automatically, unless the manual toggle has set an explicit override */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]){
     --bg:#eef0f4;
-    --panel:rgba(255,255,255,.28);
-    --panel2:rgba(255,255,255,.38);
-    --glass-border:rgba(255,255,255,.75);
-    --glass-highlight:rgba(255,255,255,.9);
-    --glass-blur: blur(36px) saturate(220%) brightness(1.08);
+    --panel:rgba(255,255,255,.4);
+    --panel2:rgba(255,255,255,.52);
+    --glass-border:rgba(255,255,255,.65);
+    --glass-highlight:rgba(255,255,255,.8);
+    --glass-blur: blur(36px) saturate(200%) brightness(1.05);
     --border:rgba(0,0,0,.08);
-    --text:#16161a;
-    --dim:#45454e;
-    --text-shadow: -1px -1px 0 rgba(255,255,255,.9), 1px -1px 0 rgba(255,255,255,.9), -1px 1px 0 rgba(255,255,255,.9), 1px 1px 0 rgba(255,255,255,.9);
+    --text:rgba(0,0,0,.92);
+    --dim:rgba(0,0,0,.58);
     --green:#4f8f1e;
     --green-dark:#3a6b16;
     --pink:#d81b6a;
@@ -56,15 +55,14 @@
 }
 :root[data-theme="light"]{
   --bg:#eef0f4;
-  --panel:rgba(255,255,255,.28);
-  --panel2:rgba(255,255,255,.38);
-  --glass-border:rgba(255,255,255,.75);
-  --glass-highlight:rgba(255,255,255,.9);
-  --glass-blur: blur(36px) saturate(220%) brightness(1.08);
+  --panel:rgba(255,255,255,.4);
+  --panel2:rgba(255,255,255,.52);
+  --glass-border:rgba(255,255,255,.65);
+  --glass-highlight:rgba(255,255,255,.8);
+  --glass-blur: blur(36px) saturate(200%) brightness(1.05);
   --border:rgba(0,0,0,.08);
-  --text:#16161a;
-  --dim:#45454e;
-  --text-shadow: -1px -1px 0 rgba(255,255,255,.9), 1px -1px 0 rgba(255,255,255,.9), -1px 1px 0 rgba(255,255,255,.9), 1px 1px 0 rgba(255,255,255,.9);
+  --text:rgba(0,0,0,.92);
+  --dim:rgba(0,0,0,.58);
   --green:#4f8f1e;
   --green-dark:#3a6b16;
   --pink:#d81b6a;
@@ -78,12 +76,14 @@ body{
   margin:0;
   background:transparent;
   color:var(--text);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-family:var(--font);
+  font-size:15px;
+  line-height:1.4;
+  -webkit-font-smoothing:antialiased;
   min-height:100vh; min-height:100dvh;
   padding-top:env(safe-area-inset-top);
   transition: color .2s;
   position:relative;
-  text-shadow: var(--text-shadow);
 }
 /* Soft, fixed color fields behind the whole app so the glass panels have something to refract/blur - */
 /* without this, backdrop-filter on a flat single-color background looks identical to no blur at all. */
@@ -158,16 +158,16 @@ header::after{
 }
 .htitle{
   position:relative; z-index:2;
-  font-family:'Archivo Black',sans-serif;
-  font-size:28px;
-  letter-spacing:.5px;
-  line-height:1.05;
-  text-transform:uppercase;
+  font-family:var(--font);
+  font-weight:800;
+  font-size:26px;
+  letter-spacing:-.4px;
+  line-height:1.1;
   color:#fff;
   text-shadow:0 2px 10px rgba(0,0,0,.5);
 }
-.hsub{position:relative; z-index:2; color:#f3f3f3; font-size:12.5px; margin-top:6px; opacity:.9;}
-.hdate{position:relative; z-index:2; color:#fff; font-size:13px; margin-top:12px; font-weight:700; letter-spacing:.3px;}
+.hsub{position:relative; z-index:2; color:rgba(255,255,255,.82); font-size:13px; margin-top:5px; line-height:1.4;}
+.hdate{position:relative; z-index:2; color:rgba(255,255,255,.92); font-size:12.5px; margin-top:12px; font-weight:600; letter-spacing:.2px;}
 
 .theme-toggle{
   display:flex; gap:4px;
@@ -200,9 +200,9 @@ header::after{
   backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
-  font-weight:700;
+  font-weight:600;
   font-size:11.5px;
-  letter-spacing:.2px;
+  letter-spacing:.1px;
   white-space:nowrap;
   color:var(--dim);
   cursor:pointer;
@@ -233,7 +233,7 @@ header::after{
 .section{margin-bottom:18px;}
 .section-head{
   display:flex; align-items:center; gap:8px;
-  font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
   color:var(--dim); margin-bottom:8px; padding:6px 8px 6px 2px;
   border-radius:8px;
   cursor:pointer;
@@ -300,9 +300,9 @@ header::after{
 .check svg{width:13px; height:13px; stroke:#06101f; stroke-width:3; fill:none; opacity:0;}
 .check.on svg{opacity:1;}
 .tinfo{flex:1;}
-.tname{font-weight:700; font-size:14px;}
+.tname{font-weight:600; font-size:15px; letter-spacing:-.1px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:12px; color:var(--dim); margin-top:2px; line-height:1.5; text-shadow: var(--text-shadow), var(--text-shadow);}
+.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45;}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
@@ -320,8 +320,8 @@ header::after{
   border-radius:10px;
   padding:12px 14px; margin-bottom:8px;
 }
-.hist-date{font-weight:700; font-size:13.5px;}
-.hist-stats{font-size:12px; color:var(--dim);}
+.hist-date{font-weight:600; font-size:14px;}
+.hist-stats{font-size:13px; color:var(--dim);}
 .hist-pct{font-weight:800; font-size:14px;}
 .hist-empty{color:var(--dim); font-size:13px; text-align:center; padding:30px 10px;}
 
@@ -336,7 +336,7 @@ header::after{
   padding:18px;
   margin-bottom:16px;
 }
-.goal-title{font-family:'Archivo Black',sans-serif; font-size:18px; color:var(--gold); text-transform:uppercase; letter-spacing:.4px;}
+.goal-title{font-family:var(--font); font-weight:800; font-size:18px; color:var(--gold); letter-spacing:-.2px;}
 .goal-sub{font-size:12.5px; color:var(--dim); margin-top:4px; margin-bottom:14px;}
 .roadmap-total{
   display:flex;justify-content:space-between;align-items:end;gap:14px;
@@ -346,7 +346,7 @@ header::after{
   border:1px solid rgba(123,193,66,.32);border-radius:10px;padding:13px 14px;margin-bottom:12px;
 }
 .roadmap-total small{display:block;color:var(--dim);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;}
-.roadmap-total strong{display:block;color:var(--green);font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1;}
+.roadmap-total strong{display:block;color:var(--green);font-family:var(--font);font-weight:800;font-size:22px;line-height:1.1;letter-spacing:-.3px;}
 .roadmap-total span{color:var(--dim);font-size:11.5px;text-align:right;line-height:1.45;}
 
 .sort-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:0 2px;}
@@ -361,7 +361,7 @@ header::after{
 
 .tname-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .tname-row .tname{flex:1;}
-.tprice{color:#5ec9c4;font-weight:800;font-size:13px;white-space:nowrap;flex:none;}
+.tprice{color:#5ec9c4;font-weight:700;font-size:13.5px;white-space:nowrap;flex:none;}
 .tname-row.done .tprice{color:var(--dim);}
 
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
