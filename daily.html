@@ -796,8 +796,9 @@ function renderToday(){
           const t = tasksById[tid];
           if (!t) return '';
           const isDone = !!data.today[t.id];
-          const tintStyle = (t.tint && !isDone)
-            ? `style="background:linear-gradient(${hexToRgba(t.tint,0.16)},${hexToRgba(t.tint,0.16)}),var(--panel);border-left:3px solid ${hexToRgba(t.tint,0.6)};"`
+          const cardColor = t.tint || sec.color;
+          const tintStyle = !isDone
+            ? `style="background:linear-gradient(${hexToRgba(cardColor,0.16)},${hexToRgba(cardColor,0.16)}),var(--panel);border-left:3px solid ${hexToRgba(cardColor,0.6)};"`
             : '';
           const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
           return `
@@ -957,7 +958,10 @@ function renderRoadmap(){
         ${visibleItems.map(t => {
           const isDone = !!data.roadmap[t.id];
           const checkStyle = isDone ? `style="background:${cat.color};border-color:${cat.color};"` : '';
-          return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="background:rgba(255,255,255,.03);">
+          const cardTintStyle = !isDone
+            ? `background:linear-gradient(${hexToRgba(cat.color,0.14)},${hexToRgba(cat.color,0.14)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.55)};`
+            : 'background:rgba(255,255,255,.03);';
+          return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="${cardTintStyle}">
             ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
             <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo">
@@ -1060,8 +1064,11 @@ function renderHeists(){
             </div>`;
           }).join('') : '';
           const heistCheckStyle = isDone ? `style="background:${era.color};border-color:${era.color};"` : '';
+          const heistCardStyle = !isDone
+            ? `style="background:linear-gradient(${hexToRgba(era.color,0.14)},${hexToRgba(era.color,0.14)}),var(--panel);border-left:3px solid ${hexToRgba(era.color,0.55)};"`
+            : '';
           return `
-          <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
+          <div class="task ${isDone?'done':''}" data-heistid="${h.id}" ${heistCardStyle}>
             <span class="task-drag" data-heistdrag>&#9776;</span>
             <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
