@@ -579,6 +579,7 @@ const ROADMAP_STEPS = [
   { id: 'r_salvage', label: 'Salvage Yard', price: 1620000, category: 'business', note: 'Cheapest is Paleto Bay. Weekly Robberies + a passive Tow Truck income. Add its daily task back once bought.' },
   { id: 'r_facility', label: 'Facility', price: 1250000, category: 'business', note: 'Paleto Bay, cheapest of 9. Unlocks Doomsday Heist only, interiors identical everywhere so location doesn\'t change income. Lago Zancudo is the pricier alternative if you want Fort Zancudo jet proximity.' },
   { id: 'r_yacht', label: 'Galaxy Super Yacht (Orion)', price: 6000000, category: 'business', note: 'Cheapest of 3 tiers (Pisces $7M, Aquarius $8M). Pure luxury flex, not a money-maker - a floating apartment with a captain and bartender. Pisces adds a hot tub + free helicopter if you want more than the base flex.' },
+  { id: 'r_ironmule', label: 'DH-7 Iron Mule', price: 1758750, category: 'pvp', note: 'Trade Price already unlocked (Setup: Iron Mule done). Long-tether cargo hook, useful for hooking Vehicle Cargo sale vehicles instead of driving them back. Imani Tech compatible.' },
 ];
 const ROADMAP_CATEGORIES = [
   { key: 'owned', label: 'Already Owned (check these off yourself)', color: '#7bc142' },
@@ -678,6 +679,11 @@ function totalDailyTasks(){
   return SECTIONS.reduce((sum, s) => sum + s.tasks.length, 0);
 }
 
+function getWeeklyTaskIds(){
+  const weeklySection = SECTIONS.find(s => s.id === 'weekly');
+  return weeklySection ? weeklySection.tasks.map(t => t.id) : [];
+}
+
 function rolloverIfNewDay(){
   const t = todayStr();
   if (data.currentDate !== t) {
@@ -685,9 +691,24 @@ function rolloverIfNewDay(){
     const total = totalDailyTasks();
     const doneCount = Object.values(data.today).filter(Boolean).length;
     data.history[data.currentDate] = { checks: data.today, done: doneCount, total: total };
+
+    const weeklyIds = getWeeklyTaskIds();
+    const preservedWeekly = {};
+    weeklyIds.forEach(id => { if (data.today[id]) preservedWeekly[id] = true; });
+
     data.today = {};
     data.currentDate = t;
     data.collapsed = {}; // fresh day, expand every category again
+
+    // Thursday (day 4) is when Weekly tasks actually reset in-game (Kortz Center, etc.) -
+    // every other day, carry the weekly checkmarks forward instead of wiping them like daily tasks.
+    const isThursday = new Date().getDay() === 4;
+    const alreadyResetThisWeek = data.lastWeeklyReset === t;
+    if (isThursday && !alreadyResetThisWeek) {
+      data.lastWeeklyReset = t; // weekly tasks stay unchecked this rollover - a fresh week starts
+    } else {
+      Object.assign(data.today, preservedWeekly); // not Thursday (or already reset today) - keep them checked
+    }
   }
 }
 
