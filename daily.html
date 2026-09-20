@@ -267,10 +267,16 @@ header::after{
 }
 .task-drag:active{cursor:grabbing;}
 .task-edit-btn, .task-del-btn{
-  flex:none; font-size:14px; padding:4px 5px; margin-top:0;
-  opacity:.45; cursor:pointer; border-radius:6px; transition:.15s;
+  position:absolute; top:6px;
+  font-size:10px; width:18px; height:18px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--dim);
+  opacity:.4; cursor:pointer; border-radius:5px; transition:.15s;
+  line-height:1;
 }
-.task-edit-btn:hover, .task-del-btn:hover{opacity:1; background:rgba(255,255,255,.08);}
+.task-del-btn{right:6px;}
+.task-edit-btn{right:26px;}
+.task-edit-btn:hover, .task-del-btn:hover{opacity:1; background:rgba(255,255,255,.1); color:var(--text);}
 .task-del-btn:hover{color:var(--red);}
 .task.sortable-ghost{opacity:.3;}
 .task.sortable-chosen{background:var(--panel2);}
@@ -292,6 +298,7 @@ header::after{
   margin-bottom:6px;
   cursor:pointer;
   transition:.16s;
+  position:relative;
 }
 .task:hover{background:var(--panel2);}
 .task.done{opacity:.5;}
@@ -846,7 +853,7 @@ function renderToday(){
             <div class="task ${isDone?'done':''}" data-taskid="${t.id}" ${tintStyle}>
               <span class="task-drag" data-taskdrag>&#9776;</span>
               <span class="task-edit-btn" data-todayedit="${t.id}">&#9998;</span>
-              <span class="task-del-btn" data-todaydelete="${t.id}">&#128465;</span>
+              <span class="task-del-btn" data-todaydelete="${t.id}">&#10005;</span>
               <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                 <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
               </div>
@@ -1012,7 +1019,7 @@ function renderRoadmap(){
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="${cardTintStyle}">
             ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
             <span class="task-edit-btn" data-roadmapedit="${t.id}">&#9998;</span>
-            <span class="task-del-btn" data-roadmapdelete="${t.id}">&#128465;</span>
+            <span class="task-del-btn" data-roadmapdelete="${t.id}">&#10005;</span>
             <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo">
               <div class="tname-row ${isDone?'done':''}">
@@ -1127,7 +1134,7 @@ function renderHeists(){
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}" ${heistCardStyle}>
             <span class="task-drag" data-heistdrag>&#9776;</span>
             <span class="task-edit-btn" data-heistedit="${h.id}">&#9998;</span>
-            <span class="task-del-btn" data-heistdelete="${h.id}">&#128465;</span>
+            <span class="task-del-btn" data-heistdelete="${h.id}">&#10005;</span>
             <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
               <div class="tname-row">
