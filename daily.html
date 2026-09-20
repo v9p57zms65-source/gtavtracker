@@ -266,6 +266,12 @@ header::after{
   margin-top:1px;
 }
 .task-drag:active{cursor:grabbing;}
+.task-edit-btn, .task-del-btn{
+  flex:none; font-size:14px; padding:4px 5px; margin-top:0;
+  opacity:.45; cursor:pointer; border-radius:6px; transition:.15s;
+}
+.task-edit-btn:hover, .task-del-btn:hover{opacity:1; background:rgba(255,255,255,.08);}
+.task-del-btn:hover{color:var(--red);}
 .task.sortable-ghost{opacity:.3;}
 .task.sortable-chosen{background:var(--panel2);}
 .task.sortable-dragging, .task.sortable-fallback{
@@ -802,13 +808,15 @@ function passesFilter(mode, isDone){
 function renderToday(){
   ensureOrder();
   if (!data.todayFilter) data.todayFilter = 'all';
+  if (!data.taskEdits) data.taskEdits = {};
+  if (!data.deletedTasks) data.deletedTasks = [];
   const container = document.getElementById('todayList');
   const orderedSections = data.sectionOrder.map(id => SECTIONS.find(s => s.id === id)).filter(Boolean);
   const filterBar = renderFilterBar(data.todayFilter, 'todayfilter');
 
   container.innerHTML = filterBar + orderedSections.map(sec => {
     const isCollapsed = !!data.collapsed[sec.id];
-    const orderedTaskIds = data.taskOrder[sec.id] || sec.tasks.map(t => t.id);
+    const orderedTaskIds = (data.taskOrder[sec.id] || sec.tasks.map(t => t.id)).filter(id => !data.deletedTasks.includes(id));
     const tasksById = Object.fromEntries(sec.tasks.map(t => [t.id, t]));
     const doneInSection = orderedTaskIds.filter(id => data.today[id]).length;
     const visibleIds = orderedTaskIds.filter(tid => passesFilter(data.todayFilter, !!data.today[tid]));
@@ -825,6 +833,9 @@ function renderToday(){
         ${visibleIds.map(tid => {
           const t = tasksById[tid];
           if (!t) return '';
+          const edit = data.taskEdits[t.id] || {};
+          const displayName = edit.name !== undefined ? edit.name : t.name;
+          const displayNote = edit.note !== undefined ? edit.note : (t.note || '');
           const isDone = !!data.today[t.id];
           const cardColor = t.tint || sec.color;
           const tintStyle = !isDone
@@ -834,12 +845,14 @@ function renderToday(){
           return `
             <div class="task ${isDone?'done':''}" data-taskid="${t.id}" ${tintStyle}>
               <span class="task-drag" data-taskdrag>&#9776;</span>
+              <span class="task-edit-btn" data-todayedit="${t.id}">&#9998;</span>
+              <span class="task-del-btn" data-todaydelete="${t.id}">&#128465;</span>
               <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                 <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
               </div>
               <div class="tinfo" data-checkbtn>
-                <div class="tname ${isDone?'done':''}">${esc(t.name)}</div>
-                <div class="tnote">${esc(t.note||'')}</div>
+                <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
+                <div class="tnote">${esc(displayNote)}</div>
                 ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
               </div>
             </div>
@@ -935,6 +948,8 @@ function ensureRoadmapOrder(){
   if (!data.roadmapSort) data.roadmapSort = 'default';
   if (!data.roadmapCollapsed) data.roadmapCollapsed = {};
   if (!data.roadmapFilter) data.roadmapFilter = 'all';
+  if (!data.roadmapEdits) data.roadmapEdits = {};
+  if (!data.deletedRoadmapTasks) data.deletedRoadmapTasks = [];
   if (!data.roadmapCatOrder) data.roadmapCatOrder = ROADMAP_CATEGORIES.map(c => c.key);
   ROADMAP_CATEGORIES.forEach(c => { if (!data.roadmapCatOrder.includes(c.key)) data.roadmapCatOrder.push(c.key); });
   if (!data.roadmapItemOrder) data.roadmapItemOrder = {};
@@ -968,7 +983,7 @@ function renderRoadmap(){
   const orderedCats = data.roadmapCatOrder.map(k => ROADMAP_CATEGORIES.find(c => c.key === k)).filter(Boolean);
 
   const groups = orderedCats.map(cat => {
-    let itemIds = data.roadmapItemOrder[cat.key] || [];
+    let itemIds = (data.roadmapItemOrder[cat.key] || []).filter(id => !data.deletedRoadmapTasks.includes(id));
     let items = itemIds.map(id => ROADMAP_STEPS.find(t => t.id === id)).filter(Boolean);
     if (data.roadmapSort === 'price_asc') items = items.slice().sort((a,b) => a.price - b.price);
     else if (data.roadmapSort === 'price_desc') items = items.slice().sort((a,b) => b.price - a.price);
@@ -987,19 +1002,24 @@ function renderRoadmap(){
       <div class="section-body" ${isDefaultSort ? `data-roadmaptasklist="${cat.key}"` : ''}>
         ${visibleItems.map(t => {
           const isDone = !!data.roadmap[t.id];
+          const edit = data.roadmapEdits[t.id] || {};
+          const displayLabel = edit.label !== undefined ? edit.label : t.label;
+          const displayNote = edit.note !== undefined ? edit.note : (t.note || '');
           const checkStyle = isDone ? `style="background:${cat.color};border-color:${cat.color};"` : '';
           const cardTintStyle = !isDone
             ? `background:linear-gradient(${hexToRgba(cat.color,0.4)},${hexToRgba(cat.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.9)};`
             : 'background:rgba(255,255,255,.03);';
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="${cardTintStyle}">
             ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
+            <span class="task-edit-btn" data-roadmapedit="${t.id}">&#9998;</span>
+            <span class="task-del-btn" data-roadmapdelete="${t.id}">&#128465;</span>
             <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo">
               <div class="tname-row ${isDone?'done':''}">
-                <span class="tname ${isDone?'done':''}">${esc(t.label)}</span>
+                <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
                 ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
               </div>
-              ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
+              ${displayNote ? `<div class="tnote">${esc(displayNote)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
             </div>
           </div>`;
         }).join('')}
@@ -1038,6 +1058,8 @@ function ensureHeistOrder(){
   if (!heistState._collapsed) heistState._collapsed = {};
   if (!heistState._open) heistState._open = {};
   if (!heistState._filter) heistState._filter = 'all';
+  if (!heistState._edits) heistState._edits = {};
+  if (!heistState._deleted) heistState._deleted = [];
   if (!heistState._eraOrder) heistState._eraOrder = HEIST_ERAS.map(e => e.key);
   HEIST_ERAS.forEach(e => { if (!heistState._eraOrder.includes(e.key)) heistState._eraOrder.push(e.key); });
   if (!heistState._itemOrder) heistState._itemOrder = {};
@@ -1055,6 +1077,7 @@ function renderHeists(){
   let total = 0, done = 0;
   HEIST_ERAS.forEach(era => {
     HEIST_DATA[era.key].forEach(h => {
+      if (heistState._deleted.includes(h.id)) return;
       total++; if (heistState[h.id]) done++;
       if (h.subs) h.subs.forEach(s => { total++; if (heistState[s.id]) done++; });
     });
@@ -1067,7 +1090,7 @@ function renderHeists(){
 
   const container = document.getElementById('heistList');
   container.innerHTML = filterBar + orderedEras.map(era => {
-    const itemIds = heistState._itemOrder[era.key] || [];
+    const itemIds = (heistState._itemOrder[era.key] || []).filter(id => !heistState._deleted.includes(id));
     const items = itemIds.map(id => HEIST_DATA[era.key].find(h => h.id === id)).filter(Boolean);
     const eraDone = items.filter(h => heistState[h.id]).length;
     const isCollapsed = !!heistState._collapsed[era.key];
@@ -1085,6 +1108,9 @@ function renderHeists(){
         ${visibleItems.map(h => {
           const isDone = !!heistState[h.id];
           const isOpen = !!heistState._open[h.id];
+          const edit = heistState._edits[h.id] || {};
+          const displayName = edit.name !== undefined ? edit.name : h.name;
+          const displayNote = edit.note !== undefined ? edit.note : h.note;
           const subsHtml = h.subs ? h.subs.map(s => {
             const sDone = !!heistState[s.id];
             const subCheckStyle = sDone ? `style="width:17px;height:17px;background:${era.color};border-color:${era.color};"` : `style="width:17px;height:17px;"`;
@@ -1100,13 +1126,15 @@ function renderHeists(){
           return `
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}" ${heistCardStyle}>
             <span class="task-drag" data-heistdrag>&#9776;</span>
+            <span class="task-edit-btn" data-heistedit="${h.id}">&#9998;</span>
+            <span class="task-del-btn" data-heistdelete="${h.id}">&#128465;</span>
             <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
             <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
               <div class="tname-row">
-                <span class="tname ${isDone?'done':''}">${esc(h.name)}</span>
+                <span class="tname ${isDone?'done':''}">${esc(displayName)}</span>
                 <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
               </div>
-              <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(h.note)}</div>
+              <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(displayNote)}</div>
               ${h.subs ? `<span class="tbadge opt">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
             </div>
           </div>
@@ -1164,6 +1192,63 @@ document.addEventListener('click', (e) => {
   }
   // don't toggle collapse/task when clicking a drag handle itself
   if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]') || e.target.closest('[data-eradrag]') || e.target.closest('[data-heistdrag]') || e.target.closest('[data-roadmapcatdrag]') || e.target.closest('[data-roadmaptaskdrag]')) return;
+  const editBtn = e.target.closest('[data-todayedit], [data-roadmapedit], [data-heistedit]');
+  const delBtn = e.target.closest('[data-todaydelete], [data-roadmapdelete], [data-heistdelete]');
+  if (editBtn || delBtn) {
+    if (editBtn) {
+      const id = editBtn.dataset.todayedit || editBtn.dataset.roadmapedit || editBtn.dataset.heistedit;
+      const isToday = !!editBtn.dataset.todayedit;
+      const isRoadmap = !!editBtn.dataset.roadmapedit;
+      const isHeist = !!editBtn.dataset.heistedit;
+      let currentName, currentNote;
+      if (isToday) {
+        const found = SECTIONS.flatMap(s => s.tasks).find(t => t.id === id);
+        const edit = data.taskEdits[id] || {};
+        currentName = edit.name !== undefined ? edit.name : (found ? found.name : '');
+        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
+      } else if (isRoadmap) {
+        const found = ROADMAP_STEPS.find(t => t.id === id);
+        const edit = data.roadmapEdits[id] || {};
+        currentName = edit.label !== undefined ? edit.label : (found ? found.label : '');
+        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
+      } else if (isHeist) {
+        let found = null;
+        Object.values(HEIST_DATA).forEach(arr => { const f = arr.find(h => h.id === id); if (f) found = f; });
+        const edit = heistState._edits[id] || {};
+        currentName = edit.name !== undefined ? edit.name : (found ? found.name : '');
+        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
+      }
+      const newName = prompt('Edit name:', currentName);
+      if (newName === null) return; // cancelled
+      const newNote = prompt('Edit note:', currentNote);
+      if (newNote === null) return; // cancelled
+      if (isToday) {
+        data.taskEdits[id] = { name: newName, note: newNote };
+        queueSave(); renderToday();
+      } else if (isRoadmap) {
+        data.roadmapEdits[id] = { label: newName, note: newNote };
+        queueSave(); renderRoadmap();
+      } else if (isHeist) {
+        heistState._edits[id] = { name: newName, note: newNote };
+        queueSaveHeists(); renderHeists();
+      }
+    }
+    if (delBtn) {
+      const id = delBtn.dataset.todaydelete || delBtn.dataset.roadmapdelete || delBtn.dataset.heistdelete;
+      if (!confirm('Delete this task permanently? This just hides it - you can still bring it back later if needed.')) return;
+      if (delBtn.dataset.todaydelete) {
+        data.deletedTasks.push(id);
+        queueSave(); renderToday();
+      } else if (delBtn.dataset.roadmapdelete) {
+        data.deletedRoadmapTasks.push(id);
+        queueSave(); renderRoadmap();
+      } else if (delBtn.dataset.heistdelete) {
+        heistState._deleted.push(id);
+        queueSaveHeists(); renderHeists();
+      }
+    }
+    return;
+  }
 
   const sectionHead = e.target.closest('[data-sectiontoggle]');
   if (sectionHead) {
