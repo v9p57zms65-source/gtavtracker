@@ -266,18 +266,7 @@ header::after{
   margin-top:1px;
 }
 .task-drag:active{cursor:grabbing;}
-.task-edit-btn, .task-del-btn{
-  position:absolute; top:6px;
-  font-size:10px; width:18px; height:18px;
-  display:flex; align-items:center; justify-content:center;
-  color:var(--dim);
-  opacity:.4; cursor:pointer; border-radius:5px; transition:.15s;
-  line-height:1;
-}
-.task-del-btn{right:6px;}
-.task-edit-btn{right:26px;}
-.task-edit-btn:hover, .task-del-btn:hover{opacity:1; background:rgba(255,255,255,.1); color:var(--text);}
-.task-del-btn:hover{color:var(--red);}
+
 .task.sortable-ghost{opacity:.3;}
 .task.sortable-chosen{background:var(--panel2);}
 .task.sortable-dragging, .task.sortable-fallback{
@@ -287,19 +276,45 @@ header::after{
 }
 
 .task{
-  display:flex; align-items:flex-start; gap:12px;
+  display:flex; align-items:stretch; gap:0;
   background:var(--panel);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   border-radius:10px;
-  padding:11px 13px;
   margin-bottom:6px;
   cursor:pointer;
   transition:.16s;
   position:relative;
+  overflow:hidden;
 }
+.task-content{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:11px 13px;
+  flex:1; min-width:0;
+  transition:transform .22s cubic-bezier(.22,1,.36,1);
+}
+.task-actions{
+  position:absolute; top:0; right:0; bottom:0; width:46px;
+  display:flex; flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .22s cubic-bezier(.22,1,.36,1);
+  background:var(--panel2);
+  border-left:1px solid var(--glass-border);
+}
+.task:hover .task-actions, .task.actions-open .task-actions{transform:translateX(0);}
+.task:hover .task-content, .task.actions-open .task-content{transform:translateX(-46px);}
+.task-edit-btn, .task-del-btn{
+  flex:1;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px;
+  color:var(--dim);
+  cursor:pointer; transition:.15s;
+}
+.task-edit-btn{border-bottom:1px solid var(--glass-border);}
+.task-edit-btn:hover{color:var(--text); background:rgba(255,255,255,.08);}
+.task-del-btn:hover{color:var(--red); background:rgba(255,255,255,.08);}
 .task:hover{background:var(--panel2);}
 .task.done{opacity:.5;}
 .check{
@@ -374,7 +389,7 @@ header::after{
 
 .tname-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .tname-row .tname{flex:1;}
-.tprice{color:#5ec9c4;font-weight:700;font-size:13.5px;white-space:nowrap;flex:none;}
+.tprice{color:var(--text);font-weight:700;font-size:13.5px;white-space:nowrap;flex:none;}
 .tname-row.done .tprice{color:var(--dim);}
 
 footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); line-height:1.7;}
@@ -866,17 +881,21 @@ function renderToday(){
             : '';
           const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
           return `
-            <div class="task ${isDone?'done':''}" data-taskid="${t.id}" ${tintStyle}>
-              <span class="task-drag" data-taskdrag>&#9776;</span>
-              <span class="task-edit-btn" data-todayedit="${t.id}">&#9998;</span>
-              <span class="task-del-btn" data-todaydelete="${t.id}">&#10005;</span>
-              <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
-                <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+            <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
+              <div class="task-content" ${tintStyle}>
+                <span class="task-drag" data-taskdrag>&#9776;</span>
+                <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
+                  <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+                </div>
+                <div class="tinfo" data-checkbtn>
+                  <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
+                  <div class="tnote">${esc(displayNote)}</div>
+                  ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
+                </div>
               </div>
-              <div class="tinfo" data-checkbtn>
-                <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
-                <div class="tnote">${esc(displayNote)}</div>
-                ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
+              <div class="task-actions">
+                <span class="task-edit-btn" data-todayedit="${t.id}">&#9998;</span>
+                <span class="task-del-btn" data-todaydelete="${t.id}">&#10005;</span>
               </div>
             </div>
           `;
@@ -1032,17 +1051,21 @@ function renderRoadmap(){
           const cardTintStyle = !isDone
             ? `background:linear-gradient(${hexToRgba(cat.color,0.4)},${hexToRgba(cat.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.9)};`
             : 'background:rgba(255,255,255,.03);';
-          return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}" style="${cardTintStyle}">
-            ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
-            <span class="task-edit-btn" data-roadmapedit="${t.id}">&#9998;</span>
-            <span class="task-del-btn" data-roadmapdelete="${t.id}">&#10005;</span>
-            <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-            <div class="tinfo">
-              <div class="tname-row ${isDone?'done':''}">
-                <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
-                ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
+          return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}">
+            <div class="task-content" style="${cardTintStyle}">
+              ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
+              <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+              <div class="tinfo">
+                <div class="tname-row ${isDone?'done':''}">
+                  <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
+                  ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
+                </div>
+                ${displayNote ? `<div class="tnote">${esc(displayNote)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
               </div>
-              ${displayNote ? `<div class="tnote">${esc(displayNote)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
+            </div>
+            <div class="task-actions">
+              <span class="task-edit-btn" data-roadmapedit="${t.id}">&#9998;</span>
+              <span class="task-del-btn" data-roadmapdelete="${t.id}">&#10005;</span>
             </div>
           </div>`;
         }).join('')}
@@ -1147,18 +1170,22 @@ function renderHeists(){
             ? `style="background:linear-gradient(${hexToRgba(era.color,0.4)},${hexToRgba(era.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(era.color,0.9)};"`
             : '';
           return `
-          <div class="task ${isDone?'done':''}" data-heistid="${h.id}" ${heistCardStyle}>
-            <span class="task-drag" data-heistdrag>&#9776;</span>
-            <span class="task-edit-btn" data-heistedit="${h.id}">&#9998;</span>
-            <span class="task-del-btn" data-heistdelete="${h.id}">&#10005;</span>
-            <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-            <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
-              <div class="tname-row">
-                <span class="tname ${isDone?'done':''}">${esc(displayName)}</span>
-                <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
+          <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
+            <div class="task-content" ${heistCardStyle}>
+              <span class="task-drag" data-heistdrag>&#9776;</span>
+              <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+              <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
+                <div class="tname-row">
+                  <span class="tname ${isDone?'done':''}">${esc(displayName)}</span>
+                  <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
+                </div>
+                <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(displayNote)}</div>
+                ${h.subs ? `<span class="tbadge opt">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
               </div>
-              <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(displayNote)}</div>
-              ${h.subs ? `<span class="tbadge opt">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
+            </div>
+            <div class="task-actions">
+              <span class="task-edit-btn" data-heistedit="${h.id}">&#9998;</span>
+              <span class="task-del-btn" data-heistdelete="${h.id}">&#10005;</span>
             </div>
           </div>
           ${h.subs && isOpen ? subsHtml : ''}
@@ -1386,6 +1413,58 @@ setInterval(() => {
   rolloverIfNewDay();
   if (before !== data.currentDate) { queueSave(); renderAll(); }
 }, 60000);
+
+// ---------- SWIPE TO REVEAL (edit/delete actions on mobile) ----------
+// Desktop reveals these on hover via pure CSS (see .task:hover in the stylesheet).
+// Mobile has no hover, so a right-swipe on the card toggles the same reveal via this class.
+let swipeStartX = 0, swipeStartY = 0, swipeTask = null, swipeDecided = false, swipeIsHorizontal = false;
+const SWIPE_OPEN_THRESHOLD = 40;
+
+document.addEventListener('touchstart', (e) => {
+  const taskEl = e.target.closest('.task');
+  // Ignore swipes starting on the drag handle - that gesture belongs to Sortable, not this.
+  if (!taskEl || e.target.closest('[data-taskdrag], [data-heistdrag], [data-roadmaptaskdrag]')) { swipeTask = null; return; }
+  swipeTask = taskEl;
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+  swipeDecided = false;
+  swipeIsHorizontal = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!swipeTask) return;
+  const dx = e.touches[0].clientX - swipeStartX;
+  const dy = e.touches[0].clientY - swipeStartY;
+  if (!swipeDecided) {
+    // Only claim this gesture once it's clearly more horizontal than vertical,
+    // so normal page scrolling is never hijacked.
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      swipeDecided = true;
+      swipeIsHorizontal = Math.abs(dx) > Math.abs(dy);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (!swipeTask || !swipeIsHorizontal) { swipeTask = null; return; }
+  const dx = (e.changedTouches[0].clientX - swipeStartX);
+  if (dx > SWIPE_OPEN_THRESHOLD) {
+    document.querySelectorAll('.task.actions-open').forEach(el => { if (el !== swipeTask) el.classList.remove('actions-open'); });
+    swipeTask.classList.add('actions-open');
+  } else if (dx < -SWIPE_OPEN_THRESHOLD) {
+    swipeTask.classList.remove('actions-open');
+  }
+  swipeTask = null;
+});
+
+// Tapping anywhere outside an open swipe panel closes it again.
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.task-actions')) {
+    document.querySelectorAll('.task.actions-open').forEach(el => {
+      if (!el.contains(e.target)) el.classList.remove('actions-open');
+    });
+  }
+}, true);
 
 // ---------- PULL TO REFRESH ----------
 // Native Safari pull-to-refresh doesn't work once this is installed as a standalone home-screen app,
