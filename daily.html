@@ -335,7 +335,9 @@ header::after{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
 }
-.tbadge.opt{color:var(--dim); background:rgba(255,255,255,.06);}
+.tbadge.opt{color:#2a1a03; background:#ffb84d; font-weight:900; letter-spacing:.2px;}
+.task-content.is-optional .tname{opacity:.82;}
+.task-content.is-optional .tnote{opacity:.75;}
 
 /* ---- History ---- */
 .hist-row{
@@ -512,9 +514,7 @@ initTheme();
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
   { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
-    { id: 'gs_cache', name: "Find G's Cache", note: "Purple crate w/ question mark, 15 possible spots. ~$15-22K + ammo + snacks. Resets daily." },
     { id: 'stash_house', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
-    { id: 'madrazo_hit', name: "Do today's Madrazo Hit", note: 'Purple dollar icon. $20,000 + $10,000 bonus for using his specified weapon = $30,000/day.' },
     { id: 'street_dealer', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
   ]},
   { id: 'mansion', label: 'Mansion', color: '#f0c14b', tasks: [
@@ -557,9 +557,6 @@ const SECTIONS = [
   { id: 'autoshop', label: 'Auto Shop', color: '#3d9bdc', tasks: [
     { id: 'autoshop_contract', name: 'Customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.' },
   ]},
-  { id: 'arcade', label: 'Arcade', color: '#22d3ee', tasks: [
-    { id: 'arcade_safe', name: 'Collect cabinet income', note: '~$5,000/day when cabinets are maxed. Small but free.' },
-  ]},
   { id: 'bail', label: 'Bail Office', color: '#9c3d5e', tasks: [
     { id: 'bail_agents', name: 'Send both agents, collect safe', note: '$5K-$10K/run, ~48 min. Caps at $100K ($200K GTA+).' },
     { id: 'bail_mostwanted', name: "Today's Most Wanted target", note: 'Once/day, highest-value bounty. ~$120-130K base (3-4x a Standard bounty), likely higher after a May 2026 payout increase. Deliver alive for full payout, killing cuts it by 75%.' },
@@ -567,6 +564,7 @@ const SECTIONS = [
   { id: 'weekly', label: 'Weekly Tasks', color: '#e0473f', tasks: [
     { id: 'kortz_heist', name: 'Run The Kortz Center Heist', note: 'Resets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting). Any repeat that same week collapses to ~$300K - only worth doing once weekly.', recurring: true },
     { id: 'garment_safe_weekly', name: 'Garment Factory: collect safe (weekly sweep)', note: 'Only ~$2,000/day, so collecting once a week (~$14K total) rather than daily is just less to remember for the same money.', recurring: true },
+    { id: 'arcade_safe_weekly', name: 'Arcade: collect cabinet income (weekly sweep)', note: '~$5,000/day, so a weekly ~$35K collection is simpler than remembering it daily.', recurring: true },
     { id: 'bunker_research_x3', name: 'Do 3 Bunker Research Missions (Agent 14)', note: 'THIS WEEK ONLY (Business Rivalries, ends ~Sept 23 2026): 3 completions = flat $1,000,000 + Camo Sweatsuit, paid within 72hrs. Also pays double cash/RP/research all week. Stays checked once done - gets replaced with next week\'s promo, doesn\'t auto-reset.' },
     { id: 'check_weekly_bonus', name: "Ask Claude to check this week's Rockstar bonus challenges", note: "I can't check automatically on my own schedule - tap this as a reminder to ask me each week, and I'll research current bonuses and update this category.", recurring: true },
   ]},
@@ -615,6 +613,7 @@ const ROADMAP_STEPS = [
   { id: 'r_ironmule', label: 'DH-7 Iron Mule', price: 1758750, category: 'pvp', note: 'Trade Price already unlocked (Setup: Iron Mule done). Long-tether cargo hook, useful for hooking Vehicle Cargo sale vehicles instead of driving them back. Imani Tech compatible.' },
   { id: 'r_buffalostx', label: 'Bravado Buffalo STX', price: 1612500, category: 'pvp', note: 'Trade Price already unlocked (Agency owned). 12 homing missiles / 4 RPGs to destroy, 126 mph. Full Imani Tech suite including Missile Lock-On Jammer.' },
   { id: 'r_insurgentcustom', label: 'Insurgent Pick-Up Custom', price: 1552500, category: 'pvp', note: 'Trade Price already unlocked (Humane Labs Raid done) - $1.35M base + $202,500 custom conversion at your MOC/Avenger Workshop. 27 homing missiles, ~9 RPGs to destroy. Weak point: only 2 AA Flak hits.' },
+  { id: 'r_buzzard', label: 'Buzzard Attack Chopper', price: 1750000, category: 'pvp', note: 'Warstock Cache & Carry. Fast (145 mph), 2 miniguns + 2 homing missile launchers, seats 4. Not personal-vehicle storable - Pegasus/Hangar only.' },
 ];
 const ROADMAP_CATEGORIES = [
   { key: 'owned', label: 'Already Owned (check these off yourself)', color: '#7bc142' },
@@ -882,7 +881,7 @@ function renderToday(){
           const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
           return `
             <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
-              <div class="task-content" ${tintStyle}>
+              <div class="task-content ${t.optional?'is-optional':''}" ${tintStyle}>
                 <span class="task-drag" data-taskdrag>&#9776;</span>
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                   <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
