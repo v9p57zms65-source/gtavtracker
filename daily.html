@@ -1421,9 +1421,6 @@ document.addEventListener('click', (e) => {
     else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
     return;
   }
-    }
-    return;
-  }
 
   const sectionHead = e.target.closest('[data-sectiontoggle]');
   if (sectionHead) {
