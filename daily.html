@@ -319,6 +319,7 @@ header::after{
 .task-edit-btn{border-bottom:1px solid var(--glass-border);}
 .task-edit-btn:hover{color:var(--text); background:rgba(255,255,255,.08);}
 .task-del-btn:hover{color:var(--red); background:rgba(255,255,255,.08);}
+.task-del-btn.armed{color:#fff; background:var(--red); font-weight:800;}
 .task:hover{background:var(--panel2);}
 .task.done{opacity:.5;}
 .check{
@@ -334,12 +335,51 @@ header::after{
 .tinfo{flex:1;}
 .tname{font-weight:600; font-size:15px; letter-spacing:-.1px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45;}
+.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line;}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
 }
 .tbadge.opt{color:#2a1a03; background:#ffb84d; font-weight:900; letter-spacing:.2px;}
+
+/* ---- Inline editing (native-feeling, no browser prompt dialogs) ---- */
+.edit-field{
+  width:100%; display:block;
+  background:transparent;
+  border:none; border-bottom:1.5px solid var(--glass-border);
+  color:var(--text);
+  font-family:var(--font);
+  padding:3px 0 4px;
+  outline:none;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.edit-field:focus{border-bottom-color:var(--green);}
+.edit-name{font-weight:600; font-size:15px; letter-spacing:-.1px; margin-bottom:6px;}
+.edit-note{font-size:13px; color:var(--dim); resize:none; overflow:hidden; line-height:1.45;}
+.edit-optional-row{
+  display:flex; align-items:center; gap:8px; margin-top:10px; margin-bottom:2px;
+  font-size:12.5px; font-weight:600; color:var(--dim); cursor:pointer; user-select:none;
+}
+.edit-optional-toggle{
+  width:34px; height:20px; border-radius:20px; background:var(--border);
+  position:relative; flex:none; transition:background .15s;
+}
+.edit-optional-toggle::after{
+  content:""; position:absolute; top:2px; left:2px; width:16px; height:16px;
+  border-radius:50%; background:#fff; transition:transform .15s; box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.edit-optional-toggle.on{background:var(--green);}
+.edit-optional-toggle.on::after{transform:translateX(14px);}
+.edit-actions-row{display:flex; gap:8px; margin-top:12px;}
+.edit-save-btn, .edit-cancel-btn{
+  flex:1; text-align:center; padding:7px 0; border-radius:8px;
+  font-size:12.5px; font-weight:700; cursor:pointer; transition:.15s;
+}
+.edit-save-btn{background:var(--green-dark); color:#fff;}
+.edit-save-btn:hover{filter:brightness(1.15);}
+.edit-cancel-btn{background:var(--panel2); color:var(--dim); border:1px solid var(--glass-border);}
+.edit-cancel-btn:hover{color:var(--text);}
 /* ---- History ---- */
 .hist-row{
   display:flex; align-items:center; justify-content:space-between;
@@ -709,6 +749,8 @@ function ensureOrder(){
   });
 }
 let saveTimeout = null;
+let editingKey = null;       // e.g. 'today:bunker' - which single task, if any, is currently in inline edit mode
+let deleteConfirmKey = null; // e.g. 'today:bunker' - which delete button is armed, awaiting a second confirm tap
 
 function totalDailyTasks(){
   return SECTIONS.reduce((sum, s) => sum + s.tasks.length, 0);
@@ -874,15 +916,40 @@ function renderToday(){
           const edit = data.taskEdits[t.id] || {};
           const displayName = edit.name !== undefined ? edit.name : t.name;
           const displayNote = edit.note !== undefined ? edit.note : (t.note || '');
+          const displayOptional = edit.optional !== undefined ? edit.optional : !!t.optional;
           const isDone = !!data.today[t.id];
           const cardColor = t.tint || sec.color;
           const tintStyle = !isDone
             ? `style="background:linear-gradient(${hexToRgba(cardColor,0.4)},${hexToRgba(cardColor,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cardColor,0.9)};"`
             : '';
           const checkStyle = isDone ? `style="background:${sec.color};border-color:${sec.color};"` : '';
+          const thisKey = 'today:' + t.id;
+          const isEditing = editingKey === thisKey;
+          const isDelArmed = deleteConfirmKey === thisKey;
+
+          if (isEditing) {
+            return `
+            <div class="task" data-taskid="${t.id}">
+              <div class="task-content" style="background:var(--panel2);" data-edittarget="${t.id}" data-edittab="today">
+                <div style="flex:1; min-width:0;">
+                  <input class="edit-field edit-name" value="${esc(displayName)}" placeholder="Task name">
+                  <textarea class="edit-field edit-note" rows="2" placeholder="Note (optional)">${esc(displayNote)}</textarea>
+                  <div class="edit-optional-row" data-editopttoggle>
+                    <span class="edit-optional-toggle ${displayOptional?'on':''}" data-editopttoggle></span>
+                    Optional task
+                  </div>
+                  <div class="edit-actions-row">
+                    <span class="edit-cancel-btn" data-editcancel>Cancel</span>
+                    <span class="edit-save-btn" data-editsave>Save</span>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }
+
           return `
             <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
-              <div class="task-content ${t.optional?'is-optional':''}" ${tintStyle}>
+              <div class="task-content ${displayOptional?'is-optional':''}" ${tintStyle}>
                 <span class="task-drag" data-taskdrag>&#9776;</span>
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                   <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
@@ -890,13 +957,13 @@ function renderToday(){
                 <div class="tinfo" data-checkbtn>
                   <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
                   <div class="tnote">${esc(displayNote)}</div>
-                  ${t.optional ? '<span class="tbadge opt">Optional</span>' : ''}
+                  ${displayOptional ? '<span class="tbadge opt">Optional</span>' : ''}
                 </div>
               </div>
               <span class="task-hover-trigger" data-checkbtn></span>
               <div class="task-actions">
                 <span class="task-edit-btn" data-todayedit="${t.id}">&#9998;</span>
-                <span class="task-del-btn" data-todaydelete="${t.id}">&#10005;</span>
+                <span class="task-del-btn ${isDelArmed?'armed':''}" data-todaydelete="${t.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</span>
               </div>
             </div>
           `;
@@ -1048,10 +1115,34 @@ function renderRoadmap(){
           const edit = data.roadmapEdits[t.id] || {};
           const displayLabel = edit.label !== undefined ? edit.label : t.label;
           const displayNote = edit.note !== undefined ? edit.note : (t.note || '');
+          const displayOptional = edit.optional !== undefined ? edit.optional : !!t.optional;
           const checkStyle = isDone ? `style="background:${cat.color};border-color:${cat.color};"` : '';
           const cardTintStyle = !isDone
             ? `background:linear-gradient(${hexToRgba(cat.color,0.4)},${hexToRgba(cat.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(cat.color,0.9)};`
             : 'background:rgba(255,255,255,.03);';
+          const thisKey = 'roadmap:' + t.id;
+          const isEditing = editingKey === thisKey;
+          const isDelArmed = deleteConfirmKey === thisKey;
+
+          if (isEditing) {
+            return `<div class="task" data-roadmapid="${t.id}">
+              <div class="task-content" style="background:var(--panel2);" data-edittarget="${t.id}" data-edittab="roadmap">
+                <div style="flex:1; min-width:0;">
+                  <input class="edit-field edit-name" value="${esc(displayLabel)}" placeholder="Item name">
+                  <textarea class="edit-field edit-note" rows="2" placeholder="Note (optional)">${esc(displayNote)}</textarea>
+                  <div class="edit-optional-row" data-editopttoggle>
+                    <span class="edit-optional-toggle ${displayOptional?'on':''}" data-editopttoggle></span>
+                    Optional item
+                  </div>
+                  <div class="edit-actions-row">
+                    <span class="edit-cancel-btn" data-editcancel>Cancel</span>
+                    <span class="edit-save-btn" data-editsave>Save</span>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }
+
           return `<div class="task ${isDone?'done':''}" data-roadmapid="${t.id}">
             <div class="task-content" style="${cardTintStyle}">
               ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
@@ -1061,13 +1152,13 @@ function renderRoadmap(){
                   <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
                   ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
                 </div>
-                ${displayNote ? `<div class="tnote">${esc(displayNote)}</div>` : ''}${t.optional?'<span class="tbadge opt">Optional</span>':''}
+                ${displayNote ? `<div class="tnote">${esc(displayNote)}</div>` : ''}${displayOptional?'<span class="tbadge opt">Optional</span>':''}
               </div>
             </div>
             <span class="task-hover-trigger"></span>
-              <div class="task-actions">
+            <div class="task-actions">
               <span class="task-edit-btn" data-roadmapedit="${t.id}">&#9998;</span>
-              <span class="task-del-btn" data-roadmapdelete="${t.id}">&#10005;</span>
+              <span class="task-del-btn ${isDelArmed?'armed':''}" data-roadmapdelete="${t.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</span>
             </div>
           </div>`;
         }).join('')}
@@ -1171,6 +1262,25 @@ function renderHeists(){
           const heistCardStyle = !isDone
             ? `style="background:linear-gradient(${hexToRgba(era.color,0.4)},${hexToRgba(era.color,0.4)}),var(--panel);border-left:3px solid ${hexToRgba(era.color,0.9)};"`
             : '';
+          const thisKey = 'heist:' + h.id;
+          const isEditing = editingKey === thisKey;
+          const isDelArmed = deleteConfirmKey === thisKey;
+
+          if (isEditing) {
+            return `<div class="task" data-heistid="${h.id}">
+              <div class="task-content" style="background:var(--panel2);" data-edittarget="${h.id}" data-edittab="heist">
+                <div style="flex:1; min-width:0;">
+                  <input class="edit-field edit-name" value="${esc(displayName)}" placeholder="Heist name">
+                  <textarea class="edit-field edit-note" rows="2" placeholder="Note">${esc(displayNote)}</textarea>
+                  <div class="edit-actions-row">
+                    <span class="edit-cancel-btn" data-editcancel>Cancel</span>
+                    <span class="edit-save-btn" data-editsave>Save</span>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }
+
           return `
           <div class="task ${isDone?'done':''}" data-heistid="${h.id}">
             <div class="task-content" ${heistCardStyle}>
@@ -1186,9 +1296,9 @@ function renderHeists(){
               </div>
             </div>
             <span class="task-hover-trigger"></span>
-              <div class="task-actions">
+            <div class="task-actions">
               <span class="task-edit-btn" data-heistedit="${h.id}">&#9998;</span>
-              <span class="task-del-btn" data-heistdelete="${h.id}">&#10005;</span>
+              <span class="task-del-btn ${isDelArmed?'armed':''}" data-heistdelete="${h.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</span>
             </div>
           </div>
           ${h.subs && isOpen ? subsHtml : ''}
@@ -1247,58 +1357,70 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]') || e.target.closest('[data-eradrag]') || e.target.closest('[data-heistdrag]') || e.target.closest('[data-roadmapcatdrag]') || e.target.closest('[data-roadmaptaskdrag]')) return;
   const editBtn = e.target.closest('[data-todayedit], [data-roadmapedit], [data-heistedit]');
   const delBtn = e.target.closest('[data-todaydelete], [data-roadmapdelete], [data-heistdelete]');
-  if (editBtn || delBtn) {
-    if (editBtn) {
-      const id = editBtn.dataset.todayedit || editBtn.dataset.roadmapedit || editBtn.dataset.heistedit;
-      const isToday = !!editBtn.dataset.todayedit;
-      const isRoadmap = !!editBtn.dataset.roadmapedit;
-      const isHeist = !!editBtn.dataset.heistedit;
-      let currentName, currentNote;
-      if (isToday) {
-        const found = SECTIONS.flatMap(s => s.tasks).find(t => t.id === id);
-        const edit = data.taskEdits[id] || {};
-        currentName = edit.name !== undefined ? edit.name : (found ? found.name : '');
-        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
-      } else if (isRoadmap) {
-        const found = ROADMAP_STEPS.find(t => t.id === id);
-        const edit = data.roadmapEdits[id] || {};
-        currentName = edit.label !== undefined ? edit.label : (found ? found.label : '');
-        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
-      } else if (isHeist) {
-        let found = null;
-        Object.values(HEIST_DATA).forEach(arr => { const f = arr.find(h => h.id === id); if (f) found = f; });
-        const edit = heistState._edits[id] || {};
-        currentName = edit.name !== undefined ? edit.name : (found ? found.name : '');
-        currentNote = edit.note !== undefined ? edit.note : (found ? (found.note || '') : '');
-      }
-      const newName = prompt('Edit name:', currentName);
-      if (newName === null) return; // cancelled
-      const newNote = prompt('Edit note:', currentNote);
-      if (newNote === null) return; // cancelled
-      if (isToday) {
-        data.taskEdits[id] = { name: newName, note: newNote };
-        queueSave(); renderToday();
-      } else if (isRoadmap) {
-        data.roadmapEdits[id] = { label: newName, note: newNote };
-        queueSave(); renderRoadmap();
-      } else if (isHeist) {
-        heistState._edits[id] = { name: newName, note: newNote };
-        queueSaveHeists(); renderHeists();
-      }
+  const saveBtn = e.target.closest('[data-editsave]');
+  const cancelBtn = e.target.closest('[data-editcancel]');
+  const optToggle = e.target.closest('[data-editopttoggle]');
+
+  if (editBtn) {
+    const id = editBtn.dataset.todayedit || editBtn.dataset.roadmapedit || editBtn.dataset.heistedit;
+    const tab = editBtn.dataset.todayedit ? 'today' : editBtn.dataset.roadmapedit ? 'roadmap' : 'heist';
+    editingKey = tab + ':' + id;
+    deleteConfirmKey = null;
+    if (tab === 'today') renderToday(); else if (tab === 'roadmap') renderRoadmap(); else renderHeists();
+    setTimeout(() => {
+      const inp = document.querySelector('[data-edittarget] .edit-name');
+      if (inp) { inp.focus(); inp.select(); }
+    }, 0);
+    return;
+  }
+  if (optToggle) {
+    const toggle = optToggle;
+    toggle.classList.toggle('on');
+    return;
+  }
+  if (saveBtn) {
+    const card = saveBtn.closest('[data-edittarget]');
+    const tab = card.dataset.edittab;
+    const id = card.dataset.edittarget;
+    const newName = card.querySelector('.edit-name').value.trim();
+    const newNote = card.querySelector('.edit-note').value.trim();
+    const newOptional = card.querySelector('.edit-optional-toggle').classList.contains('on');
+    if (tab === 'today') {
+      data.taskEdits[id] = { name: newName, note: newNote, optional: newOptional };
+      editingKey = null; queueSave(); renderToday();
+    } else if (tab === 'roadmap') {
+      data.roadmapEdits[id] = { label: newName, note: newNote, optional: newOptional };
+      editingKey = null; queueSave(); renderRoadmap();
+    } else {
+      heistState._edits[id] = { name: newName, note: newNote };
+      editingKey = null; queueSaveHeists(); renderHeists();
     }
-    if (delBtn) {
-      const id = delBtn.dataset.todaydelete || delBtn.dataset.roadmapdelete || delBtn.dataset.heistdelete;
-      if (!confirm('Delete this task permanently? This just hides it - you can still bring it back later if needed.')) return;
-      if (delBtn.dataset.todaydelete) {
-        data.deletedTasks.push(id);
-        queueSave(); renderToday();
-      } else if (delBtn.dataset.roadmapdelete) {
-        data.deletedRoadmapTasks.push(id);
-        queueSave(); renderRoadmap();
-      } else if (delBtn.dataset.heistdelete) {
-        heistState._deleted.push(id);
-        queueSaveHeists(); renderHeists();
-      }
+    return;
+  }
+  if (cancelBtn) {
+    editingKey = null;
+    const card = cancelBtn.closest('[data-edittab]');
+    const tab = card ? card.dataset.edittab : null;
+    if (tab === 'today') renderToday(); else if (tab === 'roadmap') renderRoadmap(); else renderHeists();
+    return;
+  }
+  if (delBtn) {
+    const id = delBtn.dataset.todaydelete || delBtn.dataset.roadmapdelete || delBtn.dataset.heistdelete;
+    const tab = delBtn.dataset.todaydelete ? 'today' : delBtn.dataset.roadmapdelete ? 'roadmap' : 'heist';
+    const key = tab + ':' + id;
+    if (deleteConfirmKey !== key) {
+      // First tap: arm the confirm state instead of a native confirm() dialog (unreliable in standalone PWA mode).
+      deleteConfirmKey = key;
+      if (tab === 'today') renderToday(); else if (tab === 'roadmap') renderRoadmap(); else renderHeists();
+      return;
+    }
+    // Second tap on the same button: actually delete.
+    deleteConfirmKey = null;
+    if (tab === 'today') { data.deletedTasks.push(id); queueSave(); renderToday(); }
+    else if (tab === 'roadmap') { data.deletedRoadmapTasks.push(id); queueSave(); renderRoadmap(); }
+    else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
+    return;
+  }
     }
     return;
   }
