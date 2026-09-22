@@ -470,6 +470,30 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
   border-radius:50%;
 }
 .ptr-spinner.spinning{animation:ptr-spin .6s linear infinite;}
+
+.undo-toast{
+  position:fixed; left:50%; bottom:24px; bottom:calc(24px + env(safe-area-inset-bottom, 0px));
+  transform:translate(-50%, 20px);
+  display:flex; align-items:center; gap:14px;
+  background:rgba(30,30,34,.92);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  color:#fff;
+  padding:12px 16px 12px 18px;
+  border-radius:14px;
+  font-size:13.5px; font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.08);
+  z-index:200;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s cubic-bezier(.22,1,.36,1), transform .25s cubic-bezier(.22,1,.36,1);
+  max-width:90vw;
+}
+.undo-toast.show{opacity:1; transform:translate(-50%, 0); pointer-events:auto;}
+.undo-toast-btn{
+  color:#5ec9c4; font-weight:800; cursor:pointer; white-space:nowrap;
+  padding:2px 4px;
+}
+.undo-toast-btn:hover{opacity:.8;}
 @keyframes ptr-spin{to{transform:rotate(360deg);}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
@@ -478,6 +502,10 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
 <div class="ptr-indicator" id="ptrIndicator">
   <div class="ptr-spinner" id="ptrSpinner"></div>
   <span id="ptrText">Pull to refresh</span>
+</div>
+<div class="undo-toast" id="undoToast">
+  <span id="undoToastMsg"></span>
+  <span class="undo-toast-btn" data-undoaction>Undo</span>
 </div>
 <div class="wrap">
 
@@ -769,6 +797,62 @@ function ensureOrder(){
 let saveTimeout = null;
 let editingKey = null;       // e.g. 'today:bunker' - which single task, if any, is currently in inline edit mode
 let deleteConfirmKey = null; // e.g. 'today:bunker' - which delete button is armed, awaiting a second confirm tap
+let lastAction = null;       // { type:'delete'|'edit', tab, id, previousEdit } - the one most recent undoable action
+let undoToastTimeout = null;
+
+function showUndoToast(message){
+  const toast = document.getElementById('undoToast');
+  document.getElementById('undoToastMsg').textContent = message;
+  toast.classList.add('show');
+  clearTimeout(undoToastTimeout);
+  undoToastTimeout = setTimeout(() => { toast.classList.remove('show'); lastAction = null; }, 5000);
+}
+
+function hideUndoToast(){
+  document.getElementById('undoToast').classList.remove('show');
+  clearTimeout(undoToastTimeout);
+}
+
+function performUndo(){
+  if (!lastAction) return;
+  const { type, tab, id, previousEdit } = lastAction;
+  if (type === 'delete') {
+    if (tab === 'today') { data.deletedTasks = data.deletedTasks.filter(x => x !== id); queueSave(); renderToday(); }
+    else if (tab === 'roadmap') { data.deletedRoadmapTasks = data.deletedRoadmapTasks.filter(x => x !== id); queueSave(); renderRoadmap(); }
+    else { heistState._deleted = heistState._deleted.filter(x => x !== id); queueSaveHeists(); renderHeists(); }
+  } else if (type === 'edit') {
+    if (tab === 'today') {
+      if (previousEdit === null) delete data.taskEdits[id]; else data.taskEdits[id] = previousEdit;
+      queueSave(); renderToday();
+    } else if (tab === 'roadmap') {
+      if (previousEdit === null) delete data.roadmapEdits[id]; else data.roadmapEdits[id] = previousEdit;
+      queueSave(); renderRoadmap();
+    } else {
+      if (previousEdit === null) delete heistState._edits[id]; else heistState._edits[id] = previousEdit;
+      queueSaveHeists(); renderHeists();
+    }
+  }
+  lastAction = null;
+  hideUndoToast();
+}
+
+function getTaskLabel(tab, id){
+  if (tab === 'today') {
+    const found = SECTIONS.flatMap(s => s.tasks).find(t => t.id === id);
+    const edit = data.taskEdits[id] || {};
+    return edit.name !== undefined ? edit.name : (found ? found.name : 'Task');
+  } else if (tab === 'roadmap') {
+    const found = ROADMAP_STEPS.find(t => t.id === id);
+    const edit = data.roadmapEdits[id] || {};
+    return edit.label !== undefined ? edit.label : (found ? found.label : 'Item');
+  } else {
+    let found = null;
+    Object.values(HEIST_DATA).forEach(arr => { const f = arr.find(h => h.id === id); if (f) found = f; });
+    const edit = heistState._edits[id] || {};
+    return edit.name !== undefined ? edit.name : (found ? found.name : 'Heist');
+  }
+}
+
 
 function totalDailyTasks(){
   return SECTIONS.reduce((sum, s) => sum + s.tasks.length, 0);
@@ -1369,6 +1453,12 @@ document.addEventListener('click', (e) => {
   const saveBtn = e.target.closest('[data-editsave]');
   const cancelBtn = e.target.closest('[data-editcancel]');
   const optToggle = e.target.closest('[data-editopttoggle]');
+  const undoBtn = e.target.closest('[data-undoaction]');
+
+  if (undoBtn) {
+    performUndo();
+    return;
+  }
 
   if (editBtn) {
     const id = editBtn.dataset.todayedit || editBtn.dataset.roadmapedit || editBtn.dataset.heistedit;
@@ -1393,17 +1483,25 @@ document.addEventListener('click', (e) => {
     const id = card.dataset.edittarget;
     const newName = card.querySelector('.edit-name').value.trim();
     const newNote = card.querySelector('.edit-note').value.trim();
-    const newOptional = card.querySelector('.edit-optional-toggle').classList.contains('on');
+    const optToggleEl = card.querySelector('.edit-optional-toggle');
+    const newOptional = optToggleEl ? optToggleEl.classList.contains('on') : undefined;
     if (tab === 'today') {
+      const previousEdit = data.taskEdits[id] !== undefined ? data.taskEdits[id] : null;
       data.taskEdits[id] = { name: newName, note: newNote, optional: newOptional };
       editingKey = null; queueSave(); renderToday();
+      lastAction = { type: 'edit', tab, id, previousEdit };
     } else if (tab === 'roadmap') {
+      const previousEdit = data.roadmapEdits[id] !== undefined ? data.roadmapEdits[id] : null;
       data.roadmapEdits[id] = { label: newName, note: newNote, optional: newOptional };
       editingKey = null; queueSave(); renderRoadmap();
+      lastAction = { type: 'edit', tab, id, previousEdit };
     } else {
+      const previousEdit = heistState._edits[id] !== undefined ? heistState._edits[id] : null;
       heistState._edits[id] = { name: newName, note: newNote };
       editingKey = null; queueSaveHeists(); renderHeists();
+      lastAction = { type: 'edit', tab, id, previousEdit };
     }
+    showUndoToast(`Updated "${newName}"`);
     return;
   }
   if (cancelBtn) {
@@ -1425,9 +1523,12 @@ document.addEventListener('click', (e) => {
     }
     // Second tap on the same button: actually delete.
     deleteConfirmKey = null;
+    const label = getTaskLabel(tab, id);
     if (tab === 'today') { data.deletedTasks.push(id); queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.deletedRoadmapTasks.push(id); queueSave(); renderRoadmap(); }
     else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
+    lastAction = { type: 'delete', tab, id };
+    showUndoToast(`Deleted "${label}"`);
     return;
   }
 
@@ -1589,20 +1690,45 @@ document.addEventListener('touchmove', (e) => {
   const clamped = Math.max(-SWIPE_DELETE_AT, Math.min(SWIPE_REVEAL, dx));
   swipeContent.style.transition = 'none';
   swipeContent.style.transform = `translateX(${clamped}px)`;
+
+  // Reveal the relevant colored icon panel live, in step with the finger - this is what was
+  // missing before: the panel only appeared once the gesture ended, which read as a blank, sudden pop-in.
+  const editPanel = swipeTask.querySelector('.task-actions-edit');
+  const delPanel = swipeTask.querySelector('.task-actions-delete');
+  if (editPanel) editPanel.style.transition = 'none';
+  if (delPanel) delPanel.style.transition = 'none';
+  if (dx > 0) {
+    const progress = Math.min(1, dx / SWIPE_REVEAL);
+    if (editPanel) editPanel.style.transform = `translateX(${(progress - 1) * 100}%)`;
+    if (delPanel) delPanel.style.transform = 'translateX(100%)';
+  } else if (dx < 0) {
+    const progress = Math.min(1, -dx / SWIPE_REVEAL);
+    if (delPanel) delPanel.style.transform = `translateX(${(1 - progress) * 100}%)`;
+    if (editPanel) editPanel.style.transform = 'translateX(-100%)';
+  }
 }, { passive: true });
 
 document.addEventListener('touchend', () => {
   if (!swipeTask || !swipeIsHorizontal) { swipeTask = null; return; }
   swipeContent.style.transition = '';
   swipeContent.style.transform = '';
+  const editPanel = swipeTask.querySelector('.task-actions-edit');
+  const delPanel = swipeTask.querySelector('.task-actions-delete');
+  // Clear the live inline styles so the CSS class rules (swipe-left/swipe-right) take over cleanly,
+  // with their own transition applying for a smooth final settle rather than an abrupt jump.
+  if (editPanel) { editPanel.style.transition = ''; editPanel.style.transform = ''; }
+  if (delPanel) { delPanel.style.transition = ''; delPanel.style.transform = ''; }
 
   if (swipeCurrentDx <= -SWIPE_DELETE_AT) {
     // Full swipe left, past the delete threshold - delete immediately, same as Mail's full swipe-to-delete.
     const tab = swipeTask.dataset.taskid !== undefined ? 'today' : swipeTask.dataset.roadmapid !== undefined ? 'roadmap' : 'heist';
     const id = swipeTask.dataset.taskid || swipeTask.dataset.roadmapid || swipeTask.dataset.heistid;
+    const label = getTaskLabel(tab, id);
     if (tab === 'today') { data.deletedTasks.push(id); queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.deletedRoadmapTasks.push(id); queueSave(); renderRoadmap(); }
     else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
+    lastAction = { type: 'delete', tab, id };
+    showUndoToast(`Deleted "${label}"`);
   } else if (swipeCurrentDx < -20) {
     swipeTask.classList.add('swipe-left');
     swipeTask.classList.remove('swipe-right');
