@@ -864,7 +864,8 @@ function getTaskLabel(tab, id){
 
 
 function totalDailyTasks(){
-  return SECTIONS.reduce((sum, s) => sum + s.tasks.length, 0);
+  const deleted = data.deletedTasks || [];
+  return SECTIONS.reduce((sum, s) => sum + s.tasks.filter(t => !deleted.includes(t.id)).length, 0);
 }
 
 function getWeeklyTaskIds(){
@@ -880,7 +881,8 @@ function rolloverIfNewDay(){
   if (data.currentDate !== t) {
     // archive whatever was checked on the old date
     const total = totalDailyTasks();
-    const doneCount = Object.values(data.today).filter(Boolean).length;
+    const deletedIdsForArchive = data.deletedTasks || [];
+    const doneCount = Object.keys(data.today).filter(id => data.today[id] && !deletedIdsForArchive.includes(id)).length;
     data.history[data.currentDate] = { checks: data.today, done: doneCount, total: total };
 
     // Preserve ALL weekly-section tasks by default (both recurring ones like Kortz Center AND
@@ -1086,7 +1088,8 @@ function renderToday(){
   }).join('');
 
   const total = totalDailyTasks();
-  const done = Object.values(data.today).filter(Boolean).length;
+  const deletedIds = data.deletedTasks || [];
+  const done = Object.keys(data.today).filter(id => data.today[id] && !deletedIds.includes(id)).length;
   document.getElementById('progtext').textContent = done + ' / ' + total;
   document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
   document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
