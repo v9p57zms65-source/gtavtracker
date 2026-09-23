@@ -353,7 +353,11 @@ header::after{
 .tinfo{flex:1;}
 .tname{font-weight:600; font-size:15px; letter-spacing:-.1px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line;}
+.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line; display:none;}
+.task:hover .tnote, .task.note-open .tnote{display:block;}
+@media (hover:hover) and (pointer:fine){
+  .task .tnote{transition:opacity .12s;}
+}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
@@ -601,8 +605,8 @@ initTheme();
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
   { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
-    { id: 'stash_house', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
-    { id: 'street_dealer', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
+    { id: 'stash_house_v2', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
+    { id: 'street_dealer_v2', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
   ]},
   { id: 'mansion', label: 'Mansion', color: '#f0c14b', tasks: [
     { id: 'mansion_boost', name: "Set today's Business Production Boost", note: 'Pick one business for x3 speed, 24h, from the wall terminal.', optional: true },
@@ -1060,7 +1064,7 @@ function renderToday(){
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                   <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
                 </div>
-                <div class="tinfo" data-checkbtn>
+                <div class="tinfo" data-notetoggle="${t.id}">
                   <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
                   <div class="tnote">${esc(displayNote)}</div>
                   ${displayOptional ? '<span class="tbadge opt">Optional</span>' : ''}
@@ -1250,7 +1254,7 @@ function renderRoadmap(){
             <div class="task-content" style="${cardTintStyle}">
               ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
               <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-              <div class="tinfo">
+              <div class="tinfo" data-notetoggle="${t.id}">
                 <div class="tname-row ${isDone?'done':''}">
                   <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
                   ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
@@ -1386,7 +1390,7 @@ function renderHeists(){
             <div class="task-content" ${heistCardStyle}>
               <span class="task-drag" data-heistdrag>&#9776;</span>
               <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-              <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : ''}>
+              <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : `data-notetoggle="${h.id}"`}>
                 <div class="tname-row">
                   <span class="tname ${isDone?'done':''}">${esc(displayName)}</span>
                   <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
@@ -1452,6 +1456,11 @@ document.addEventListener('click', (e) => {
   }
   // don't toggle collapse/task when clicking a drag handle itself
   if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]') || e.target.closest('[data-eradrag]') || e.target.closest('[data-heistdrag]') || e.target.closest('[data-roadmapcatdrag]') || e.target.closest('[data-roadmaptaskdrag]')) return;
+  const noteToggle = e.target.closest('[data-notetoggle]');
+  if (noteToggle) {
+    noteToggle.closest('.task').classList.toggle('note-open');
+    return;
+  }
   const editBtn = e.target.closest('[data-todayedit], [data-roadmapedit], [data-heistedit]');
   const delBtn = e.target.closest('[data-todaydelete], [data-roadmapdelete], [data-heistdelete]');
   const saveBtn = e.target.closest('[data-editsave]');
