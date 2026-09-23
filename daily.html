@@ -884,9 +884,12 @@ function rolloverIfNewDay(){
     const preservedWeekly = {};
     allWeeklyIds.forEach(id => { if (data.today[id]) preservedWeekly[id] = true; });
 
+    const wasWeeklyCollapsed = !!data.collapsed['weekly'];
     data.today = {};
     data.currentDate = t;
-    data.collapsed = {}; // fresh day, expand every category again
+    // Fresh day, expand every category again - EXCEPT Weekly, which only gets new content on Thursday,
+    // so it should keep whatever collapsed/open state it already had until that actual reset happens.
+    data.collapsed = { weekly: wasWeeklyCollapsed };
 
     // Thursday (day 4) is when recurring Weekly tasks actually reset in-game (Kortz Center, etc.) -
     // every other day, carry all weekly checkmarks forward instead of wiping them like daily tasks.
@@ -897,6 +900,7 @@ function rolloverIfNewDay(){
       // Drop only the recurring ones - promotional tasks carry forward even through a Thursday reset,
       // since they don't repeat weekly, they just get swapped out for a new task entirely when I update them.
       recurringWeeklyIds.forEach(id => { delete preservedWeekly[id]; });
+      data.collapsed['weekly'] = false; // fresh week of Weekly tasks - expand it now, this is its actual reset moment
     }
     Object.assign(data.today, preservedWeekly);
   }
