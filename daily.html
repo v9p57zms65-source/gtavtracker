@@ -243,6 +243,8 @@ header::after{
 .progress-bar{flex:1; height:9px; border-radius:99px; background:rgba(0,0,0,.25); overflow:hidden;}
 .progress-fill{height:100%; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:.3s;}
 .progress-text{font-size:12.5px; font-weight:800; color:var(--gold); white-space:nowrap;}
+.progress-row{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex:none;}
+.weekly-progtext{color:var(--red); font-size:10.5px; font-weight:700;}
 
 /* ---- Section groups ---- */
 .section{margin-bottom:18px;}
@@ -550,7 +552,10 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
   <div class="view active" id="view-today">
     <div class="progress-wrap">
       <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
-      <div class="progress-text" id="progtext">0 / 0</div>
+      <div class="progress-row">
+        <div class="progress-text" id="progtext">0 / 0</div>
+        <div class="progress-text weekly-progtext" id="weeklyProgtext">Weekly: 0 / 0</div>
+      </div>
     </div>
     <div id="todayList"></div>
   </div>
@@ -862,9 +867,25 @@ function getTaskLabel(tab, id){
 }
 
 
-function totalDailyTasks(){
+function getValidTaskIds(excludeWeekly){
   const deleted = data.deletedTasks || [];
-  return SECTIONS.reduce((sum, s) => sum + s.tasks.filter(t => !deleted.includes(t.id)).length, 0);
+  const ids = [];
+  SECTIONS.forEach(s => {
+    if (excludeWeekly && s.id === 'weekly') return;
+    s.tasks.forEach(t => { if (!deleted.includes(t.id)) ids.push(t.id); });
+  });
+  return ids;
+}
+
+function totalDailyTasks(){
+  return getValidTaskIds(true).length;
+}
+
+function totalWeeklyTasks(){
+  const weeklySection = SECTIONS.find(s => s.id === 'weekly');
+  if (!weeklySection) return 0;
+  const deleted = data.deletedTasks || [];
+  return weeklySection.tasks.filter(t => !deleted.includes(t.id)).length;
 }
 
 function getWeeklyTaskIds(){
@@ -880,8 +901,8 @@ function rolloverIfNewDay(){
   if (data.currentDate !== t) {
     // archive whatever was checked on the old date
     const total = totalDailyTasks();
-    const deletedIdsForArchive = data.deletedTasks || [];
-    const doneCount = Object.keys(data.today).filter(id => data.today[id] && !deletedIdsForArchive.includes(id)).length;
+    const validDailyIdsForArchive = getValidTaskIds(true);
+    const doneCount = validDailyIdsForArchive.filter(id => data.today[id]).length;
     data.history[data.currentDate] = { checks: data.today, done: doneCount, total: total };
 
     // Preserve ALL weekly-section tasks by default (both recurring ones like Kortz Center AND
@@ -1087,11 +1108,18 @@ function renderToday(){
   }).join('');
 
   const total = totalDailyTasks();
-  const deletedIds = data.deletedTasks || [];
-  const done = Object.keys(data.today).filter(id => data.today[id] && !deletedIds.includes(id)).length;
+  const validDailyIds = getValidTaskIds(true);
+  const done = validDailyIds.filter(id => data.today[id]).length;
   document.getElementById('progtext').textContent = done + ' / ' + total;
   document.getElementById('fill').style.width = (total? (done/total*100):0) + '%';
   document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
+
+  const weeklyTotal = totalWeeklyTasks();
+  const weeklySection = SECTIONS.find(s => s.id === 'weekly');
+  const weeklyIds = weeklySection ? weeklySection.tasks.map(t => t.id).filter(id => !(data.deletedTasks||[]).includes(id)) : [];
+  const weeklyDone = weeklyIds.filter(id => data.today[id]).length;
+  const weeklyProgEl = document.getElementById('weeklyProgtext');
+  if (weeklyProgEl) weeklyProgEl.textContent = 'Weekly: ' + weeklyDone + ' / ' + weeklyTotal;
 
   initSortables();
   updateUndoButtonState();
