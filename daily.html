@@ -169,6 +169,7 @@ header::after{
 .hsub{position:relative; z-index:2; color:rgba(255,255,255,.82); font-size:13px; margin-top:5px; line-height:1.4;}
 .hdate{position:relative; z-index:2; color:rgba(255,255,255,.92); font-size:12.5px; margin-top:12px; font-weight:600; letter-spacing:.2px;}
 
+.header-controls-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:8px;}
 .theme-toggle{
   display:flex; gap:4px;
   background:var(--panel);
@@ -177,7 +178,7 @@ header::after{
   border:1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 18px rgba(0,0,0,.16);
   border-radius:20px;
-  padding:3px; width:fit-content; margin:0 0 14px auto;
+  padding:3px; width:fit-content;
 }
 .theme-opt{
   padding:6px 12px; border-radius:16px; font-size:12px; font-weight:700;
@@ -186,6 +187,20 @@ header::after{
 }
 .theme-opt:hover{color:var(--text);}
 .theme-opt.active{background:var(--green-dark); color:#fff;}
+
+.header-undo-btn{
+  background:var(--panel);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border:1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 18px rgba(0,0,0,.16);
+  border-radius:20px;
+  padding:8px 14px; font-size:12px; font-weight:700;
+  color:var(--text); cursor:pointer; user-select:none; transition:.15s;
+  white-space:nowrap; flex:none;
+}
+.header-undo-btn:hover{background:var(--panel2);}
+.header-undo-btn.disabled{opacity:.35; pointer-events:none; cursor:default;}
 
 /* ---- Tabs ---- */
 .tabs{display:flex; gap:6px; margin-bottom:16px; overflow-x:auto;}
@@ -353,11 +368,7 @@ header::after{
 .tinfo{flex:1;}
 .tname{font-weight:600; font-size:15px; letter-spacing:-.1px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line; display:none;}
-.task:hover .tnote, .task.note-open .tnote{display:block;}
-@media (hover:hover) and (pointer:fine){
-  .task .tnote{transition:opacity .12s;}
-}
+.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line;}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
@@ -519,10 +530,13 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
     <div class="hdate" id="dateDisplay"></div>
   </header>
 
-  <div class="theme-toggle" id="themeToggle">
-    <span class="theme-opt" data-theme-choice="auto">&#9788; Auto</span>
-    <span class="theme-opt" data-theme-choice="light">&#9728; Light</span>
-    <span class="theme-opt" data-theme-choice="dark">&#9790; Dark</span>
+  <div class="header-controls-row">
+    <div class="theme-toggle" id="themeToggle">
+      <span class="theme-opt" data-theme-choice="auto">&#9788; Auto</span>
+      <span class="theme-opt" data-theme-choice="light">&#9728; Light</span>
+      <span class="theme-opt" data-theme-choice="dark">&#9790; Dark</span>
+    </div>
+    <div class="header-undo-btn disabled" id="headerUndoBtn" data-undoaction>&#8630; Undo</div>
   </div>
 
   <div class="tabs">
@@ -605,7 +619,7 @@ initTheme();
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
   { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
-    { id: 'stash_house_v2', name: 'Raid the Stash House', note: 'Purple house icon w/ crosshair, 25 possible spots. Clear NPCs, find the 6-digit code on a yellow sticky note, crack the safe — auto-refills one business 100% (worth $75K in supplies) + some cash. Resets 9am GMT.' },
+    { id: 'stash_house_v2', name: 'Raid the Stash House', note: '25 possible spots (purple house icon). Clear NPCs, find the sticky-note code, crack the safe — refills one business 100% + cash. Resets 9am GMT.' },
     { id: 'street_dealer_v2', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
   ]},
   { id: 'biker', label: 'Biker Businesses', color: '#7bc142', tasks: [
@@ -619,7 +633,7 @@ const SECTIONS = [
     { id: 'mansion_boost', name: "Set today's Business Production Boost", note: 'Pick one business for x3 speed, 24h, from the wall terminal.', tint: '#f0c14b', optional: true },
     { id: 'bunker', name: 'Bunker: buy supplies / check stock, sell', note: 'Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.', tint: '#f0c14b' },
     { id: 'acid_all', name: 'Acid Lab: boost, buy supplies, sell stock', note: 'Boost once/day at the chemistry table (resets 6am GMT). Keep supplies topped up. Sell is always a single delivery vehicle regardless of stock.', tint: '#c4e538' },
-    { id: 'nc_main', name: 'Nightclub: collect safe, check technicians, sell if worth it, promote if slipping', note: 'Safe pays up to $50,000/day at 95-100% popularity. Prioritize Cocaine/Meth/Bunker/Counterfeit technicians, skip Weed & Doc Forgery. Warehouse sell is always a single vehicle, no risk. Run a Promote mission if popularity is slipping below 90% to protect the full safe payout.', tint: '#ff3dd8' },
+    { id: 'nc_main', name: 'Nightclub: collect safe, check technicians, sell if worth it, promote if slipping', note: 'Safe pays up to $50K/day at 95-100% popularity. Prioritize Cocaine/Meth/Bunker/Counterfeit techs, skip Weed & Doc Forgery. Warehouse sell is always one vehicle, no risk. Promote if popularity drops below 90%.', tint: '#ff3dd8' },
     { id: 'agency_main', name: 'Agency: collect safe and run a Security Contract', note: 'Safe pays up to $20,000/day, caps at $250,000 stored. Contract tiers (Professional/Specialist/Specialist+) are randomly rolled - just run the best of whatever 3 show up. Also worth a quick check for a Payphone Hit while you\'re there (doubles to $85K if the bonus condition is met).', tint: '#ff3d7f' },
     { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
     { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
@@ -798,7 +812,7 @@ function hideUndoToast(){
 
 function performUndo(){
   if (!lastAction) return;
-  const { type, tab, id, previousEdit } = lastAction;
+  const { type, tab, id, previousEdit, previousValue } = lastAction;
   if (type === 'delete') {
     if (tab === 'today') { data.deletedTasks = data.deletedTasks.filter(x => x !== id); queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.deletedRoadmapTasks = data.deletedRoadmapTasks.filter(x => x !== id); queueSave(); renderRoadmap(); }
@@ -814,9 +828,20 @@ function performUndo(){
       if (previousEdit === null) delete heistState._edits[id]; else heistState._edits[id] = previousEdit;
       queueSaveHeists(); renderHeists();
     }
+  } else if (type === 'toggle') {
+    if (tab === 'today') { data.today[id] = previousValue; queueSave(); renderToday(); }
+    else if (tab === 'roadmap') { data.roadmap[id] = previousValue; queueSave(); renderRoadmap(); }
+    else { heistState[id] = previousValue; queueSaveHeists(); renderHeists(); }
   }
   lastAction = null;
   hideUndoToast();
+  updateUndoButtonState();
+}
+
+function updateUndoButtonState(){
+  const btn = document.getElementById('headerUndoBtn');
+  if (!btn) return;
+  btn.classList.toggle('disabled', !lastAction);
 }
 
 function getTaskLabel(tab, id){
@@ -1045,7 +1070,7 @@ function renderToday(){
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                   <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
                 </div>
-                <div class="tinfo" data-notetoggle="${t.id}">
+                <div class="tinfo">
                   <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
                   <div class="tnote">${esc(displayNote)}</div>
                   ${displayOptional ? '<span class="tbadge opt">Optional</span>' : ''}
@@ -1069,6 +1094,7 @@ function renderToday(){
   document.getElementById('dateDisplay').textContent = prettyDate(data.currentDate);
 
   initSortables();
+  updateUndoButtonState();
 }
 
 let sortableGroups = {}; // groupName -> array of Sortable instances
@@ -1236,7 +1262,7 @@ function renderRoadmap(){
             <div class="task-content" style="${cardTintStyle}">
               ${isDefaultSort ? '<span class="task-drag" data-roadmaptaskdrag>&#9776;</span>' : ''}
               <div class="check ${isDone?'on':''}" ${checkStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-              <div class="tinfo" data-notetoggle="${t.id}">
+              <div class="tinfo">
                 <div class="tname-row ${isDone?'done':''}">
                   <span class="tname ${isDone?'done':''}">${esc(displayLabel)}</span>
                   ${t.price > 0 ? `<span class="tprice">${money(t.price)}</span>` : ''}
@@ -1254,6 +1280,7 @@ function renderRoadmap(){
 
   document.getElementById('roadmapList').innerHTML = header + sortBar + filterBar + groups;
   initRoadmapSortables();
+  updateUndoButtonState();
 }
 
 function initRoadmapSortables(){
@@ -1372,13 +1399,13 @@ function renderHeists(){
             <div class="task-content" ${heistCardStyle}>
               <span class="task-drag" data-heistdrag>&#9776;</span>
               <div class="check ${isDone?'on':''}" data-heistcheck ${heistCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-              <div class="tinfo" ${h.subs ? `data-heistexpand="${h.id}"` : `data-notetoggle="${h.id}"`}>
+              <div class="tinfo">
                 <div class="tname-row">
                   <span class="tname ${isDone?'done':''}">${esc(displayName)}</span>
                   <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
                 </div>
                 <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(displayNote)}</div>
-                ${h.subs ? `<span class="tbadge opt">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
+                ${h.subs ? `<span class="tbadge opt" data-heistexpand="${h.id}">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
               </div>
             </div>
             <div class="task-actions-edit" data-heistedit="${h.id}">&#9998;</div>
@@ -1392,6 +1419,7 @@ function renderHeists(){
   }).join('');
 
   initHeistSortables();
+  updateUndoButtonState();
 }
 
 function initHeistSortables(){
@@ -1438,11 +1466,6 @@ document.addEventListener('click', (e) => {
   }
   // don't toggle collapse/task when clicking a drag handle itself
   if (e.target.closest('[data-sectiondrag]') || e.target.closest('[data-taskdrag]') || e.target.closest('[data-eradrag]') || e.target.closest('[data-heistdrag]') || e.target.closest('[data-roadmapcatdrag]') || e.target.closest('[data-roadmaptaskdrag]')) return;
-  const noteToggle = e.target.closest('[data-notetoggle]');
-  if (noteToggle) {
-    noteToggle.closest('.task').classList.toggle('note-open');
-    return;
-  }
   const editBtn = e.target.closest('[data-todayedit], [data-roadmapedit], [data-heistedit]');
   const delBtn = e.target.closest('[data-todaydelete], [data-roadmapdelete], [data-heistdelete]');
   const saveBtn = e.target.closest('[data-editsave]');
@@ -1536,10 +1559,12 @@ document.addEventListener('click', (e) => {
     return;
   }
   const taskEl = e.target.closest('[data-taskid]');
-  if (taskEl && e.target.closest('[data-checkbtn]')) {
+  if (taskEl) {
     const id = taskEl.dataset.taskid;
     rolloverIfNewDay();
+    const wasChecked = !!data.today[id];
     data.today[id] = !data.today[id];
+    lastAction = { type: 'toggle', tab: 'today', id, previousValue: wasChecked };
 
     // If this task just completed its whole section, auto-collapse that section.
     if (data.today[id]) {
@@ -1559,7 +1584,9 @@ document.addEventListener('click', (e) => {
   if (roadmapEl) {
     const id = roadmapEl.dataset.roadmapid;
     if (!data.roadmap) data.roadmap = {};
+    const wasChecked = !!data.roadmap[id];
     data.roadmap[id] = !data.roadmap[id];
+    lastAction = { type: 'toggle', tab: 'roadmap', id, previousValue: wasChecked };
     queueSave();
     renderRoadmap();
     return;
@@ -1617,18 +1644,20 @@ document.addEventListener('click', (e) => {
     renderHeists();
     return;
   }
-  const heistCheck = e.target.closest('[data-heistcheck]');
-  if (heistCheck) {
-    const id = heistCheck.closest('[data-heistid]').dataset.heistid;
-    heistState[id] = !heistState[id];
-    queueSaveHeists();
-    renderHeists();
-    return;
-  }
   const heistExpand = e.target.closest('[data-heistexpand]');
   if (heistExpand) {
     const id = heistExpand.dataset.heistexpand;
     heistState._open[id] = !heistState._open[id];
+    renderHeists();
+    return;
+  }
+  const heistCard = e.target.closest('[data-heistid]');
+  if (heistCard) {
+    const id = heistCard.dataset.heistid;
+    const wasChecked = !!heistState[id];
+    heistState[id] = !heistState[id];
+    lastAction = { type: 'toggle', tab: 'heist', id, previousValue: wasChecked };
+    queueSaveHeists();
     renderHeists();
     return;
   }
