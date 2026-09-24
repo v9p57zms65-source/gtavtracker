@@ -1567,11 +1567,15 @@ document.addEventListener('click', (e) => {
     lastAction = { type: 'toggle', tab: 'today', id, previousValue: wasChecked };
 
     // If this task just completed its whole section, auto-collapse that section.
+    // Optional tasks don't count toward this - a category is "done" once every mandatory task is checked,
+    // even if optional ones are skipped that day.
     if (data.today[id]) {
       const owningSection = SECTIONS.find(sec => sec.tasks.some(t => t.id === id));
       if (owningSection) {
         const orderedIds = data.taskOrder[owningSection.id] || owningSection.tasks.map(t => t.id);
-        const allDone = orderedIds.every(tid => data.today[tid]);
+        const tasksById2 = Object.fromEntries(owningSection.tasks.map(t => [t.id, t]));
+        const mandatoryIds = orderedIds.filter(tid => tasksById2[tid] && !tasksById2[tid].optional);
+        const allDone = mandatoryIds.length > 0 && mandatoryIds.every(tid => data.today[tid]);
         if (allDone) data.collapsed[owningSection.id] = true;
       }
     }
