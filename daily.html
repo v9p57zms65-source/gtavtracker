@@ -138,7 +138,10 @@ body::after{
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) body::after { opacity:.12; mix-blend-mode:multiply; }
 }
-.wrap{position:relative; z-index:2; max-width:820px;margin:0 auto;padding:18px 14px 90px;}
+.wrap{position:relative; z-index:2; max-width:820px;margin:0 auto;padding:18px 14px 90px; transition:opacity .22s ease;}
+.wrap.fading-for-reload{opacity:0;}
+body::before, body::after{transition:opacity .22s ease;}
+body.fading-for-reload::before, body.fading-for-reload::after{opacity:0;}
 
 /* ---- Liquid Glass surface treatment, applied to every card-like element ---- */
 .glass{
@@ -1896,6 +1899,14 @@ async function doFullRefresh(){
       await Promise.all(keys.map(k => caches.delete(k)));
     }
   } catch(e) { /* ignore, reload will still fetch from network either way */ }
+
+  // Fade the visible content down to the plain background color before actually reloading.
+  // The native reload transition itself can't be suppressed from page code, but if the very
+  // last thing on screen is already a flat, theme-matching color rather than the busy colorful
+  // UI, there's nothing dramatic to visually jump from - the transition reads as much softer.
+  document.body.classList.add('fading-for-reload');
+  document.querySelector('.wrap').classList.add('fading-for-reload');
+  await new Promise(resolve => setTimeout(resolve, 220));
 
   location.reload();
 }
