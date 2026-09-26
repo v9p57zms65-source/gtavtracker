@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// Sets the very first paint's background to match the actual active theme, before any CSS even
+// parses - this is what the flash during location.reload() actually is: a brief gap where the
+// browser shows nothing yet. Deliberately reads the *real* current theme rather than a hardcoded
+// value, since a hardcoded one previously caused a mismatch that broke contrast in the wrong theme.
+(function(){
+  try {
+    var stored = localStorage.getItem('gta_daily_theme_v1');
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+    document.documentElement.style.background = isDark ? '#0a0a0c' : '#eef0f4';
+  } catch(e) { /* if anything here fails, just let the normal CSS handle it as before */ }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
