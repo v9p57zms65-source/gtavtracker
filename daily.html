@@ -1527,10 +1527,12 @@ document.addEventListener('click', (e) => {
     editingKey = tab + ':' + id;
     deleteConfirmKey = null;
     if (tab === 'today') renderToday(); else if (tab === 'roadmap') renderRoadmap(); else renderHeists();
-    setTimeout(() => {
-      const inp = document.querySelector('[data-edittarget] .edit-name');
-      if (inp) { inp.focus(); inp.select(); }
-    }, 0);
+    // Focus synchronously, right here in the same tap handler - iOS Safari needs the focus call to
+    // stay inside the original trusted user-gesture context. Deferring it via setTimeout (even 0ms)
+    // pushes it outside that context, which is exactly what caused the keyboard/cursor to never
+    // properly attach (text would appear selected, but nothing could actually be typed or deleted).
+    const inp = document.querySelector('[data-edittarget] .edit-name');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
     return;
   }
   if (optToggle) {
