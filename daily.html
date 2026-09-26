@@ -643,39 +643,39 @@ initTheme();
 
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
-  { id: 'freeroam', label: "Freeroam Events (whenever you spot them)", color: '#b06bff', tasks: [
-    { id: 'stash_house_v2', name: 'Raid the Stash House', note: '25 possible spots (purple house icon). Clear NPCs, find the sticky-note code, crack the safe — refills one business 100% + cash. Resets 9am GMT.' },
-    { id: 'street_dealer_v2', name: 'Sell all drug stock to a Street Dealer', note: 'Coke/Meth/Weed/Acid product only (not Counterfeit or Doc Forgery). Only the day\'s "premium" drug pays well — the other 3 pay less than a normal sell mission. Instant, once/dealer/day, but zero risk vs. a real sell mission.' },
-  ]},
   { id: 'biker', label: 'Biker Businesses', color: '#7bc142', tasks: [
-    { id: 'coke', name: 'Cocaine Lockup: source & sell', note: 'Sell at 5 stacks or fewer for guaranteed 1 vehicle.' },
-    { id: 'meth', name: 'Meth Lab: source & sell', note: 'Sell at 10 bins or fewer to stay capped at 2 vehicles.' },
-    { id: 'weed', name: 'Weed Farm: source & sell', note: 'Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.' },
-    { id: 'counterfeit', name: 'Counterfeit Cash: source & sell', note: 'Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
-    { id: 'docforge', name: 'Document Forgery: source & sell', note: 'Weakest earner of the 5 — optional, low priority.', optional: true },
-    { id: 'bunker', name: 'Bunker: buy supplies / check stock, sell', note: 'Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.' },
-    { id: 'acid_all', name: 'Acid Lab: boost, buy supplies, sell stock', note: 'Boost once/day at the chemistry table (resets 6am GMT). Keep supplies topped up. Sell is always a single delivery vehicle regardless of stock.' },
+    { id: 'coke', name: 'Cocaine Lockup', note: 'Source & sell. Sell at 5 stacks or fewer for guaranteed 1 vehicle.' },
+    { id: 'meth', name: 'Meth Lab', note: 'Source & sell. Sell at 10 bins or fewer to stay capped at 2 vehicles.' },
+    { id: 'weed', name: 'Weed Farm', note: 'Source & sell. Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.' },
+    { id: 'counterfeit', name: 'Counterfeit Cash', note: 'Source & sell. Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.' },
+    { id: 'bunker', name: 'Bunker', note: 'Buy supplies / check stock, sell. Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.' },
+    { id: 'acid_all', name: 'Acid Lab', note: 'Boost, buy supplies, sell stock. Boost once/day at the chemistry table (resets 6am GMT). Sell is always a single delivery vehicle.' },
   ]},
   { id: 'ceo', label: 'CEO Businesses', color: '#6c7bff', tasks: [
-    { id: 'mansion_boost', name: "Set today's Business Production Boost", note: 'Pick one business for x3 speed, 24h, from the wall terminal.', tint: '#f0c14b', optional: true },
-    { id: 'nc_main', name: 'Nightclub: collect safe, check technicians, sell if worth it, promote if slipping', note: 'Safe pays up to $50K/day at 95-100% popularity. Prioritize Cocaine/Meth/Bunker/Counterfeit techs, skip Weed & Doc Forgery. Warehouse sell is always one vehicle, no risk. Promote if popularity drops below 90%.', tint: '#ff3dd8' },
-    { id: 'agency_main', name: 'Agency: collect safe and run a Security Contract', note: 'Safe pays up to $20,000/day, caps at $250,000 stored. Contract tiers (Professional/Specialist/Specialist+) are randomly rolled - just run the best of whatever 3 show up. Also worth a quick check for a Payphone Hit while you\'re there (doubles to $85K if the bonus condition is met).', tint: '#ff3d7f' },
-    { id: 'special_cargo', name: 'Special Cargo: buy x3 crates or dispatch Lupe', note: 'Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
-    { id: 'vehicle_cargo', name: 'Vehicle Cargo: source a car', note: 'No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
-    { id: 'hangar_cargo', name: 'Air Freight Cargo: dispatch Rooster McCraw', note: '$25,000/dispatch, 1-2 random-type crates in ~48 min. Re-dispatch each cycle.', tint: '#ff8a3d', optional: true },
-    { id: 'autoshop_contract', name: 'Auto Shop: customize 2 cars, staff deliver both', note: 'Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', tint: '#3d9bdc' },
-    { id: 'bail_agents', name: 'Bail Office: send both agents, collect safe, do Most Wanted', note: '$5K-$10K/run, ~48 min, caps at $100K. Plus today\'s Most Wanted target (~$120-130K base, deliver alive for full payout).', tint: '#9c3d5e' },
-    { id: 'salvage_safe', name: 'Salvage Yard: collect Office Safe, run a Tow Truck job', note: 'Safe caps at $250K. Beater truck, no Staff upgrade - full 96 min cycle, $30-40K per vehicle.', tint: '#6b7a8f' },
-    { id: 'mf_carwash', name: 'Hands On Car Wash: collect safe, check Heat level', note: 'Legal job if Heat is high, illegal ($35K) if it isn\'t. All laundered cash from all 3 fronts pays out here.', tint: '#5ec9c4' },
-    { id: 'mf_others', name: 'Check Smoke on the Water + Higgins Helitours Heat, run a job', note: 'Each tracks Heat independently from the Car Wash. No separate safe at either - their earnings still pay out at the Car Wash.', tint: '#5ec9c4', optional: true },
+    { id: 'mansion_boost', name: 'Production Boost', note: "Set today's boost. Pick one business for x3 speed, 24h, from the wall terminal.", tint: '#f0c14b', optional: true },
+    { id: 'nc_main', name: 'Nightclub', note: 'Collect safe, check technicians, sell if worth it, promote if slipping. Safe pays up to $50K/day at 95-100% popularity. Prioritize Cocaine/Meth/Bunker/Counterfeit techs, skip Weed & Doc Forgery. Promote if popularity drops below 90%.', tint: '#ff3dd8' },
+    { id: 'agency_main', name: 'Agency', note: 'Collect safe, run a Security Contract. Safe pays up to $20,000/day, caps at $250,000. Contract tiers are randomly rolled - just run the best of the 3 shown. Also check for a Payphone Hit (doubles to $85K).', tint: '#ff3d7f' },
+    { id: 'special_cargo', name: 'Special Cargo', note: 'Buy x3 crates or dispatch Lupe. Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
+    { id: 'vehicle_cargo', name: 'Vehicle Cargo', note: 'Source a car. No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
+    { id: 'hangar_cargo', name: 'Air Freight Cargo', note: 'Dispatch Rooster McCraw. $25,000/dispatch, 1-2 random-type crates in ~48 min.', tint: '#ff8a3d', optional: true },
+    { id: 'mf_carwash', name: 'Car Wash', note: 'Collect safe, check Heat level. Legal job if Heat is high, illegal ($35K) if not. All 3 laundering fronts pay out here.', tint: '#5ec9c4' },
+    { id: 'mf_others', name: 'Other Laundering Fronts', note: 'Check Smoke on the Water + Higgins Helitours Heat, run a job. Each tracks Heat independently - no separate safe, pays out at the Car Wash.', tint: '#5ec9c4', optional: true },
   ]},
   { id: 'weekly', label: 'Weekly Tasks', color: '#e0473f', tasks: [
-    { id: 'kortz_heist', name: 'Run The Kortz Center Heist', note: 'Resets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting), higher split across a full crew who unlock the co-op loot room. Any repeat that same week collapses to ~$300K - only worth doing once weekly.\n\nCrew-of-randos setup (handles both stealth and loud equally well, since randoms can\'t be relied on to stay quiet):\n- Entry: Staff Entrance (via Staff Key Card) - the reliable all-purpose pick, versatile for either approach\n- Infiltration Gear: Staff Key Card\n- Unmarked Weapons: Military Loadout - best backup if it goes loud\n- Getaway Vehicle: Armored Caracara\n- Equipment: Access Code + Hacking Device (both mandatory, no choice)\n- Optional preps: do all 5 with a crew - they pay for themselves with more people to use the extra capacity and weakened guards\n- Scope everything BEFORE Thursday - scoping doesn\'t touch the weekly reset, only re-check secondary targets right before the finale since those can shift between runs', recurring: true },
-    { id: 'garment_safe_weekly_v2', name: 'Garment Factory: collect safe (weekly sweep)', note: 'Only ~$2,000/day, so collecting once a week (~$14K total) rather than daily is just less to remember for the same money.', recurring: true },
-    { id: 'arcade_safe_weekly', name: 'Arcade: collect cabinet income (weekly sweep)', note: '~$5,000/day, so a weekly ~$35K collection is simpler than remembering it daily.', recurring: true },
-    { id: 'bunker_research_x3', name: 'Do 3 Bunker Research Missions (Agent 14)', note: 'THIS WEEK ONLY (Business Rivalries, ends ~Sept 23 2026): 3 completions = flat $1,000,000 + Camo Sweatsuit, paid within 72hrs. Also pays double cash/RP/research all week. Stays checked once done - gets replaced with next week\'s promo, doesn\'t auto-reset.' },
-    { id: 'salvage_robberies', name: 'Complete all 3 Salvage Yard Robberies', note: 'Duggan, Gangbanger, and Cargo Ship Robberies - fresh set each week. Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true },
-    { id: 'check_weekly_bonus', name: "Ask Claude to check this week's Rockstar bonus challenges", note: "I can't check automatically on my own schedule - tap this as a reminder to ask me each week, and I'll research current bonuses and update this category.", recurring: true },
+    { id: 'kortz_heist', name: 'Kortz Center Heist', note: 'Resets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting), higher split across a full crew who unlock the co-op loot room. Any repeat that same week collapses to ~$300K - only worth doing once weekly.\n\nCrew-of-randos setup (handles both stealth and loud equally well, since randoms can\'t be relied on to stay quiet):\n- Entry: Staff Entrance (via Staff Key Card) - the reliable all-purpose pick, versatile for either approach\n- Infiltration Gear: Staff Key Card\n- Unmarked Weapons: Military Loadout - best backup if it goes loud\n- Getaway Vehicle: Armored Caracara\n- Equipment: Access Code + Hacking Device (both mandatory, no choice)\n- Optional preps: do all 5 with a crew - they pay for themselves with more people to use the extra capacity and weakened guards\n- Scope everything BEFORE Thursday - scoping doesn\'t touch the weekly reset, only re-check secondary targets right before the finale since those can shift between runs', recurring: true },
+    { id: 'bunker_research_x3', name: 'Bunker Research x3', note: 'Do 3 Bunker Research Missions (Agent 14). THIS WEEK ONLY (Business Rivalries, ends ~Sept 23 2026): 3 completions = flat $1,000,000 + Camo Sweatsuit, paid within 72hrs. Also pays double cash/RP/research all week. Stays checked once done - gets replaced with next week\'s promo, doesn\'t auto-reset.' },
+    { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 (Duggan, Gangbanger, Cargo Ship) - fresh set each week. Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true },
+    { id: 'check_weekly_bonus', name: 'Check Weekly Bonus', note: "Ask Claude to check this week's Rockstar bonus challenges. I can't check automatically on my own schedule - this is a reminder to ask me, and I'll research current bonuses and update this category.", recurring: true },
+  ]},
+  { id: 'optional', label: 'Optional', color: '#f4f4f5', tasks: [
+    { id: 'docforge', name: 'Document Forgery', note: 'Source & sell. Weakest earner of the 5 — low priority.', optional: true },
+    { id: 'autoshop_contract', name: 'Auto Shop', note: 'Customize 2 cars, staff deliver both. Personal delivery averages $25-30K/car; staff is lower (cut + damage risk) but zero effort.', optional: true },
+    { id: 'bail_agents', name: 'Bail Office', note: 'Send both agents, collect safe, do Most Wanted. $5K-$10K/run, caps at $100K. Most Wanted ~$120-130K, deliver alive.', optional: true },
+    { id: 'salvage_safe', name: 'Salvage Yard', note: 'Collect Office Safe, run a Tow Truck job. Safe caps at $250K. Beater truck, 96 min cycle, $30-40K/vehicle.', optional: true },
+    { id: 'stash_house_v2', name: 'Stash House', note: 'Raid it. 25 possible spots (purple house icon). Clear NPCs, find the sticky-note code, crack the safe — refills one business 100% + cash. Resets 9am GMT.', optional: true },
+    { id: 'street_dealer_v2', name: 'Street Dealers', note: 'Sell all drug stock. Coke/Meth/Weed/Acid only (not Counterfeit or Doc Forgery). Only the day\'s premium drug pays well.', optional: true },
+    { id: 'garment_safe_weekly_v2', name: 'Garment Factory', note: 'Collect safe. Only ~$2,000/day — small but free.', optional: true },
+    { id: 'arcade_safe_weekly', name: 'Arcade', note: 'Collect cabinet income. ~$5,000/day — small but free.', optional: true },
   ]},
 ];
 
@@ -813,6 +813,10 @@ function ensureOrder(){
   if (descBtn) descBtn.classList.toggle('active', !!data.showDescriptions);
   // include any sections that exist in SECTIONS but not yet in sectionOrder (e.g. after an update)
   SECTIONS.forEach(s => { if (!data.sectionOrder.includes(s.id)) data.sectionOrder.push(s.id); });
+  // Optional starts collapsed by default - checked directly rather than relying on "just added to
+  // sectionOrder", since that check never fires for a completely fresh state (sectionOrder gets
+  // fully populated in one step above, not incrementally).
+  if (data.collapsed['optional'] === undefined) data.collapsed['optional'] = true;
   SECTIONS.forEach(sec => {
     if (!data.taskOrder[sec.id]) data.taskOrder[sec.id] = sec.tasks.map(t => t.id);
     const known = sec.tasks.map(t => t.id);
