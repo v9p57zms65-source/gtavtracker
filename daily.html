@@ -370,7 +370,9 @@ header::after{
 .tinfo{flex:1;}
 .tname{font-weight:600; font-size:15px; letter-spacing:-.1px;}
 .tname.done{text-decoration:line-through;}
-.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line;}
+.tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line; display:none;}
+body.show-descriptions .tnote{display:block;}
+.header-undo-btn.active{background:var(--green-dark); color:#fff; border-color:transparent;}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
@@ -539,6 +541,7 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
       <span class="theme-opt" data-theme-choice="dark">&#9790; Dark</span>
     </div>
     <div class="header-undo-btn disabled" id="headerUndoBtn" data-undoaction>&#8630; Undo</div>
+    <div class="header-undo-btn" id="descToggleBtn" data-desctoggle>&#128172; Descriptions</div>
   </div>
 
   <div class="tabs">
@@ -787,6 +790,10 @@ function ensureOrder(){
   if (!data.taskOrder) data.taskOrder = {};
   if (!data.collapsed) data.collapsed = {};
   if (!data.roadmap) data.roadmap = {};
+  if (data.showDescriptions === undefined) data.showDescriptions = false;
+  document.body.classList.toggle('show-descriptions', !!data.showDescriptions);
+  const descBtn = document.getElementById('descToggleBtn');
+  if (descBtn) descBtn.classList.toggle('active', !!data.showDescriptions);
   // include any sections that exist in SECTIONS but not yet in sectionOrder (e.g. after an update)
   SECTIONS.forEach(s => { if (!data.sectionOrder.includes(s.id)) data.sectionOrder.push(s.id); });
   SECTIONS.forEach(sec => {
@@ -1500,9 +1507,17 @@ document.addEventListener('click', (e) => {
   const cancelBtn = e.target.closest('[data-editcancel]');
   const optToggle = e.target.closest('[data-editopttoggle]');
   const undoBtn = e.target.closest('[data-undoaction]');
+  const descToggle = e.target.closest('[data-desctoggle]');
 
   if (undoBtn) {
     performUndo();
+    return;
+  }
+  if (descToggle) {
+    data.showDescriptions = !data.showDescriptions;
+    document.body.classList.toggle('show-descriptions', data.showDescriptions);
+    descToggle.classList.toggle('active', data.showDescriptions);
+    queueSave();
     return;
   }
 
