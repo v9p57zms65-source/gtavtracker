@@ -335,7 +335,7 @@ header::after{
   position:absolute; top:0; bottom:0; width:64px;
   display:flex; align-items:center; justify-content:center;
   transition:transform .22s cubic-bezier(.22,1,.36,1);
-  z-index:1;
+  z-index:3;
   font-size:17px;
   color:#fff;
 }
@@ -1572,18 +1572,18 @@ document.addEventListener('click', (e) => {
     if (tab === 'today') {
       const previousEdit = data.taskEdits[id] !== undefined ? data.taskEdits[id] : null;
       data.taskEdits[id] = { name: newName, note: newNote, optional: newOptional };
-      editingKey = null; queueSave(); renderToday();
       lastAction = { type: 'edit', tab, id, previousEdit };
+      editingKey = null; queueSave(); renderToday();
     } else if (tab === 'roadmap') {
       const previousEdit = data.roadmapEdits[id] !== undefined ? data.roadmapEdits[id] : null;
       data.roadmapEdits[id] = { label: newName, note: newNote, optional: newOptional };
-      editingKey = null; queueSave(); renderRoadmap();
       lastAction = { type: 'edit', tab, id, previousEdit };
+      editingKey = null; queueSave(); renderRoadmap();
     } else {
       const previousEdit = heistState._edits[id] !== undefined ? heistState._edits[id] : null;
       heistState._edits[id] = { name: newName, note: newNote };
-      editingKey = null; queueSaveHeists(); renderHeists();
       lastAction = { type: 'edit', tab, id, previousEdit };
+      editingKey = null; queueSaveHeists(); renderHeists();
     }
     showUndoToast(`Updated "${newName}"`);
     return;
@@ -1608,10 +1608,10 @@ document.addEventListener('click', (e) => {
     // Second tap on the same button: actually delete.
     deleteConfirmKey = null;
     const label = getTaskLabel(tab, id);
+    lastAction = { type: 'delete', tab, id };
     if (tab === 'today') { data.deletedTasks.push(id); queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.deletedRoadmapTasks.push(id); queueSave(); renderRoadmap(); }
     else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
-    lastAction = { type: 'delete', tab, id };
     showUndoToast(`Deleted "${label}"`);
     return;
   }
@@ -1818,10 +1818,10 @@ document.addEventListener('touchend', () => {
     const tab = swipeTask.dataset.taskid !== undefined ? 'today' : swipeTask.dataset.roadmapid !== undefined ? 'roadmap' : 'heist';
     const id = swipeTask.dataset.taskid || swipeTask.dataset.roadmapid || swipeTask.dataset.heistid;
     const label = getTaskLabel(tab, id);
+    lastAction = { type: 'delete', tab, id };
     if (tab === 'today') { data.deletedTasks.push(id); queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.deletedRoadmapTasks.push(id); queueSave(); renderRoadmap(); }
     else { heistState._deleted.push(id); queueSaveHeists(); renderHeists(); }
-    lastAction = { type: 'delete', tab, id };
     showUndoToast(`Deleted "${label}"`);
   } else if (swipeCurrentDx < -20) {
     swipeTask.classList.add('swipe-left');
