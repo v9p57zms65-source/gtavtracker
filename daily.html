@@ -346,9 +346,9 @@ header::after{
 /* (A narrow sub-zone trigger caused a hover-flicker loop before - hovering the whole card, a large, */
 /* unchanging target, is what's actually stable. Content shrinks via margin, revealing both edges.) */
 @media (hover:hover) and (pointer:fine){
-  .task:hover .task-content{ margin-left:64px; margin-right:64px; }
-  .task:hover .task-actions-edit{transform:translateX(0);}
-  .task:hover .task-actions-delete{transform:translateX(0);}
+  .task:not(.no-actions):hover .task-content{ margin-left:64px; margin-right:64px; }
+  .task:not(.no-actions):hover .task-actions-edit{transform:translateX(0);}
+  .task:not(.no-actions):hover .task-actions-delete{transform:translateX(0);}
 }
 
 /* ---- Touch: Mail-style bidirectional swipe, JS-driven via .swipe-left/.swipe-right classes ---- */
@@ -687,7 +687,8 @@ const SECTIONS = [
       { id: 'emp', name: 'EMP Charges', tag: 'Optional' },
       { id: 'finale', name: 'Heist Finale' },
     ] },
-    { id: 'bunker_research_x3', name: 'Bunker Research x3', note: 'Do 3 Bunker Research Missions (Agent 14). THIS WEEK ONLY (Business Rivalries, ends ~Sept 23 2026): 3 completions = flat $1,000,000 + Camo Sweatsuit, paid within 72hrs. Also pays double cash/RP/research all week. Stays checked once done - gets replaced with next week\'s promo, doesn\'t auto-reset.' },
+    { id: 'bail_bounties_oct1', name: 'Bail Bounties x2', note: "This week only (Oct 1-7 2026), the Weekly Challenge: secure two Bail Office Bounties for the Green Vintage Skull Mask and $100,000. Standard and Most Wanted targets also pay 2x GTA$ and RP all week. Stays checked once done, gets replaced with next week's challenge." },
+    { id: 'security_x5_oct1', name: 'Security Contracts x5', note: "This week only (ends Oct 7 2026), Halloween bonus: complete 5 Agency Security Contracts for $500,000, paid within 72 hours. Stays checked once done, gets replaced with next week's bonus." },
     { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 (Duggan, Gangbanger, Cargo Ship) - fresh set each week. Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true },
     { id: 'safe_collection', name: 'Collect Safes', note: 'Weekly sweep of the four business safes. Check each one off as you collect it. Salvage Yard safe caps at $250K, Bail Office at $100K.', recurring: true, subs: [
       { id: 'garment', name: 'Garment Factory' },
@@ -1153,7 +1154,7 @@ function renderToday(){
           }
 
           return `
-            <div class="task ${isDone?'done':''}" data-taskid="${t.id}">
+            <div class="task ${isDone?'done':''} ${(t.subs && t.subs.length) ? 'no-actions' : ''}" data-taskid="${t.id}">
               <div class="task-content ${displayOptional?'is-optional':''}" ${tintStyle}>
                 <span class="task-drag" data-taskdrag>&#9776;</span>
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
@@ -1170,8 +1171,8 @@ function renderToday(){
                 </div>
                 ${(t.subs && t.subs.length) ? `<div class="subtoggle ${data.subOpen[t.id] ? 'open' : ''}">${t.subs.filter(sb => data.today[t.id + ':' + sb.id]).length}/${t.subs.length}<span class="subchev">&#9656;</span></div>` : ''}
               </div>
-              <div class="task-actions-edit" data-todayedit="${t.id}">&#9998;</div>
-              <div class="task-actions-delete ${isDelArmed?'armed':''}" data-todaydelete="${t.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</div>
+              ${(t.subs && t.subs.length) ? '' : `<div class="task-actions-edit" data-todayedit="${t.id}">&#9998;</div>
+              <div class="task-actions-delete ${isDelArmed?'armed':''}" data-todaydelete="${t.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</div>`}
             </div>
           `;
         }).join('')}
@@ -1816,7 +1817,7 @@ const SWIPE_DELETE_AT = 160; // swipe this far left and it deletes outright, no 
 document.addEventListener('touchstart', (e) => {
   const taskEl = e.target.closest('.task');
   // Ignore swipes starting on the drag handle - that gesture belongs to Sortable, not this.
-  if (!taskEl || e.target.closest('[data-taskdrag], [data-heistdrag], [data-roadmaptaskdrag]')) { swipeTask = null; return; }
+  if (!taskEl || taskEl.classList.contains('no-actions') || e.target.closest('[data-taskdrag], [data-heistdrag], [data-roadmaptaskdrag]')) { swipeTask = null; return; }
   // Close any other card already open before starting a new gesture.
   document.querySelectorAll('.task.swipe-left, .task.swipe-right').forEach(el => { if (el !== taskEl) el.classList.remove('swipe-left','swipe-right'); });
   swipeTask = taskEl;
