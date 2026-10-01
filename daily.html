@@ -389,6 +389,38 @@ header::after{
 .tname.done{text-decoration:line-through;}
 .tnote{font-size:13px; color:var(--dim); margin-top:3px; line-height:1.45; white-space:pre-line; display:none;}
 body.show-descriptions .tnote{display:block;}
+.header-undo-btn.newtask-btn{background:var(--green-dark); color:#fff; border-color:transparent;}
+.nt-overlay{position:fixed; inset:0; z-index:300; display:none; align-items:flex-end; justify-content:center; background:rgba(0,0,0,.55); overscroll-behavior:contain;}
+.nt-overlay.open{display:flex;}
+body.nt-open{overflow:hidden;}
+.nt-modal{width:100%; max-width:520px; max-height:92%; overflow-y:auto; -webkit-overflow-scrolling:touch; background:var(--bg); color:var(--text); border:1px solid var(--glass-border); border-radius:22px 22px 0 0; padding:18px 18px calc(18px + env(safe-area-inset-bottom, 0px));}
+@media (min-width:600px){ .nt-overlay{align-items:center;} .nt-modal{border-radius:22px; max-height:88%;} }
+.nt-head{font-size:18px; font-weight:800; margin-bottom:6px;}
+.nt-label{display:block; font-size:12px; font-weight:800; color:var(--dim); margin:14px 0 6px; letter-spacing:.2px;}
+.nt-input{width:100%; box-sizing:border-box; font:inherit; font-size:16px; color:var(--text); background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px 12px; outline:none; -webkit-appearance:none; appearance:none;}
+.nt-input:focus{border-color:var(--green);}
+.nt-input.nt-err{border-color:var(--red);}
+textarea.nt-input{resize:none;}
+.nt-subrow{display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+.nt-rmsub{flex:0 0 auto; width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:var(--panel); color:var(--dim); cursor:pointer; font-size:14px;}
+.nt-addsub{display:inline-block; font-size:13px; font-weight:800; color:var(--green); padding:6px 2px; cursor:pointer;}
+.nt-colors{display:flex; flex-wrap:wrap; gap:10px;}
+.nt-swatch{width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-sizing:border-box; position:relative;}
+.nt-swatch.none{background:var(--panel); border:2px dashed var(--border);}
+.nt-swatch.sel{box-shadow:0 0 0 2px var(--bg), 0 0 0 4px var(--text);}
+.nt-toggle-row{display:flex; align-items:center; justify-content:space-between; margin-top:14px; font-size:14px; font-weight:700; cursor:pointer;}
+.nt-switch{width:44px; height:26px; border-radius:13px; background:var(--panel); border:1px solid var(--border); position:relative; transition:.15s; flex:none;}
+.nt-switch::after{content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.15s;}
+.nt-switch.on{background:var(--green-dark); border-color:transparent;}
+.nt-switch.on::after{left:20px;}
+.nt-seg{display:flex; gap:4px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:3px;}
+.nt-seg span{flex:1; text-align:center; padding:8px 0; border-radius:9px; font-size:13px; font-weight:800; color:var(--dim); cursor:pointer;}
+.nt-seg span.on{background:var(--green-dark); color:#fff;}
+.nt-hint{font-size:11.5px; color:var(--dim); margin-top:6px; line-height:1.4;}
+.nt-actions{display:flex; gap:10px; margin-top:20px;}
+.nt-actions span{flex:1; text-align:center; padding:12px 0; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer;}
+.nt-cancel{background:var(--panel); color:var(--text);}
+.nt-create{background:var(--green-dark); color:#fff;}
 .header-undo-btn.active{background:var(--green-dark); color:#fff; border-color:transparent;}
 .subtasks{margin-top:8px; display:flex; flex-direction:column; gap:2px;}
 .subtask{display:flex; align-items:center; gap:10px; padding:7px 8px; min-height:34px; border-radius:10px; font-size:14px; font-weight:600; background:rgba(127,127,127,.12); cursor:pointer; -webkit-tap-highlight-color:transparent;}
@@ -572,6 +604,10 @@ footer{text-align:center; color:var(--dim); font-size:11px; margin-top:24px; pad
     <div class="header-undo-btn" id="descToggleBtn" data-desctoggle>&#128172; Descriptions</div>
   </div>
 
+  <div class="header-controls-row" style="justify-content:flex-start; margin-top:-4px;">
+    <div class="header-undo-btn newtask-btn" id="newTaskBtn" data-nt-open>&#65291; New Task</div>
+  </div>
+
   <div class="tabs">
     <div class="tab active" data-view="today">Today</div>
     <div class="tab" data-view="roadmap">Long-Term</div>
@@ -669,6 +705,7 @@ const SECTIONS = [
     { id: 'special_cargo', name: 'Special Cargo', note: 'Buy x3 crates or dispatch Lupe. Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
     { id: 'vehicle_cargo', name: 'Vehicle Cargo', note: 'Source a car. No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
     { id: 'hangar_cargo', name: 'Air Freight Cargo', note: 'Dispatch Rooster McCraw. $25,000/dispatch, 1-2 random-type crates in ~48 min.', tint: '#ff8a3d', optional: true },
+    { id: 'bail_most_wanted', name: 'Bail Most Wanted', note: "Once per day, the top Bail Office target and its biggest single payout. Deliver alive for roughly $120-130K base, and Standard and Most Wanted targets pay 2x GTA$ and RP this week (Oct 1-7 2026), so about double right now. Failing uses up the day's attempt, so bring armor.", tint: '#9c3d5e' },
     { id: 'mf_carwash', name: 'Car Wash', note: 'Collect safe, check Heat level. Legal job if Heat is high, illegal ($35K) if not. All 3 laundering fronts pay out here.', tint: '#5ec9c4' },
     { id: 'mf_others', name: 'Other Laundering Fronts', note: 'Check Smoke on the Water + Higgins Helitours Heat, run a job. Each tracks Heat independently - no separate safe, pays out at the Car Wash.', tint: '#5ec9c4', optional: true },
   ]},
@@ -829,7 +866,24 @@ let data = {
   collapsed: {}             // sectionId -> bool
 };
 
+// ---------- CUSTOM TASKS (created with the New Task button) ----------
+// Stored in data.customTasks and injected into SECTIONS: weekly ones join Weekly Tasks (reset Thursday),
+// daily ones live in a Custom category that only exists while it has tasks.
+const CUSTOM_COLORS = ['', '#e0473f', '#ff8a3d', '#f0c14b', '#7bc142', '#5ec9c4', '#6c7bff', '#b06bff', '#ff3d7f'];
+function syncCustomTasks(){
+  const list = (data && data.customTasks) || [];
+  SECTIONS.forEach(sec => { sec.tasks = sec.tasks.filter(t => !t.custom); });
+  const ci = SECTIONS.findIndex(sec => sec.id === 'custom');
+  if (ci >= 0) SECTIONS.splice(ci, 1);
+  const toTask = ct => ({ id: ct.id, name: ct.name, note: ct.note || '', optional: !!ct.optional, tint: ct.tint || undefined, recurring: ct.freq === 'weekly', subs: (ct.subs && ct.subs.length) ? ct.subs : undefined, custom: true });
+  const weekly = SECTIONS.find(sec => sec.id === 'weekly');
+  list.filter(ct => ct.freq === 'weekly').forEach(ct => { if (weekly) weekly.tasks.push(toTask(ct)); });
+  const daily = list.filter(ct => ct.freq !== 'weekly');
+  if (daily.length) SECTIONS.push({ id: 'custom', label: 'Custom', color: '#b06bff', tasks: daily.map(toTask) });
+}
+
 function ensureOrder(){
+  syncCustomTasks();
   if (!data.sectionOrder) data.sectionOrder = SECTIONS.map(s => s.id);
   if (!data.taskOrder) data.taskOrder = {};
   if (!data.collapsed) data.collapsed = {};
@@ -933,6 +987,7 @@ function getTaskLabel(tab, id){
 
 
 function getValidTaskIds(excludeWeekly){
+  syncCustomTasks();
   const deleted = data.deletedTasks || [];
   const ids = [];
   SECTIONS.forEach(s => {
@@ -962,6 +1017,7 @@ function getWeeklyTaskIds(){
 }
 
 function rolloverIfNewDay(){
+  syncCustomTasks();
   const t = todayStr();
   if (data.currentDate !== t) {
     // archive whatever was checked on the old date
@@ -1154,7 +1210,7 @@ function renderToday(){
           }
 
           return `
-            <div class="task ${isDone?'done':''} ${(t.subs && t.subs.length) ? 'no-actions' : ''}" data-taskid="${t.id}">
+            <div class="task ${isDone?'done':''} ${(t.subs && t.subs.length && !t.custom) ? 'no-actions' : ''}" data-taskid="${t.id}">
               <div class="task-content ${displayOptional?'is-optional':''}" ${tintStyle}>
                 <span class="task-drag" data-taskdrag>&#9776;</span>
                 <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
@@ -1171,7 +1227,7 @@ function renderToday(){
                 </div>
                 ${(t.subs && t.subs.length) ? `<div class="subtoggle ${data.subOpen[t.id] ? 'open' : ''}">${t.subs.filter(sb => data.today[t.id + ':' + sb.id]).length}/${t.subs.length}<span class="subchev">&#9656;</span></div>` : ''}
               </div>
-              ${(t.subs && t.subs.length) ? '' : `<div class="task-actions-edit" data-todayedit="${t.id}">&#9998;</div>
+              ${(t.subs && t.subs.length && !t.custom) ? '' : `<div class="task-actions-edit" data-todayedit="${t.id}">&#9998;</div>
               <div class="task-actions-delete ${isDelArmed?'armed':''}" data-todaydelete="${t.id}">${isDelArmed ? '&#10003;' : '&#10005;'}</div>`}
             </div>
           `;
@@ -1573,6 +1629,8 @@ document.addEventListener('click', (e) => {
   const saveBtn = e.target.closest('[data-editsave]');
   const cancelBtn = e.target.closest('[data-editcancel]');
   const optToggle = e.target.closest('[data-editopttoggle]');
+  if (e.target.closest('[data-nt-open]')) { openNewTaskModal(); return; }
+  if (e.target.closest('#ntOverlay')) { handleNewTaskClick(e); return; }
   const undoBtn = e.target.closest('[data-undoaction]');
   const descToggle = e.target.closest('[data-desctoggle]');
 
@@ -1906,6 +1964,77 @@ document.addEventListener('click', (e) => {
   });
 }, true);
 
+
+// ---------- NEW TASK FORM ----------
+let ntState = { color: '', optional: false, freq: 'daily' };
+function ntRenderColors(){
+  document.getElementById('ntColors').innerHTML = CUSTOM_COLORS.map(c =>
+    `<span class="nt-swatch ${c ? '' : 'none'} ${ntState.color === c ? 'sel' : ''}" data-nt-color="${c}" ${c ? `style="background:${c};"` : ''}></span>`).join('');
+}
+function ntAddSubRow(focus){
+  const row = document.createElement('div');
+  row.className = 'nt-subrow';
+  row.innerHTML = '<input class="nt-input nt-subinput" maxlength="40" placeholder="Subtask" autocomplete="off"><span class="nt-rmsub" data-nt-rmsub>&#10005;</span>';
+  document.getElementById('ntSubs').appendChild(row);
+  if (focus) row.querySelector('input').focus();
+}
+function openNewTaskModal(){
+  ntState = { color: '', optional: false, freq: 'daily' };
+  document.getElementById('ntName').value = '';
+  document.getElementById('ntName').classList.remove('nt-err');
+  document.getElementById('ntNote').value = '';
+  document.getElementById('ntSubs').innerHTML = '';
+  document.getElementById('ntOptSwitch').classList.remove('on');
+  document.querySelectorAll('#ntFreq span').forEach(sp => sp.classList.toggle('on', sp.dataset.ntFreq === 'daily'));
+  ntRenderColors();
+  document.getElementById('ntOverlay').classList.add('open');
+  document.body.classList.add('nt-open');
+  // focus synchronously inside the tap so iOS attaches the keyboard and cursor
+  document.getElementById('ntName').focus();
+}
+function closeNewTaskModal(){
+  document.getElementById('ntOverlay').classList.remove('open');
+  document.body.classList.remove('nt-open');
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+function createCustomTask(){
+  const nameEl = document.getElementById('ntName');
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.classList.add('nt-err'); nameEl.focus(); return; }
+  const subs = [...document.querySelectorAll('#ntSubs .nt-subinput')].map(i => i.value.trim()).filter(Boolean).map((n, i) => ({ id: 's' + (i + 1), name: n }));
+  const ct = { id: 'custom_' + Date.now().toString(36), name, note: document.getElementById('ntNote').value.trim(), optional: ntState.optional, tint: ntState.color || undefined, freq: ntState.freq, subs };
+  if (!data.customTasks) data.customTasks = [];
+  data.customTasks.push(ct);
+  syncCustomTasks();
+  if (!data.collapsed) data.collapsed = {};
+  data.collapsed[ct.freq === 'weekly' ? 'weekly' : 'custom'] = false;
+  queueSave();
+  closeNewTaskModal();
+  renderToday();
+  const card = document.querySelector(`[data-taskid="${ct.id}"]`);
+  if (card && card.scrollIntoView) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function handleNewTaskClick(e){
+  if (e.target.id === 'ntOverlay') { closeNewTaskModal(); return; }
+  if (e.target.closest('[data-nt-cancel]')) { closeNewTaskModal(); return; }
+  if (e.target.closest('[data-nt-save]')) { createCustomTask(); return; }
+  if (e.target.closest('[data-nt-addsub]')) { ntAddSubRow(true); return; }
+  const rm = e.target.closest('[data-nt-rmsub]');
+  if (rm) { rm.parentElement.remove(); return; }
+  const col = e.target.closest('[data-nt-color]');
+  if (col) { ntState.color = col.dataset.ntColor; ntRenderColors(); return; }
+  if (e.target.closest('[data-nt-opt]')) { ntState.optional = !ntState.optional; document.getElementById('ntOptSwitch').classList.toggle('on', ntState.optional); return; }
+  const fr = e.target.closest('[data-nt-freq]');
+  if (fr) { ntState.freq = fr.dataset.ntFreq; document.querySelectorAll('#ntFreq span').forEach(sp => sp.classList.toggle('on', sp === fr)); return; }
+}
+document.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('ntOverlay');
+  if (!overlay.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeNewTaskModal(); return; }
+  if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('nt-subinput')) { e.preventDefault(); ntAddSubRow(true); }
+});
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'ntName') e.target.classList.remove('nt-err'); });
+
 // ---------- PULL TO REFRESH ----------
 // Native Safari pull-to-refresh doesn't work once this is installed as a standalone home-screen app,
 // so this is a hand-built version that actually re-fetches from Supabase, not just a page reload.
@@ -1918,6 +2047,7 @@ const ptrSpinner = document.getElementById('ptrSpinner');
 const ptrText = document.getElementById('ptrText');
 
 document.addEventListener('touchstart', (e) => {
+  if (e.target.closest && e.target.closest('#ntOverlay')) return;
   if (window.scrollY <= 0 && !ptrRefreshing) {
     ptrStartY = e.touches[0].clientY;
     ptrPulling = true;
@@ -1981,5 +2111,24 @@ async function doFullRefresh(){
 
 initState();
 </script>
+<div class="nt-overlay" id="ntOverlay">
+  <div class="nt-modal" role="dialog" aria-modal="true" aria-label="New task">
+    <div class="nt-head">New Task</div>
+    <label class="nt-label" for="ntName">Title</label>
+    <input class="nt-input" id="ntName" maxlength="30" placeholder="Short title, one row" autocomplete="off">
+    <label class="nt-label" for="ntNote">Description</label>
+    <textarea class="nt-input" id="ntNote" rows="3" placeholder="Optional details"></textarea>
+    <label class="nt-label">Subtasks</label>
+    <div id="ntSubs"></div>
+    <div class="nt-addsub" data-nt-addsub>&#65291; Add subtask</div>
+    <label class="nt-label">Color</label>
+    <div class="nt-colors" id="ntColors"></div>
+    <div class="nt-toggle-row" data-nt-opt><span>Optional task</span><span class="nt-switch" id="ntOptSwitch"></span></div>
+    <label class="nt-label">Repeats</label>
+    <div class="nt-seg" id="ntFreq"><span data-nt-freq="daily" class="on">Daily</span><span data-nt-freq="weekly">Weekly</span></div>
+    <div class="nt-hint">Daily resets every morning and lives under Custom. Weekly resets every Thursday and lives under Weekly Tasks.</div>
+    <div class="nt-actions"><span class="nt-cancel" data-nt-cancel>Cancel</span><span class="nt-create" data-nt-save>Create</span></div>
+  </div>
+</div>
 </body>
 </html>
