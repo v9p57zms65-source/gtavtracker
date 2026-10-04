@@ -1213,9 +1213,9 @@ function renderToday(){
             <div class="task ${isDone?'done':''} ${(t.subs && t.subs.length && !t.custom) ? 'no-actions' : ''}" data-taskid="${t.id}">
               <div class="task-content ${displayOptional?'is-optional':''}" ${tintStyle}>
                 <span class="task-drag" data-taskdrag>&#9776;</span>
-                <div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
+                ${(t.subs && t.subs.length) ? '' : `<div class="check ${isDone?'on':''}" data-checkbtn ${checkStyle}>
                   <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
-                </div>
+                </div>`}
                 <div class="tinfo">
                   <div class="tname ${isDone?'done':''}">${esc(displayName)}</div>
                   <div class="tnote">${esc(displayNote)}</div>
