@@ -358,6 +358,10 @@ header::after{
   .task:not(.no-actions):hover .task-content{ margin-left:64px; margin-right:64px; }
   .task:not(.no-actions):hover .task-actions-edit{transform:translateX(0);}
   .task:not(.no-actions):hover .task-actions-delete{transform:translateX(0);}
+  /* Carried over a re-render: open instantly with no animation so checking a card never makes its buttons hide and slide back in */
+  .task.hover-hold:not(.no-actions) .task-content{ margin-left:64px; margin-right:64px; transition:none !important; }
+  .task.hover-hold:not(.no-actions) .task-actions-edit,
+  .task.hover-hold:not(.no-actions) .task-actions-delete{ transform:translateX(0); transition:none !important; }
 }
 
 /* ---- Touch: Mail-style bidirectional swipe, JS-driven via .swipe-left/.swipe-right classes ---- */
@@ -2118,6 +2122,55 @@ async function doFullRefresh(){
 
   location.reload();
 }
+
+// ---------- KEEP SIDE BUTTONS OPEN ACROSS RE-RENDERS ----------
+// Every render replaces the whole list's DOM, so a card whose side buttons were open (mouse hover on desktop,
+// swipe on touch) came back closed and then animated open again whenever you checked or unchecked it.
+// This remembers which card was open and restores it instantly, without animation.
+function ocKeyOf(el){
+  if (!el) return null;
+  if (el.dataset.taskid !== undefined) return ['data-taskid', el.dataset.taskid];
+  if (el.dataset.roadmapid !== undefined) return ['data-roadmapid', el.dataset.roadmapid];
+  if (el.dataset.heistid !== undefined) return ['data-heistid', el.dataset.heistid];
+  return null;
+}
+function ocFind(k){ return k ? document.querySelector('.task[' + k[0] + '="' + k[1] + '"]') : null; }
+function ocIsMouse(){ return !!(window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches); }
+function ocRelease(){ document.querySelectorAll('.task.hover-hold').forEach(el => el.classList.remove('hover-hold')); }
+function captureOpenCards(){
+  const st = {};
+  if (ocIsMouse()) {
+    // The held card counts too: after a re-render some browsers don't report :hover until the mouse moves again
+    const hov = document.querySelector('.task.hover-hold') || document.querySelector('.task:hover');
+    if (hov && !hov.classList.contains('no-actions')) st.hover = ocKeyOf(hov);
+  }
+  const sw = document.querySelector('.task.swipe-left, .task.swipe-right');
+  if (sw) st.swipe = { key: ocKeyOf(sw), cls: sw.classList.contains('swipe-left') ? 'swipe-left' : 'swipe-right' };
+  return st;
+}
+function restoreOpenCards(st){
+  if (st.hover) {
+    const el = ocFind(st.hover);
+    if (el && !el.classList.contains('no-actions')) {
+      el.classList.add('hover-hold');
+      // Let go on the next real mouse movement, when the browser's own :hover is trustworthy again
+      document.addEventListener('mousemove', ocRelease, { once: true });
+    }
+  }
+  if (st.swipe) {
+    const el = ocFind(st.swipe.key);
+    if (el) el.classList.add(st.swipe.cls);
+  }
+}
+['renderToday', 'renderRoadmap', 'renderHeists'].forEach(name => {
+  const original = window[name];
+  window[name] = function(){
+    const st = captureOpenCards();
+    const result = original.apply(this, arguments);
+    restoreOpenCards(st);
+    return result;
+  };
+});
 
 initState();
 </script>
