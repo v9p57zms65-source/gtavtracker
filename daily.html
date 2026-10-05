@@ -346,6 +346,15 @@ header::after{
 /* (A narrow sub-zone trigger caused a hover-flicker loop before - hovering the whole card, a large, */
 /* unchanging target, is what's actually stable. Content shrinks via margin, revealing both edges.) */
 @media (hover:hover) and (pointer:fine){
+  /* Mouse hover only: a gentler ease-in-out over a longer duration so the side buttons glide in instead of snapping.
+     Content and both panels share the exact same timing so they move as one piece. Touch swipe is untouched. */
+  .task:not(.no-actions) .task-content{ transition: margin .5s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.22,1,.36,1); will-change: margin; }
+  .task:not(.no-actions) .task-actions-edit,
+  .task:not(.no-actions) .task-actions-delete{ transition: transform .5s cubic-bezier(.4,0,.2,1); will-change: transform; }
+  /* Tiny hover-intent delay on the way in only, so sweeping the mouse down the list doesn't make every card flinch */
+  .task:not(.no-actions):hover .task-content,
+  .task:not(.no-actions):hover .task-actions-edit,
+  .task:not(.no-actions):hover .task-actions-delete{ transition-delay: .07s; }
   .task:not(.no-actions):hover .task-content{ margin-left:64px; margin-right:64px; }
   .task:not(.no-actions):hover .task-actions-edit{transform:translateX(0);}
   .task:not(.no-actions):hover .task-actions-delete{transform:translateX(0);}
