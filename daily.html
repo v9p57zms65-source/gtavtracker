@@ -446,6 +446,9 @@ textarea.nt-input{resize:none;}
 .subtask.done{opacity:.55;}
 .subtask.done .subname{text-decoration:line-through;}
 .subtask.done .subcheck svg{opacity:1;}
+.heist-subhead{padding:10px 0 3px 34px; font-size:10.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--dim);}
+.heist-subtag{display:inline-block; margin-left:8px; font-size:9.5px; font-weight:900; letter-spacing:.2px; color:#2a1a03; background:#ffb84d; padding:1px 6px; border-radius:6px; vertical-align:middle;}
+.heist-subtag.alt{background:var(--panel2); color:var(--dim); border:1px solid var(--border);}
 .tbadge{
   font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px;
   white-space:nowrap; margin-top:2px; display:inline-block;
@@ -809,36 +812,223 @@ const ROADMAP_CATEGORIES = [
 
 const HEIST_DATA = {
   early: [
-    {id:'fleeca', name:'The Fleeca Job', year:'2015', crew:'2 players', req:'Rank 12 + High-End Apartment', note:'The tutorial heist — bank vault job in Los Santos. Short and easy.'},
-    {id:'prison', name:'The Prison Break', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Extract Prof. Rashkovsky from Bolingbroke Penitentiary. Widely considered the most tedious of the originals.'},
-    {id:'humane', name:'The Humane Labs Raid', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Steal an experimental nerve agent from a secure lab.'},
-    {id:'seriesa', name:'Series A Funding', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'Trevor Philips Industries debut — protect Trevor while sourcing product for a deal.'},
-    {id:'pacific', name:'The Pacific Standard Job', year:'2015', crew:'4 players', req:'Rank 12 + High-End Apartment', note:'The finale of the original 5 — rob the Pacific Standard Bank in Downtown Vinewood.'},
+    {"id": "fleeca", "name": "The Fleeca Job", "year": "2015", "crew": "2 players", "req": "Rank 12 + High-End Apartment", "note": "The tutorial heist — bank vault job in Los Santos. Short and easy.",
+      subs:[
+        {"id": "fl1", "label": "Setup: Scope Out"},
+        {"id": "fl2", "label": "Setup: Kuruma"},
+        {"id": "fl3", "label": "Finale: The Fleeca Job", "completes": true},
+      ]},
+    {"id": "prison", "name": "The Prison Break", "year": "2015", "crew": "4 players", "req": "Rank 12 + High-End Apartment", "note": "Extract Prof. Rashkovsky from Bolingbroke Penitentiary. Widely considered the most tedious of the originals.",
+      subs:[
+        {"id": "pb1", "label": "Setup: Plane"},
+        {"id": "pb2", "label": "Setup: Bus"},
+        {"id": "pb3", "label": "Setup: Station"},
+        {"id": "pb4", "label": "Setup: Wet Work"},
+        {"id": "pb5", "label": "Finale: The Prison Break", "completes": true},
+      ]},
+    {"id": "humane", "name": "The Humane Labs Raid", "year": "2015", "crew": "4 players", "req": "Rank 12 + High-End Apartment", "note": "Steal an experimental nerve agent from a secure lab.",
+      subs:[
+        {"id": "hl1", "label": "Setup: Key Codes"},
+        {"id": "hl2", "label": "Setup: Insurgents"},
+        {"id": "hl3", "label": "Setup: EMP"},
+        {"id": "hl4", "label": "Setup: Valkyrie"},
+        {"id": "hl5", "label": "Setup: Deliver EMP"},
+        {"id": "hl6", "label": "Finale: The Humane Labs Raid", "completes": true},
+      ]},
+    {"id": "seriesa", "name": "Series A Funding", "year": "2015", "crew": "4 players", "req": "Rank 12 + High-End Apartment", "note": "Trevor Philips Industries debut — protect Trevor while sourcing product for a deal.",
+      subs:[
+        {"id": "sa1", "label": "Setup: Coke"},
+        {"id": "sa2", "label": "Setup: Trash Truck"},
+        {"id": "sa3", "label": "Setup: Bikers"},
+        {"id": "sa4", "label": "Setup: Weed"},
+        {"id": "sa5", "label": "Setup: Steal Meth"},
+        {"id": "sa6", "label": "Finale: Series A Funding", "completes": true},
+      ]},
+    {"id": "pacific", "name": "The Pacific Standard Job", "year": "2015", "crew": "4 players", "req": "Rank 12 + High-End Apartment", "note": "The finale of the original 5 — rob the Pacific Standard Bank in Downtown Vinewood.",
+      subs:[
+        {"id": "ps1", "label": "Setup: Vans"},
+        {"id": "ps2", "label": "Setup: Signal"},
+        {"id": "ps3", "label": "Setup: Hack"},
+        {"id": "ps4", "label": "Setup: Convoy"},
+        {"id": "ps5", "label": "Setup: Bikes"},
+        {"id": "ps6", "label": "Finale: The Pacific Standard Job", "completes": true},
+      ]},
   ],
   mid: [
-    {id:'doomsday', name:'The Doomsday Heist', year:'2017', crew:'2-4 players', req:'Facility (from $1,250,000)', note:'Three acts, run in order the first time. Total payout up to $5.25M on Hard across all three.',
+    {"id": "doomsday", "name": "The Doomsday Heist", "year": "2017", "crew": "2-4 players", "req": "Facility (from $1,250,000)", "note": "Three acts, run in order the first time. Total payout up to $5.25M on Hard across all three.",
       subs:[
-        {id:'dd1', label:'Act 1: The Data Breaches'},
-        {id:'dd2', label:'Act 2: The Bogdan Problem'},
-        {id:'dd3', label:'Act 3: The Doomsday Scenario (highest-paying act)'},
+        {"id": "dh1", "header": "Act 1: The Data Breaches"},
+        {"id": "dd1_p1", "label": "Prep: Paramedic Equipment"},
+        {"id": "dd1_s1", "label": "Setup: Dead Courier"},
+        {"id": "dd1_p2", "label": "Prep: Deluxos"},
+        {"id": "dd1_s2", "label": "Setup: Signal Intercepts"},
+        {"id": "dd1_p3", "label": "Prep: Akula"},
+        {"id": "dd1_s3", "label": "Setup: Server Farm"},
+        {"id": "dd1", "label": "Finale: The Data Breaches"},
+        {"id": "dh2", "header": "Act 2: The Bogdan Problem"},
+        {"id": "dd2_p1", "label": "Prep: Keycards"},
+        {"id": "dd2_s1", "label": "Setup: Avenger"},
+        {"id": "dd2_p2", "label": "Prep: ULP Intel"},
+        {"id": "dd2_s2", "label": "Setup: Rescue ULP"},
+        {"id": "dd2_p3", "label": "Prep: Riot Control Van"},
+        {"id": "dd2_s3", "label": "Setup: Salvage Hard Drives"},
+        {"id": "dd2_p4", "label": "Prep: Strombergs"},
+        {"id": "dd2_s4", "label": "Setup: Submarine Recon"},
+        {"id": "dd2_p5", "label": "Prep: Torpedo ECU"},
+        {"id": "dd2", "label": "Finale: The Bogdan Problem"},
+        {"id": "dh3", "header": "Act 3: The Doomsday Scenario (highest-paying act)"},
+        {"id": "dd3_p1", "label": "Prep: Marked Cash"},
+        {"id": "dd3_p2", "label": "Prep: Recon"},
+        {"id": "dd3_s1", "label": "Setup: Rescue Agent 14"},
+        {"id": "dd3_p3", "label": "Prep: Chernobog"},
+        {"id": "dd3_s2", "label": "Setup: Escort ULP"},
+        {"id": "dd3_p4", "label": "Prep: Flight Path"},
+        {"id": "dd3_s3", "label": "Setup: Barrage"},
+        {"id": "dd3_p5", "label": "Prep: Test Site Intel"},
+        {"id": "dd3_s4", "label": "Setup: Khanjali"},
+        {"id": "dd3_p6", "label": "Prep: Onboard Computer"},
+        {"id": "dd3_s5", "label": "Setup: Air Defenses"},
+        {"id": "dd3", "label": "Finale: The Doomsday Scenario", "completes": true},
       ]},
-    {id:'casino', name:'The Diamond Casino Heist', year:'2019', crew:'2-4 players', req:'Arcade', note:'Up to ~$4.7M on a first weekly run (Diamond target). Payout is the same across approaches — vault contents decide the money, approach decides your risk profile.',
+    {"id": "casino", "name": "The Diamond Casino Heist", "year": "2019", "crew": "2-4 players", "req": "Arcade", "note": "Up to ~$4.7M on a first weekly run (Diamond target). Payout is the same across approaches — vault contents decide the money, approach decides your risk profile.",
       subs:[
-        {id:'cas1', label:'Approach: Silent & Sneaky (full stealth)'},
-        {id:'cas2', label:'Approach: Big Con (disguise-based)'},
-        {id:'cas3', label:'Approach: Aggressive (loud, guns blazing)'},
+        {"id": "ch1", "header": "Setup"},
+        {"id": "cas_equip", "label": "Arcade Equipment"},
+        {"id": "cas_scope", "label": "Casino Scoping"},
+        {"id": "ch2", "header": "General preps"},
+        {"id": "cas_vault", "label": "Vault Contents"},
+        {"id": "cas_weapons", "label": "Unmarked Weapons"},
+        {"id": "cas_getaway", "label": "Getaway Vehicles"},
+        {"id": "cas_hack", "label": "Hacking Device"},
+        {"id": "cas_keycards", "label": "Vault Keycards"},
+        {"id": "cas_routes", "label": "Guard Patrol Routes", "tag": "Optional"},
+        {"id": "cas_duggan", "label": "Duggan Shipments", "tag": "Optional"},
+        {"id": "cas_intel", "label": "Security Intel", "tag": "Optional"},
+        {"id": "cas_drills", "label": "Power Drills", "tag": "Optional"},
+        {"id": "cas_pass", "label": "Security Pass", "tag": "Optional"},
+        {"id": "cas_masks", "label": "Masks", "tag": "Optional"},
+        {"id": "ch3", "header": "Silent & Sneaky preps"},
+        {"id": "cas_nano", "label": "Nano Drones"},
+        {"id": "cas_laser", "label": "Vault Lasers"},
+        {"id": "cas_emp", "label": "EMP Device", "tag": "Optional"},
+        {"id": "cas_suits", "label": "Infiltration Suits", "tag": "Optional"},
+        {"id": "ch4", "header": "The Big Con preps"},
+        {"id": "cas_g6a", "label": "Gruppe Sechs Gear Part 1", "tag": "Pick one", "alt": true},
+        {"id": "cas_g6b", "label": "Gruppe Sechs Gear Part 2", "tag": "Pick one", "alt": true},
+        {"id": "cas_bug1", "label": "Bugstar Gear Part 1", "tag": "Pick one", "alt": true},
+        {"id": "cas_bug2", "label": "Bugstar Gear Part 2", "tag": "Pick one", "alt": true},
+        {"id": "cas_maint1", "label": "Maintenance Gear Part 1", "tag": "Pick one", "alt": true},
+        {"id": "cas_maint2", "label": "Maintenance Gear Part 2", "tag": "Pick one", "alt": true},
+        {"id": "cas_vdrills", "label": "Vault Drills"},
+        {"id": "cas_dead", "label": "Yung Ancestor: Dead Weight", "tag": "Optional"},
+        {"id": "cas_after", "label": "Yung Ancestor: After Party", "tag": "Optional"},
+        {"id": "cas_fire", "label": "Firefighter Gear", "tag": "Optional"},
+        {"id": "cas_noose", "label": "NOOSE Gear", "tag": "Optional"},
+        {"id": "ch5", "header": "Aggressive preps"},
+        {"id": "cas_thermal", "label": "Thermal Charges"},
+        {"id": "cas_explo", "label": "Vault Explosives"},
+        {"id": "cas_armor", "label": "Reinforced Armor", "tag": "Optional"},
+        {"id": "cas_tbm", "label": "Tunnel Boring Machine", "tag": "Optional"},
+        {"id": "ch6", "header": "Finale (one per approach)"},
+        {"id": "cas1", "label": "Finale: Silent & Sneaky", "completes": true},
+        {"id": "cas2", "label": "Finale: The Big Con", "completes": true},
+        {"id": "cas3", "label": "Finale: Aggressive", "completes": true},
       ]},
-    {id:'cayo', name:'The Cayo Perico Heist', year:'2020', crew:'Solo–4 players', req:'Kosatka', note:'The only heist fully soloable from setup to finale. ~$700K-$1M per solo run post-2026 payout adjustment.'},
-    {id:'contract', name:'The Contract / The Data Leaks', year:'2021', crew:'2-4 players', req:'Agency', note:'Dr. Dre and Franklin Clinton mission strand, culminating in The Data Leaks finale.'},
+    {"id": "cayo", "name": "The Cayo Perico Heist", "year": "2020", "crew": "Solo–4 players", "req": "Kosatka", "note": "The only heist fully soloable from setup to finale. ~$700K-$1M per solo run post-2026 payout adjustment.",
+      subs:[
+        {"id": "cy1", "header": "Intel"},
+        {"id": "cy_intel", "label": "Gather Intel"},
+        {"id": "cy2", "header": "Approach vehicle (pick one)"},
+        {"id": "cy_kosatka", "label": "Kosatka (sonar deflector)", "tag": "Pick one", "alt": true},
+        {"id": "cy_alkonost", "label": "Alkonost", "tag": "Pick one", "alt": true},
+        {"id": "cy_velum", "label": "Velum", "tag": "Pick one", "alt": true},
+        {"id": "cy_stealth", "label": "Stealth Helicopter", "tag": "Pick one", "alt": true},
+        {"id": "cy_boat", "label": "Patrol Boat", "tag": "Pick one", "alt": true},
+        {"id": "cy_longfin", "label": "Longfin", "tag": "Pick one", "alt": true},
+        {"id": "cy3", "header": "Equipment"},
+        {"id": "cy_demo", "label": "Demolition Charges", "tag": "As needed", "alt": true},
+        {"id": "cy_safe", "label": "Safe Code", "tag": "As needed", "alt": true},
+        {"id": "cy_plasma", "label": "Plasma Cutter", "tag": "As needed", "alt": true},
+        {"id": "cy_finger", "label": "Fingerprint Cloner", "tag": "As needed", "alt": true},
+        {"id": "cy_torch", "label": "Cutting Torch", "tag": "As needed", "alt": true},
+        {"id": "cy4", "header": "Weapons and disruption"},
+        {"id": "cy_weapons", "label": "Unmarked Weapons"},
+        {"id": "cy_dweap", "label": "Disrupt Weapons", "tag": "Optional"},
+        {"id": "cy_darmor", "label": "Disrupt Armor", "tag": "Optional"},
+        {"id": "cy_dair", "label": "Disrupt Air Support", "tag": "Optional"},
+        {"id": "cy5", "header": "Finale"},
+        {"id": "cy_finale", "label": "The Cayo Perico Heist", "completes": true},
+      ]},
+    {"id": "contract", "name": "The Contract / The Data Leaks", "year": "2021", "crew": "2-4 players", "req": "Agency", "note": "Dr. Dre and Franklin Clinton mission strand, culminating in The Data Leaks finale.",
+      subs:[
+        {"id": "ct_course", "label": "On Course"},
+        {"id": "ct_recovery", "label": "Setup: Data Recovery"},
+        {"id": "ct1", "header": "Nightlife Leak"},
+        {"id": "ct_nl1", "label": "Investigation: The Nightclub"},
+        {"id": "ct_nl2", "label": "Investigation: The Marina"},
+        {"id": "ct_nl3", "label": "Finale: Nightlife Leak"},
+        {"id": "ct2", "header": "High Society Leak"},
+        {"id": "ct_hs1", "label": "Investigation: The Country Club"},
+        {"id": "ct_hs2", "label": "Investigation: Guest List"},
+        {"id": "ct_hs3", "label": "Finale: High Society Leak"},
+        {"id": "ct3", "header": "South Central Leak"},
+        {"id": "ct_sc1", "label": "Investigation: Davis"},
+        {"id": "ct_sc2", "label": "Investigation: The Ballas"},
+        {"id": "ct_sc3", "label": "Finale: South Central Leak"},
+        {"id": "ct4", "header": "Final missions"},
+        {"id": "ct_studio", "label": "Studio Time"},
+        {"id": "ct_dre", "label": "Don't F*** With Dre", "completes": true},
+      ]},
   ],
   late: [
-    {id:'cluckin', name:"Cluckin' Bell Farm Raid", year:'2024', crew:'Solo-friendly', req:'No property required — genuinely free to access', note:'$400K solo, $600K on first completion of the week. Good beginner-friendly heist since it needs no property investment at all.'},
-    {id:'kortz', name:'The Kortz Center Heist', year:'2026', crew:'2-4 players', req:'Mansion + Art Studio add-on', note:"Rockstar's newest heist and widely considered the last major one before GTA Online's focus shifts to GTA 6. Art-theft heist in Pacific Bluffs."},
+    {"id": "cluckin", "name": "Cluckin' Bell Farm Raid", "year": "2024", "crew": "Solo-friendly", "req": "No property required — genuinely free to access", "note": "$400K solo, $600K on first completion of the week. Good beginner-friendly heist since it needs no property investment at all.",
+      subs:[
+        {"id": "cb1", "label": "Setup: Slush Fund"},
+        {"id": "cb2", "label": "Setup: Breaking and Entering"},
+        {"id": "cb3", "label": "Prep: Concealed Weapons"},
+        {"id": "cb4", "label": "Prep: Hit and Run"},
+        {"id": "cb5", "label": "Disruption: Disorganized Crime", "tag": "Optional"},
+        {"id": "cb6", "label": "Finale: Scene of the Crime", "completes": true},
+      ]},
+    {"id": "kortz", "name": "The Kortz Center Heist", "year": "2026", "crew": "2-4 players", "req": "Mansion + Art Studio add-on", "note": "Rockstar's newest heist and widely considered the last major one before GTA Online's focus shifts to GTA 6. Art-theft heist in Pacific Bluffs.",
+      subs:[
+        {"id": "kz_scope", "label": "Scope Out Kortz Center"},
+        {"id": "kz1", "header": "Mandatory preps"},
+        {"id": "kz_infil", "label": "Infiltration Gear (Staff Key Card, Tactical Equipment, Alpha Mail Disguise or Hazmat Suit)", "tag": "Pick one", "alt": true},
+        {"id": "kz_weapons", "label": "Unmarked Weapons", "tag": "Pick one", "alt": true},
+        {"id": "kz_access", "label": "Access Code"},
+        {"id": "kz_hack", "label": "Hacking Device"},
+        {"id": "kz_getaway", "label": "Getaway Vehicle (Annihilator Stealth, Manchez Bikes or Armored Caracara)", "tag": "Pick one", "alt": true},
+        {"id": "kz2", "header": "Optional preps"},
+        {"id": "kz_ship", "label": "Guard Shipments", "tag": "Optional"},
+        {"id": "kz_routes", "label": "Guard Routes", "tag": "Optional"},
+        {"id": "kz_glass", "label": "Glass Cutter", "tag": "Optional"},
+        {"id": "kz_drills", "label": "Power Drills", "tag": "Optional"},
+        {"id": "kz_emp", "label": "EMP Charges", "tag": "Optional"},
+        {"id": "kz3", "header": "Finale"},
+        {"id": "kz_finale", "label": "The Kortz Center Heist", "completes": true},
+      ]},
   ],
   other: [
-    {id:'knoway', name:'KnoWay Out', year:'2026', crew:'Contact Mission', note:'Included in the current weekly completion bonus rotation alongside the full Heists.'},
-    {id:'oscar', name:'Oscar Guzman Flies Again', year:'2026', crew:'Contact Mission', note:'Also part of the current weekly bonus rotation — a notable standalone job even though it is not a full multi-setup Heist.'},
-  ]
+    {"id": "knoway", "name": "KnoWay Out", "year": "2026", "crew": "Contact Mission", "note": "Included in the current weekly completion bonus rotation alongside the full Heists.",
+      subs:[
+        {"id": "kw1", "label": "Negative Press"},
+        {"id": "kw2", "label": "Inside Job"},
+        {"id": "kw3", "label": "Tunnel Vision"},
+        {"id": "kw4", "label": "Trash Talking"},
+        {"id": "kw5", "label": "A Clean Break"},
+        {"id": "kw6", "label": "Home Sweet Home", "completes": true},
+      ]},
+    {"id": "oscar", "name": "Oscar Guzman Flies Again", "year": "2026", "crew": "Contact Mission", "note": "Also part of the current weekly bonus rotation — a notable standalone job even though it is not a full multi-setup Heist.",
+      subs:[
+        {"id": "oz1", "label": "Intro: Up and Running"},
+        {"id": "oz2", "label": "Setup: Mogul"},
+        {"id": "oz3", "label": "Setup: Intel"},
+        {"id": "oz4", "label": "Setup: Iron Mule"},
+        {"id": "oz5", "label": "Setup: Ammunition"},
+        {"id": "oz6", "label": "Finale: The Titan Job", "completes": true},
+      ]},
+  ],
 };
 const HEIST_ERAS = [
   { key: 'early', label: 'Early Game — Rank 12, High-End Apartment (2015 "Heists" update)', color: '#7bc142' },
@@ -968,6 +1158,7 @@ function performUndo(){
     if (tab === 'today' && lastAction.previousKeys) { Object.keys(lastAction.previousKeys).forEach(k => { data.today[k] = lastAction.previousKeys[k]; }); queueSave(); renderToday(); }
     else if (tab === 'today') { data.today[id] = previousValue; queueSave(); renderToday(); }
     else if (tab === 'roadmap') { data.roadmap[id] = previousValue; queueSave(); renderRoadmap(); }
+    else if (lastAction.previousKeys) { Object.keys(lastAction.previousKeys).forEach(k => { heistState[k] = lastAction.previousKeys[k]; }); queueSaveHeists(); renderHeists(); }
     else { heistState[id] = previousValue; queueSaveHeists(); renderHeists(); }
   }
   lastAction = null;
@@ -1477,6 +1668,26 @@ function initRoadmapSortables(){
   });
 }
 
+// One-time: heists/acts you had already ticked off keep their new mission subtasks ticked.
+// Only fully linear heists are migrated (every mission was required). Choice-based ones (Casino, Cayo, Kortz)
+// are left alone, because there is no way to know which prep you picked.
+function migrateHeistMissions(){
+  if (heistState._missionMig) return;
+  const linear = ['fleeca','prison','humane','seriesa','pacific','contract','cluckin','knoway','oscar'];
+  HEIST_ERAS.forEach(era => HEIST_DATA[era.key].forEach(h => {
+    if (linear.includes(h.id) && heistState[h.id]) {
+      h.subs.filter(x => !x.header && x.tag !== 'Optional').forEach(x => { heistState[x.id] = true; });
+    }
+    if (h.id === 'doomsday') {
+      ['dd1','dd2','dd3'].forEach(act => {
+        if (heistState[act]) h.subs.filter(x => !x.header && x.id.indexOf(act + '_') === 0).forEach(x => { heistState[x.id] = true; });
+      });
+    }
+  }));
+  heistState._missionMig = 1;
+  queueSaveHeists();
+}
+
 function ensureHeistOrder(){
   if (!heistState._collapsed) heistState._collapsed = {};
   if (!heistState._open) heistState._open = {};
@@ -1485,6 +1696,7 @@ function ensureHeistOrder(){
   if (!heistState._deleted) heistState._deleted = [];
   if (!heistState._eraOrder) heistState._eraOrder = HEIST_ERAS.map(e => e.key);
   HEIST_ERAS.forEach(e => { if (!heistState._eraOrder.includes(e.key)) heistState._eraOrder.push(e.key); });
+  migrateHeistMissions();
   if (!heistState._itemOrder) heistState._itemOrder = {};
   HEIST_ERAS.forEach(era => {
     const known = HEIST_DATA[era.key].map(h => h.id);
@@ -1502,7 +1714,6 @@ function renderHeists(){
     HEIST_DATA[era.key].forEach(h => {
       if (heistState._deleted.includes(h.id)) return;
       total++; if (heistState[h.id]) done++;
-      if (h.subs) h.subs.forEach(s => { total++; if (heistState[s.id]) done++; });
     });
   });
   document.getElementById('heistProgtext').textContent = done + ' / ' + total;
@@ -1534,12 +1745,15 @@ function renderHeists(){
           const edit = heistState._edits[h.id] || {};
           const displayName = edit.name !== undefined ? edit.name : h.name;
           const displayNote = edit.note !== undefined ? edit.note : h.note;
+          const subItems = h.subs ? h.subs.filter(s => !s.header) : [];
+          const subDoneCount = subItems.filter(s => heistState[s.id]).length;
           const subsHtml = h.subs ? h.subs.map(s => {
+            if (s.header) return `<div class="heist-subhead">${esc(s.header)}</div>`;
             const sDone = !!heistState[s.id];
             const subCheckStyle = sDone ? `style="width:17px;height:17px;background:${era.color};border-color:${era.color};"` : `style="width:17px;height:17px;"`;
             return `<div class="task" data-subid="${s.id}" style="background:transparent;border:none;padding:6px 0 6px 34px;margin-bottom:0;">
               <div class="check ${sDone?'on':''}" ${subCheckStyle}><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
-              <div class="tinfo"><span class="tname ${sDone?'done':''}" style="font-size:12.5px;">${esc(s.label)}</span></div>
+              <div class="tinfo"><span class="tname ${sDone?'done':''}" style="font-size:12.5px;">${esc(s.label)}</span>${s.tag ? `<span class="heist-subtag ${s.alt ? 'alt' : ''}">${esc(s.tag)}</span>` : ''}</div>
             </div>`;
           }).join('') : '';
           const heistCheckStyle = isDone ? `style="background:${era.color};border-color:${era.color};"` : '';
@@ -1576,7 +1790,7 @@ function renderHeists(){
                   <span class="tprice" style="color:${era.color};">${esc(h.year)}</span>
                 </div>
                 <div class="tnote">${esc(h.crew)} · ${esc(h.req)}<br>${esc(displayNote)}</div>
-                ${h.subs ? `<span class="tbadge opt" data-heistexpand="${h.id}">${isOpen ? 'Tap to collapse Acts/Approaches' : 'Tap to show Acts/Approaches'}</span>` : ''}
+                ${h.subs ? `<span class="tbadge opt" data-heistexpand="${h.id}">${isOpen ? 'Tap to hide missions' : 'Tap to show missions'} (${subDoneCount}/${subItems.length})</span>` : ''}
               </div>
             </div>
             <div class="task-actions-edit" data-heistedit="${h.id}">&#9998;</div>
@@ -1844,7 +2058,17 @@ document.addEventListener('click', (e) => {
   const subEl = e.target.closest('[data-subid]');
   if (subEl) {
     const id = subEl.dataset.subid;
+    let parentHeist = null;
+    HEIST_ERAS.forEach(er => HEIST_DATA[er.key].forEach(hh => { if (hh.subs && hh.subs.some(x => x.id === id)) parentHeist = hh; }));
+    const previousKeys = { [id]: !!heistState[id] };
+    if (parentHeist) previousKeys[parentHeist.id] = !!heistState[parentHeist.id];
     heistState[id] = !heistState[id];
+    // The heist counts as done once any of its finale missions is done, and un-done when none are
+    if (parentHeist) {
+      const finales = parentHeist.subs.filter(x => x.completes);
+      if (finales.length) heistState[parentHeist.id] = finales.some(x => heistState[x.id]);
+    }
+    lastAction = { type: 'toggle', tab: 'heist', id: parentHeist ? parentHeist.id : id, previousKeys };
     queueSaveHeists();
     renderHeists();
     return;
