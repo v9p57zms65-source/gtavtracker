@@ -706,10 +706,17 @@ initTheme();
 
 // ---------- TASK DEFINITIONS ----------
 const SECTIONS = [
+  { id: 'biker', label: 'MC Businesses', color: '#e07b39', tasks: [
+    { id: 'bunker', name: 'Bunker', note: 'Buy supplies / check stock, sell. Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.', tint: '#9aa84a' },
+    { id: 'acid_all', name: 'Acid Lab', note: 'Boost, buy supplies, sell stock. Boost once/day at the chemistry table (resets 6am GMT). Sell is always a single delivery vehicle.', tint: '#c4e538' },
+    { id: 'coke', name: 'Cocaine Lockup', note: 'Source & sell. Sell at 5 stacks or fewer for guaranteed 1 vehicle.', tint: '#dcd7c9', optional: true },
+    { id: 'meth', name: 'Meth Lab', note: 'Source & sell. Sell at 10 bins or fewer to stay capped at 2 vehicles.', tint: '#5ec4ff', optional: true },
+    { id: 'weed', name: 'Weed Farm', note: 'Source & sell. Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.', tint: '#2fa84f', optional: true },
+    { id: 'counterfeit', name: 'Counterfeit Cash', note: 'Source & sell. Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.', tint: '#b7c96b', optional: true },
+    { id: 'docforge', name: 'Document Forgery', note: 'Source & sell. Weakest earner of the 5 — low priority.', tint: '#d8b27a', optional: true },
+  ]},
   { id: 'ceo', label: 'CEO Businesses', color: '#6c7bff', tasks: [
     { id: 'mansion_boost', name: 'Production Boost', note: "Set today's boost. Pick one business for x3 speed, 24h, from the wall terminal.", tint: '#f0c14b', optional: true },
-    { id: 'bunker', name: 'Bunker', note: 'Buy supplies / check stock, sell. Sell at ~50% (50 units) for max 2 vehicles. Sell to Los Santos.', tint: '#f0c14b' },
-    { id: 'acid_all', name: 'Acid Lab', note: 'Boost, buy supplies, sell stock. Boost once/day at the chemistry table (resets 6am GMT). Sell is always a single delivery vehicle.', tint: '#c4e538' },
     { id: 'nc_main', name: 'Nightclub', note: 'Collect safe, check technicians, sell if worth it, promote if slipping. Safe pays up to $50K/day at 95-100% popularity. Prioritize Cocaine/Meth/Bunker/Counterfeit techs, skip Weed & Doc Forgery. Promote if popularity drops below 90%.', tint: '#ff3dd8' },
     { id: 'agency_main', name: 'Agency', note: 'Collect safe, run a Security Contract. Safe pays up to $20,000/day, caps at $250,000. Contract tiers are randomly rolled - just run the best of the 3 shown. Also check for a Payphone Hit (doubles to $85K).', tint: '#ff3d7f' },
     { id: 'special_cargo', name: 'Special Cargo', note: 'Buy x3 crates or dispatch Lupe. Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
@@ -747,11 +754,6 @@ const SECTIONS = [
     { id: 'check_weekly_bonus', name: 'Check Weekly Bonus', note: "Ask Claude to check this week's Rockstar bonus challenges. I can't check automatically on my own schedule - this is a reminder to ask me, and I'll research current bonuses and update this category.", recurring: true },
   ]},
   { id: 'optional', label: 'Optional', color: '#f4f4f5', tasks: [
-    { id: 'coke', name: 'Cocaine Lockup', note: 'Source & sell. Sell at 5 stacks or fewer for guaranteed 1 vehicle.', optional: true },
-    { id: 'meth', name: 'Meth Lab', note: 'Source & sell. Sell at 10 bins or fewer to stay capped at 2 vehicles.', optional: true },
-    { id: 'weed', name: 'Weed Farm', note: 'Source & sell. Boosted +35% if Smoke on the Water is owned. Lowest priority otherwise.', optional: true },
-    { id: 'counterfeit', name: 'Counterfeit Cash', note: 'Source & sell. Boosted +35% if Hands On Car Wash is owned. 10 stacks or fewer = 1 vehicle.', optional: true },
-    { id: 'docforge', name: 'Document Forgery', note: 'Source & sell. Weakest earner of the 5 — low priority.', optional: true },
     { id: 'stash_house_v2', name: 'Stash House', note: 'Raid it. 25 possible spots (purple house icon). Clear NPCs, find the sticky-note code, crack the safe — refills one business 100% + cash. Resets 9am GMT.', optional: true },
     { id: 'street_dealer_v2', name: 'Street Dealers', note: 'Sell all drug stock. Coke/Meth/Weed/Acid only (not Counterfeit or Doc Forgery). Only the day\'s premium drug pays well.', optional: true },
   ]},
@@ -1099,6 +1101,7 @@ function ensureOrder(){
   // sectionOrder", since that check never fires for a completely fresh state (sectionOrder gets
   // fully populated in one step above, not incrementally).
   if (!data.optionalOpenV2) { data.collapsed['optional'] = false; data.optionalOpenV2 = true; }
+  if (!data.mcSectionV1) { data.collapsed['biker'] = false; if (data.taskOrder) delete data.taskOrder['biker']; data.mcSectionV1 = true; }
   SECTIONS.forEach(sec => {
     if (!data.taskOrder[sec.id]) data.taskOrder[sec.id] = sec.tasks.map(t => t.id);
     const known = sec.tasks.map(t => t.id);
