@@ -755,8 +755,16 @@ const SECTIONS = [
       { id: 'finale', name: 'Heist Finale' },
     ] },
     { id: 'survival_oct22', name: 'Survival Waves', note: "This week only (Oct 22-28 2026), the Weekly Challenge: complete all waves of a Survival for the Gray Interloper Outfit and $150,000. Week 4 of 5 toward the $2,000,000 bonus for all five challenges by Nov 4. Halloween Survivals (Ludendorff Cemetery, Cayo Perico, Alien) pay 3x this week, so those are the ones to run. Stays checked once done, gets replaced with next week's challenge (10 waves without dying)." },
-    { id: 'short_trips_oct22', name: 'Short Trips x3', note: "This week only (ends Oct 28 2026): complete all three Short Trips (Seed Capital, Fire It Up, OG Kush) for $500,000 paid within 72 hours. Needs exactly one partner, since you play Franklin and they play Lamar, so solo won't work. Start from Pause > Online > Jobs > Play Job > Rockstar Created > Missions. Stays checked once done, gets replaced with next week's bonus." },
-    { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 - fresh set each week. This week (Oct 22-28): Duggan Robbery (Ocelot Virtue, top tier), plus Albany Fränken Stange and Vapid Caracara. Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true },
+    { id: 'short_trips_oct22', name: 'Short Trips x3', note: "This week only (ends Oct 28 2026): complete all three Short Trips (Seed Capital, Fire It Up, OG Kush) for $500,000 paid within 72 hours. Needs exactly one partner, since you play Franklin and they play Lamar, so solo won't work. Start from Pause > Online > Jobs > Play Job > Rockstar Created > Missions. Stays checked once done, gets replaced with next week's bonus.", subs: [
+      { id: 'seed', name: 'Seed Capital' },
+      { id: 'fire', name: 'Fire It Up' },
+      { id: 'og', name: 'OG Kush' },
+    ] },
+    { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 - fresh set each week. This week (Oct 22-28): Duggan Robbery (Ocelot Virtue, top tier), Cargo Ship Robbery (Albany Fränken Stange) and McTony Robbery (Vapid Caracara 4x4). Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true, subs: [
+      { id: 'duggan', name: 'Duggan: Ocelot Virtue' },
+      { id: 'cargo', name: 'Cargo Ship: Fränken Stange' },
+      { id: 'mctony', name: 'McTony: Caracara 4x4' },
+    ] },
     { id: 'safe_collection', name: 'Collect Safes', note: 'Weekly sweep of the four business safes. Check each one off as you collect it. Salvage Yard safe caps at $250K, Bail Office at $100K.', recurring: true, subs: [
       { id: 'garment', name: 'Garment Factory' },
       { id: 'arcade', name: 'Arcade' },
@@ -1366,6 +1374,15 @@ function renderToday(){
   if (!data.taskEdits) data.taskEdits = {};
   if (!data.deletedTasks) data.deletedTasks = [];
   if (!data.subOpen) data.subOpen = {};
+  // One-time: Short Trips and Salvage Robberies gained subtasks. If you had already ticked either one, keep it done.
+  if (!data.subMigV2) {
+    SECTIONS.forEach(sc => sc.tasks.forEach(t => {
+      if (['short_trips_oct22', 'salvage_robberies'].includes(t.id) && t.subs && data.today[t.id] && t.subs.every(sb => !data.today[t.id + ':' + sb.id])) {
+        t.subs.forEach(sb => { data.today[t.id + ':' + sb.id] = true; });
+      }
+    }));
+    data.subMigV2 = true;
+  }
   // A task with subtasks is done exactly when all of its subtasks are done
   SECTIONS.forEach(sc => sc.tasks.forEach(t => { if (t.subs) data.today[t.id] = t.subs.every(sb => data.today[t.id + ':' + sb.id]); }));
   const container = document.getElementById('todayList');
