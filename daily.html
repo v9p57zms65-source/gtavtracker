@@ -446,6 +446,17 @@ textarea.nt-input{resize:none;}
 .subtask.done{opacity:.55;}
 .subtask.done .subname{text-decoration:line-through;}
 .subtask.done .subcheck svg{opacity:1;}
+.chal-card{margin:0 0 14px; padding:14px; border-radius:16px; background:var(--panel); border:1px solid var(--border);}
+.chal-title{font-size:15px; font-weight:800; margin-bottom:4px;}
+.chal-sub{font-size:12px; color:var(--dim); line-height:1.45; margin-bottom:8px;}
+.chal-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--border);}
+.chal-name{font-size:13.5px; font-weight:700;}
+.chal-dates{font-size:11.5px; color:var(--dim);}
+.chal-status{font-size:12px; font-weight:800; text-align:right; flex:none;}
+.chal-status.ok{color:#7bc142;}
+.chal-status.missing{color:#e0473f;}
+.chal-status.pending{color:#f0c14b;}
+.chal-status.later{color:var(--dim);}
 .heist-subhead{padding:10px 0 3px 34px; font-size:10.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--dim);}
 .heist-subtag{display:inline-block; margin-left:8px; font-size:9.5px; font-weight:900; letter-spacing:.2px; color:#2a1a03; background:#ffb84d; padding:1px 6px; border-radius:6px; vertical-align:middle;}
 .heist-subtag.alt{background:var(--panel2); color:var(--dim); border:1px solid var(--border);}
@@ -1507,14 +1518,42 @@ function initSortables(){
   });
 }
 
+// The five Halloween Weekly Challenges that count toward the $2,000,000 bonus (all five by Nov 4).
+// Each week's tracker task is checked off in the app, and every day's ticks are archived in History,
+// so this can look back and show which weeks were ticked even after the task was swapped out.
+const HALLOWEEN_CHALLENGES = [
+  { week: 1, label: 'Bail Bounties x2', dates: 'Oct 1-7', id: 'bail_bounties_oct1' },
+  { week: 2, label: 'Adversary Modes x2', dates: 'Oct 8-14', id: 'adversary_x2_oct8' },
+  { week: 3, label: 'Win 3 Races', dates: 'Oct 15-21', id: 'races_x3_oct15' },
+  { week: 4, label: 'Survival Waves', dates: 'Oct 22-28', id: 'survival_oct22' },
+  { week: 5, label: '10 Survival waves without dying', dates: 'Oct 29-Nov 4', id: null },
+];
+function challengeStatus(c){
+  if (!c.id) return { cls: 'later', text: 'Starts Oct 29' };
+  if (data.today && data.today[c.id]) return { cls: 'ok', text: 'Ticked this week' };
+  const hit = Object.keys(data.history || {}).sort().find(d => data.history[d] && data.history[d].checks && data.history[d].checks[c.id]);
+  if (hit) return { cls: 'ok', text: 'Ticked on ' + prettyDate(hit) };
+  const now = new Date();
+  const started = c.week <= 4;
+  return { cls: c.week === 4 ? 'pending' : 'missing', text: c.week === 4 ? 'Not ticked yet' : 'Never ticked in the app' };
+}
+function challengeCardHtml(){
+  const rows = HALLOWEEN_CHALLENGES.map(c => {
+    const st = challengeStatus(c);
+    return `<div class="chal-row"><div><div class="chal-name">Week ${c.week}: ${esc(c.label)}</div><div class="chal-dates">${esc(c.dates)}</div></div><div class="chal-status ${st.cls}">${esc(st.text)}</div></div>`;
+  }).join('');
+  const done = HALLOWEEN_CHALLENGES.filter(c => c.id && challengeStatus(c).cls === 'ok').length;
+  return `<div class="chal-card"><div class="chal-title">Halloween $2M bonus: weekly challenges</div><div class="chal-sub">${done} of 5 ticked in this app. All five by Nov 4 pay GTA$2,000,000. "Never ticked" only means you didn't tick it here, not that you didn't finish it in game.</div>${rows}</div>`;
+}
+
 function renderHistory(){
   const container = document.getElementById('historyList');
   const dates = Object.keys(data.history).sort().reverse();
   if (!dates.length){
-    container.innerHTML = '<div class="hist-empty">No history yet — complete some tasks today, and once a new day rolls over it\'ll show up here.</div>';
+    container.innerHTML = challengeCardHtml() + '<div class="hist-empty">No history yet — complete some tasks today, and once a new day rolls over it\'ll show up here.</div>';
     return;
   }
-  container.innerHTML = dates.map(d => {
+  container.innerHTML = challengeCardHtml() + dates.map(d => {
     const h = data.history[d];
     const pct = h.total ? Math.round((h.done/h.total)*100) : 0;
     const color = pct >= 80 ? '#7bc142' : pct >= 40 ? '#f0c14b' : '#e0473f';
