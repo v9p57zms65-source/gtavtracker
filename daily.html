@@ -734,13 +734,13 @@ const SECTIONS = [
     { id: 'special_cargo', name: 'Special Cargo', note: 'Buy x3 crates or dispatch Lupe. Sell in Invite Only unless chasing High Demand bonus.', tint: '#ff8a3d' },
     { id: 'vehicle_cargo', name: 'Vehicle Cargo', note: 'Source a car. No passive option — must steal personally. Keep a mixed-value stock.', tint: '#ff8a3d' },
     { id: 'hangar_cargo', name: 'Air Freight Cargo', note: 'Dispatch Rooster McCraw. $25,000/dispatch, 1-2 random-type crates in ~48 min.', tint: '#ff8a3d', optional: true },
-    { id: 'bail_most_wanted', name: 'Bail Most Wanted', note: "Once per day, the top Bail Office target and its biggest single payout. Deliver alive for roughly $120-130K base, and Standard and Most Wanted targets pay 2x GTA$ and RP all October 2026, so about double right now. Failing uses up the day's attempt, so bring armor.", tint: '#9c3d5e' },
+    { id: 'bail_most_wanted', name: 'Bail Most Wanted', note: "Once per day, the top Bail Office target and its biggest single payout. Deliver alive for roughly $120-130K base, and Standard and Most Wanted targets pay 2x GTA$ and RP through Nov 4 2026, so about double right now. Failing uses up the day's attempt, so bring armor.", tint: '#9c3d5e' },
     { id: 'autoshop_contract', name: 'Auto Shop', note: 'Customize 2 cars, staff deliver both. Personal delivery averages $25-30K/car, staff is lower (cut + damage risk) but zero effort.', tint: '#3d9bdc' },
     { id: 'mf_carwash', name: 'Car Wash', note: 'Collect safe, check Heat level. Legal job if Heat is high, illegal ($35K) if not. All 3 laundering fronts pay out here.', tint: '#5ec9c4' },
     { id: 'mf_others', name: 'Other Laundering Fronts', note: 'Check Smoke on the Water + Higgins Helitours Heat, run a job. Each tracks Heat independently - no separate safe, pays out at the Car Wash.', tint: '#5ec9c4', optional: true },
   ]},
   { id: 'weekly', label: 'Weekly Tasks', color: '#e0473f', tasks: [
-    { id: 'kortz_heist', name: 'Kortz Center Heist', note: 'Primary targets this week (Oct 22-28): Stacks Study V, Trust, Brother Brother. The first-completion bonus resets today, and finishing without dying pays an extra $400K.\n\nResets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting), higher split across a full crew who unlock the co-op loot room. Any repeat that same week collapses to ~$300K - only worth doing once weekly.\n\nCrew-of-randos setup (handles both stealth and loud equally well, since randoms can\'t be relied on to stay quiet):\n- Entry: Staff Entrance (via Staff Key Card) - the reliable all-purpose pick, versatile for either approach\n- Infiltration Gear: Staff Key Card\n- Unmarked Weapons: Security Loadout - suppressed guns, Heavy Shotgun and a Stun Gun, and a much easier prep than the Military one (no Fort Zancudo, no 3-star wanted level)\n- Getaway Vehicle: Armored Caracara\n- Equipment: Access Code + Hacking Device (both mandatory, no choice)\n- Optional preps: do all 5 with a crew - they pay for themselves with more people to use the extra capacity and weakened guards\n- Scope everything BEFORE Thursday - scoping doesn\'t touch the weekly reset, only re-check secondary targets right before the finale since those can shift between runs', recurring: true, subs: [
+    { id: 'kortz_heist', name: 'Kortz Center Heist', note: 'Primary targets this week (Oct 29-Nov 4): I, Fruit, Until Death, Gone To Seed. The first-completion bonus resets today, and finishing without dying pays an extra $400K.\n\nResets Thursday. First run of the week: ~$2.0-2.25M solo (varies by target painting), higher split across a full crew who unlock the co-op loot room. Any repeat that same week collapses to ~$300K - only worth doing once weekly.\n\nCrew-of-randos setup (handles both stealth and loud equally well, since randoms can\'t be relied on to stay quiet):\n- Entry: Staff Entrance (via Staff Key Card) - the reliable all-purpose pick, versatile for either approach\n- Infiltration Gear: Staff Key Card\n- Unmarked Weapons: Security Loadout - suppressed guns, Heavy Shotgun and a Stun Gun, and a much easier prep than the Military one (no Fort Zancudo, no 3-star wanted level)\n- Getaway Vehicle: Armored Caracara\n- Equipment: Access Code + Hacking Device (both mandatory, no choice)\n- Optional preps: do all 5 with a crew - they pay for themselves with more people to use the extra capacity and weakened guards\n- Scope everything BEFORE Thursday - scoping doesn\'t touch the weekly reset, only re-check secondary targets right before the finale since those can shift between runs', recurring: true, subs: [
       { id: 'scope', name: 'Scope Out' },
       { id: 'keycard', name: 'Staff Key Card' },
       { id: 'security', name: 'Security Loadout' },
@@ -754,16 +754,11 @@ const SECTIONS = [
       { id: 'emp', name: 'EMP Charges', tag: 'Optional' },
       { id: 'finale', name: 'Heist Finale' },
     ] },
-    { id: 'survival_oct22', name: 'Survival Waves', note: "This week only (Oct 22-28 2026), the Weekly Challenge: complete all waves of a Survival for the Gray Interloper Outfit and $150,000. Week 4 of 5 toward the $2,000,000 bonus for all five challenges by Nov 4. Halloween Survivals (Ludendorff Cemetery, Cayo Perico, Alien) pay 3x this week, so those are the ones to run. Stays checked once done, gets replaced with next week's challenge (10 waves without dying)." },
-    { id: 'short_trips_oct22', name: 'Short Trips x3', note: "This week only (ends Oct 28 2026): complete all three Short Trips (Seed Capital, Fire It Up, OG Kush) for $500,000 paid within 72 hours. Needs exactly one partner, since you play Franklin and they play Lamar, so solo won't work. Start from Pause > Online > Jobs > Play Job > Rockstar Created > Missions. Stays checked once done, gets replaced with next week's bonus.", subs: [
-      { id: 'seed', name: 'Seed Capital' },
-      { id: 'fire', name: 'Fire It Up' },
-      { id: 'og', name: 'OG Kush' },
-    ] },
-    { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 - fresh set each week. This week (Oct 22-28): Duggan Robbery (Ocelot Virtue, top tier), Cargo Ship Robbery (Albany Fränken Stange) and McTony Robbery (Vapid Caracara 4x4). Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true, subs: [
-      { id: 'duggan', name: 'Duggan: Ocelot Virtue' },
-      { id: 'cargo', name: 'Cargo Ship: Fränken Stange' },
-      { id: 'mctony', name: 'McTony: Caracara 4x4' },
+    { id: 'survival10_oct29', name: '10 Survival Waves', note: "This week only (Oct 29-Nov 4 2026), the final Weekly Challenge: complete 10 waves of a Survival without dying for the Slasher Clown Outfit and $250,000. Week 5 of 5. Finishing all five Halloween weekly challenges by Nov 4 pays the $2,000,000 bonus within 72 hours, so check the History tab to see which weeks you ticked. Stays checked once done, gets replaced next week." },
+    { id: 'salvage_robberies', name: 'Salvage Robberies', note: 'Complete all 3 - fresh set each week. This week (Oct 29-Nov 4): the Gangbanger Robbery (Lampadati Cinquemila), the Podium Robbery (Karin Boor) and the Duggan Robbery (Albany Fränken Stange). Sell stolen vehicles to Yusuf Amir (more profitable than scrapping) for close to $1M combined.', recurring: true, subs: [
+      { id: 'gangbanger', name: 'Gangbanger: Cinquemila' },
+      { id: 'podium', name: 'Podium: Boor' },
+      { id: 'duggan', name: 'Duggan: Fränken Stange' },
     ] },
     { id: 'safe_collection', name: 'Collect Safes', note: 'Weekly sweep of the four business safes. Check each one off as you collect it. Salvage Yard safe caps at $250K, Bail Office at $100K.', recurring: true, subs: [
       { id: 'garment', name: 'Garment Factory' },
@@ -1543,7 +1538,7 @@ const HALLOWEEN_CHALLENGES = [
   { week: 2, label: 'Adversary Modes x2', dates: 'Oct 8-14', id: 'adversary_x2_oct8' },
   { week: 3, label: 'Win 3 Races', dates: 'Oct 15-21', id: 'races_x3_oct15' },
   { week: 4, label: 'Survival Waves', dates: 'Oct 22-28', id: 'survival_oct22' },
-  { week: 5, label: '10 Survival waves without dying', dates: 'Oct 29-Nov 4', id: null },
+  { week: 5, label: '10 Survival waves without dying', dates: 'Oct 29-Nov 4', id: 'survival10_oct29' },
 ];
 function challengeStatus(c){
   if (!c.id) return { cls: 'later', text: 'Starts Oct 29' };
@@ -1904,6 +1899,8 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     tabEl.classList.add('active');
     document.getElementById('view-' + tabEl.dataset.view).classList.add('active');
+    // History is derived from what you've ticked, so refresh it whenever you open it
+    if (tabEl.dataset.view === 'history') renderHistory();
     return;
   }
   // don't toggle collapse/task when clicking a drag handle itself
